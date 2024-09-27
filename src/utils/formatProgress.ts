@@ -8,7 +8,7 @@ interface FormatProgressOptions {
 export function formatProgress(
   value: number,
   {
-    length = 12,
+    length = 15,
     vmin = 0,
     vmax = 1,
     progressive = false,
