@@ -1,0 +1,33 @@
+# VS Code settings
+.vscode
+
+# OSX
+.DS_Store
+
+# node.js
+node_modules/
+*.log
+
+# Yarn
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Generated
+*.g.ts
+
+# Environment
+.env*
+
+# Eslint
+.eslintcache
+
+# Artefacts
+dist/
+
+# Runtime
+volumes/

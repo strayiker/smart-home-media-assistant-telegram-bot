@@ -1,0 +1,48 @@
+import fs from 'node:fs';
+
+import { CookieJar } from 'tough-cookie';
+
+import { type Logger } from './Logger.js';
+
+export interface CookieStorageOptions {
+  filePath?: string;
+  logger: Logger;
+}
+
+export class CookieStorage {
+  private filePath: string;
+  private logger: Logger;
+  private cookieJar: CookieJar = new CookieJar();
+
+  constructor(options: CookieStorageOptions) {
+    this.filePath = options.filePath ?? './cookies.json';
+    this.logger = options.logger;
+    this.loadFromFs();
+  }
+
+  flushToFs() {
+    const json = JSON.stringify(this.cookieJar.toJSON());
+    fs.writeFileSync(this.filePath, json);
+  }
+
+  loadFromFs() {
+    try {
+      const json = fs.readFileSync(this.filePath, 'utf8');
+      this.cookieJar = CookieJar.fromJSON(json);
+    } catch {
+      this.logger.debug(`Unable to load cookies from ${this.filePath}`);
+    }
+  }
+
+  setCookie(cookie: string, url: string) {
+    return this.cookieJar.setCookieSync(cookie, url);
+  }
+
+  getCookies(url: string) {
+    return this.cookieJar.getCookiesSync(url);
+  }
+
+  getCookieString(url: string) {
+    return this.cookieJar.getCookieStringSync(url);
+  }
+}

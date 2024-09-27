@@ -1,0 +1,43 @@
+{
+  "name": "smart-home-media-assistant-bot",
+  "version": "1.0.0",
+  "author": "Kirill Mesniankin <sadbox.games@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "packageManager": "yarn@4.5.0",
+  "scripts": {
+    "dev": "NODE_ENV=development && node --loader ts-node/esm --enable-source-maps --no-warnings=ExperimentalWarning ./src/index.ts",
+    "build": "rm -rf dist && tsc",
+    "start": "NODE_ENV=production && node ./dist/index.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.4.5",
+    "grammy": "^1.30.0",
+    "nanoid": "^5.0.7",
+    "parse-torrent": "^11.0.17",
+    "pino": "^9.4.0",
+    "pino-pretty": "^11.2.2",
+    "tough-cookie": "^5.0.0",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "@types/node": "^22.7.3",
+    "@types/parse-torrent": "^5.8.7",
+    "@types/uuid": "^10",
+    "eslint": "^9.10.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unicorn": "^55.0.0",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.6.0"
+  }
+}
