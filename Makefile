@@ -9,7 +9,7 @@ build:
 
 # Run the Docker container
 run:
-	podman rm $(IMAGE_NAME)
+	podman rm --ignore $(IMAGE_NAME)
 	podman run \
 		-v $(DATA_PATH):/data \
 		--name $(IMAGE_NAME) \
