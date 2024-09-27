@@ -5,6 +5,7 @@ import { Bot, GrammyError, HttpError } from 'grammy';
 import {
   botToken,
   cookiesFilePath,
+  qbtSavePath,
   qbtWebuiHost,
   qbtWebuiPassword,
   qbtWebuiPort,
@@ -33,6 +34,7 @@ const qBittorrent = new QBittorrentClient({
   url: `http://${qbtWebuiHost}:${qbtWebuiPort}`,
   username: qbtWebuiUsername,
   password: qbtWebuiPassword,
+  savePath: qbtSavePath
 });
 const torrents = new Torrents({
   bot,

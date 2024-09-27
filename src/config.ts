@@ -16,7 +16,7 @@ export const botToken = config.get('BOT_TOKEN', {
   required: true,
 });
 export const cookiesFilePath = config.get('COOKIES_FILE_PATH', {
-  default: './data/cookies.json',
+  default: '/data/cookies.json',
 });
 export const rutrackerUsername = config.get('RUTRACKER_USERNAME', {
   required: true,
@@ -37,3 +37,4 @@ export const qbtWebuiUsername = config.get('QBT_WEBUI_USERNAME', {
 export const qbtWebuiPassword = config.get('QBT_WEBUI_PASSWORD', {
   required: true,
 });
+export const qbtSavePath = config.get('QBT_SAVE_PATH');

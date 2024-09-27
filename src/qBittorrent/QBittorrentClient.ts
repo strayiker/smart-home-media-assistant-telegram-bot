@@ -14,17 +14,20 @@ interface QBClientOptions {
   url: string;
   username: string;
   password: string;
+  savePath?: string;
 }
 
 export class QBittorrentClient {
   private username: string;
   private password: string;
+  private savePath?: string;
   private cookieJar: CookieJar = new CookieJar();
   private apiBase: string;
 
   constructor(options: QBClientOptions) {
     this.username = options.username;
     this.password = options.password;
+    this.savePath = options.savePath;
     this.apiBase = `${options.url}/api/v2`;
   }
 
@@ -90,10 +93,15 @@ export class QBittorrentClient {
   async addTorrents({
     torrents = [],
     tags,
+    savepath = this.savePath,
     ...rest
   }: QBClientAddTorrentsOptions) {
     const data = new FormData();
     const hashes: string[] = [];
+
+    if (savepath) {
+      data.append('savepath', savepath);
+    }
 
     for (const torrent of torrents) {
       const buffer = Buffer.from(torrent, 'base64');
