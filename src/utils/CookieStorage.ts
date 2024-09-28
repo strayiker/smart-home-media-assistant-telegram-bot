@@ -20,12 +20,12 @@ export class CookieStorage {
     this.loadFromFs();
   }
 
-  flushToFs() {
+  private flushToFs() {
     const json = JSON.stringify(this.cookieJar.toJSON());
     fs.writeFileSync(this.filePath, json);
   }
 
-  loadFromFs() {
+  private loadFromFs() {
     try {
       const json = fs.readFileSync(this.filePath, 'utf8');
       this.cookieJar = CookieJar.fromJSON(json);
@@ -34,8 +34,18 @@ export class CookieStorage {
     }
   }
 
-  setCookie(cookie: string, url: string) {
-    return this.cookieJar.setCookieSync(cookie, url);
+  setCookie(cookieString: string, url: string) {
+    const cookie = this.cookieJar.setCookieSync(cookieString, url);
+    this.flushToFs();
+    return cookie;
+  }
+
+  setCookies(cookieStrings: string[], url: string) {
+    const cookies = cookieStrings.map((cookieString) => {
+      return this.cookieJar.setCookieSync(cookieString, url);
+    });
+    this.flushToFs();
+    return cookies;
   }
 
   getCookies(url: string) {

@@ -4,7 +4,6 @@ import parseTorrent from 'parse-torrent';
 import { CookieJar } from 'tough-cookie';
 
 import { type QBTorrent } from './models.js';
-// import type { QBTorrent } from './models.js';
 import {
   type QBClientAddTorrentsOptions,
   type QBClientGetTorrentsOptions,
@@ -103,14 +102,8 @@ export class QBittorrentClient {
       data.append('savepath', savepath);
     }
 
-    for (const torrent of torrents) {
-      const buffer = Buffer.from(torrent, 'base64');
-      const { infoHash } = await parseTorrent(buffer);
-
-      if (infoHash) {
-        hashes.push(infoHash);
-        data.append('torrents', new Blob([buffer]), `${infoHash}.torrent`);
-      }
+    if (tags) {
+      data.append('tags', tags.join(','));
     }
 
     for (const [key, value] of Object.entries(rest)) {
@@ -120,8 +113,14 @@ export class QBittorrentClient {
       );
     }
 
-    if (tags) {
-      data.append('tags', tags.join(','));
+    for (const torrent of torrents) {
+      const buffer = Buffer.from(torrent, 'base64');
+      const { infoHash } = await parseTorrent(buffer);
+
+      if (infoHash) {
+        hashes.push(infoHash);
+        data.append('torrents', new Blob([buffer]), `${infoHash}.torrent`);
+      }
     }
 
     await this.request(`${this.apiBase}/torrents/add`, {
@@ -154,8 +153,12 @@ export class QBittorrentClient {
       body: data.toString(),
     });
 
-    const json: QBTorrent[] = await response.json();
-    return json;
+    const json: { tags: string }[] = await response.json();
+
+    return json.map((item) => ({
+      ...item,
+      tags: item.tags.split(','),
+    })) as QBTorrent[];
   }
 
   async pauseTorrents(hashes: string[]) {

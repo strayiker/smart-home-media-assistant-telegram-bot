@@ -16,7 +16,7 @@ import {
 import { logger } from './logger.js';
 import { Torrents } from './middlewares/torrents.js';
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
-import { RuTrackerEngine } from './torrents/RutrackerEngine.js';
+import { RuTrackerEngine } from './searchEngines/RutrackerEngine.js';
 import { CookieStorage } from './utils/CookieStorage.js';
 
 const bot = new Bot(botToken);
@@ -34,7 +34,7 @@ const qBittorrent = new QBittorrentClient({
   url: `http://${qbtWebuiHost}:${qbtWebuiPort}`,
   username: qbtWebuiUsername,
   password: qbtWebuiPassword,
-  savePath: qbtSavePath
+  savePath: qbtSavePath,
 });
 const torrents = new Torrents({
   bot,

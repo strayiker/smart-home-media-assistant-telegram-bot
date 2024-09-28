@@ -95,7 +95,7 @@ export interface QBTorrent {
   /** Whether super seeding is enabled */
   super_seeding: boolean;
   /** Tags associated with the torrent */
-  tags: string;
+  tags: string[];
   /** Total active time (seconds) */
   time_active: number;
   /** Total size of the torrent (bytes) */

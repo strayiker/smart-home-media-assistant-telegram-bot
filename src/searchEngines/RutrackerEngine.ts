@@ -7,6 +7,7 @@ import { Engine, type SearchResult } from './Engine.js';
 const BASE_URL = 'https://rutracker.org/forum';
 const LOGIN_URL = `${BASE_URL}/login.php`;
 const SEARCH_URL = `${BASE_URL}/tracker.php`;
+const DOWNLOAD_URL = `${BASE_URL}/dl.php`;
 
 export interface RuTrackerEngineOptions {
   username: string;
@@ -48,12 +49,7 @@ export class RuTrackerEngine extends Engine {
       });
 
       const cookies = response.headers.getSetCookie();
-
-      for (const cookie of cookies) {
-        this.cookieStorage.setCookie(cookie, LOGIN_URL);
-      }
-
-      this.cookieStorage.flushToFs();
+      this.cookieStorage.setCookies(cookies, LOGIN_URL);
 
       this.logger.debug('Successfully logged in');
     } catch (error) {
@@ -102,34 +98,43 @@ export class RuTrackerEngine extends Engine {
 
     for (const row of rows) {
       const tds = $(row).find('td');
+      const id = $(row).attr('data-topic_id');
+
+      if (!id) {
+        const html = $(row).html();
+        this.logger.warn('Unable to parse RuTracker torrent id', html);
+        continue;
+      }
+
       const title = tds.eq(3).find('a').text();
       const totalSize = Number.parseInt(tds.eq(5).attr('data-ts_text') ?? '0');
       const seeds = Number.parseInt(tds.eq(6).text()) ?? 0;
       const leeches = Number.parseInt(tds.eq(7).text()) ?? 0;
-      const createdAt = this.parseDate(tds.eq(9).attr('data-ts_text'));
+      const date = this.parseDate(tds.eq(9).attr('data-ts_text'));
       const trackerUrl = tds.eq(3).find('a').attr('href');
       const downloadUrl = tds.eq(5).find('a').attr('href');
 
       if (title && trackerUrl && downloadUrl) {
         results.push({
-          engineName: this.name,
+          id,
           title,
           totalSize,
           seeds,
           leeches,
-          createdAt,
+          date,
           trackerUrl: `${BASE_URL}/${trackerUrl}`,
           downloadUrl: `${BASE_URL}/${downloadUrl}`,
         });
       }
     }
 
-    return results;
+    return results.reverse();
   }
 
-  async downloadTorrentFile(url: string) {
+  async downloadTorrentFile(id: string) {
     await this.ensureLoggedIn();
 
+    const url = `${DOWNLOAD_URL}?t=${id}`;
     const response = await fetch(url, {
       headers: {
         Cookie: this.cookieStorage.getCookieString(LOGIN_URL),

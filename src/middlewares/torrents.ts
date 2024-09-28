@@ -1,19 +1,18 @@
-import { type Bot, Composer, type Context, GrammyError } from 'grammy';
+import {
+  type Bot,
+  Composer,
+  type Context,
+  type Filter,
+  GrammyError,
+} from 'grammy';
 import { type Message } from 'grammy/types';
-import { customAlphabet } from 'nanoid';
 
 import { type QBTorrent } from '../qBittorrent/models.js';
 import { type QBittorrentClient } from '../qBittorrent/QBittorrentClient.js';
-import { type Engine, type SearchResult } from '../torrents/Engine.js';
+import { type Engine, type SearchResult } from '../searchEngines/Engine.js';
 import { formatBytes } from '../utils/formatBytes.js';
 import { formatDuration } from '../utils/formatDuration.js';
-import { formatProgress } from '../utils/formatProgress.js';
 import { type Logger } from '../utils/Logger.js';
-
-const nanoid = customAlphabet(
-  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz',
-  10,
-);
 
 export interface TorrentParams {
   bot: Bot;
@@ -28,7 +27,6 @@ export class Torrents<C extends Context> extends Composer<C> {
   private qBittorrent: QBittorrentClient;
   private chatMessages = new Map<number, Message>();
   private chatTorrents = new Map<number, string[]>();
-  private searchResults = new Map<string, SearchResult>();
   private timeout: NodeJS.Timeout;
   private logger: Logger;
 
@@ -44,89 +42,18 @@ export class Torrents<C extends Context> extends Composer<C> {
       this.createOrUpdateCardMessages();
     }, 10 * 1000);
 
-    this.on('message:entities:bot_command', async (ctx, next) => {
-      if (!ctx.message.text.startsWith('/dl_')) {
+    this.on('message::bot_command', async (ctx, next) => {
+      if (ctx.message.text?.startsWith('/dl_')) {
+        await this.handleDownloadCommand(ctx);
+      } else if (ctx.message.text?.startsWith('/rm_')) {
+        await this.handleRemoveCommand(ctx);
+      } else {
         return next();
       }
-
-      const id = ctx.message.text.replace('/dl_', '');
-      const searchResult = this.searchResults.get(id);
-
-      if (!searchResult) {
-        return ctx.reply(
-          'Команда устарела. Воспользуйтесь поиском, чтобы получить актуальный список торрентов',
-        );
-      }
-
-      const engine = this.engines.find(
-        (engine) => engine.name === searchResult.engineName,
-      );
-
-      if (!engine) {
-        return ctx.reply('Скачивание с этого трекера не поддерживается');
-      }
-
-      const metainfo = await engine.downloadTorrentFile(
-        searchResult.downloadUrl,
-      );
-
-      const { hashes, error } = await this.addTorrent(metainfo);
-
-      if (!hashes || hashes.length === 0 || error) {
-        return ctx.reply(
-          'При добавлении торрента в очередь на скачивание произошла ошибка',
-        );
-      }
-
-      this.logger.debug('A new torrents where successfully added: %s', hashes);
-
-      const chatTorrents = this.chatTorrents.get(ctx.chatId);
-
-      if (chatTorrents) {
-        chatTorrents.push(...hashes);
-      } else {
-        this.chatTorrents.set(ctx.chatId, hashes);
-      }
-
-      const message = this.chatMessages.get(ctx.chatId);
-
-      if (message) {
-        await ctx.deleteMessages([message.message_id]);
-      }
-
-      this.chatMessages.delete(ctx.chatId);
-
-      this.createOrUpdateCardMessage(ctx.chatId);
     });
 
     this.on('message:text', async (ctx) => {
-      const query = ctx.message.text;
-
-      const { data, error } = await this.searchTorrents(query);
-
-      if (!data || error) {
-        return ctx.reply('Во время поиска произошла ошибка');
-      }
-
-      if (data.length === 0) {
-        return ctx.reply('Нет результов');
-      }
-
-      const results: string[] = [];
-
-      for (const [i, result] of data.entries()) {
-        const id = nanoid();
-
-        this.searchResults.set(id, result);
-
-        if (i < 5) {
-          results.push(this.formatSearchResult(id, result));
-        }
-      }
-
-      return ctx.reply(results.join('\n\n'), {
-        parse_mode: 'HTML',
-      });
+      return this.handleSearchQuery(ctx);
     });
   }
 
@@ -134,28 +61,122 @@ export class Torrents<C extends Context> extends Composer<C> {
     clearInterval(this.timeout);
   }
 
+  private async handleSearchQuery(ctx: Filter<Context, 'message:text'>) {
+    const query = ctx.message.text;
+
+    const { results, error } = await this.searchTorrents(query);
+
+    if (!results || error) {
+      return ctx.reply('Во время поиска произошла ошибка');
+    }
+
+    if (results.length === 0) {
+      return ctx.reply('Нет результов');
+    }
+
+    const text = results
+      .slice(0, 5)
+      .map(([engine, result]) => this.formatSearchResult(engine, result))
+      .join('\n\n');
+
+    return ctx.reply(text, {
+      parse_mode: 'HTML',
+    });
+  }
+
+  private async handleDownloadCommand(
+    ctx: Filter<Context, 'message::bot_command'>,
+  ) {
+    if (!ctx.message.text) {
+      return;
+    }
+    const tag = ctx.message.text.replace('/dl_', '');
+    const tagParts = tag.split('_');
+    const engineName = tagParts[0];
+    const torrentId = tagParts[1];
+
+    const engine = this.engines.find((engine) => engine.name === engineName);
+
+    if (!engine) {
+      return ctx.reply('Трекер не поддерживается');
+    }
+
+    let torrent: string | undefined;
+
+    try {
+      torrent = await engine.downloadTorrentFile(torrentId);
+    } catch {
+      return ctx.reply('При добавлении торрента произошла ошибка');
+    }
+
+    const { hash, error } = await this.addTorrent({ torrent, tag });
+
+    if (!hash || error) {
+      return ctx.reply('При добавлении торрента произошла ошибка');
+    }
+
+    this.logger.debug('A new torrent where successfully added: %s', hash);
+
+    const chatTorrents = this.chatTorrents.get(ctx.chatId);
+
+    if (chatTorrents) {
+      chatTorrents.push(hash);
+    } else {
+      this.chatTorrents.set(ctx.chatId, [hash]);
+    }
+
+    await this.createOrUpdateCardMessage(ctx.chatId);
+  }
+
+  private async handleRemoveCommand(
+    ctx: Filter<Context, 'message::bot_command'>,
+  ) {
+    if (!ctx.message.text) {
+      return;
+    }
+    const tag = ctx.message.text.replace('/rm_', '');
+
+    const { torrent, error } = await this.getTorrentByTag(tag);
+
+    if (!torrent || error) {
+      return ctx.reply('При удалении торрента произошла ошибка');
+    }
+
+    const { hash } = torrent;
+    const { error: deletingError } = await this.deleteTorrent(hash);
+
+    if (deletingError) {
+      return ctx.reply('При удалении торрента произошла ошибка');
+    }
+
+    this.logger.debug('A torrent where successfully deleted: %s', hash);
+
+    await this.createOrUpdateCardMessage(ctx.chatId);
+  }
+
   private async searchTorrents(query: string) {
     try {
       const promises = this.engines.map(async (engine) => {
-        return engine.search(query);
+        const results = await engine.search(query);
+        return results.map((result) => [engine, result] as const);
       });
 
-      const resultsList = await Promise.all(promises);
-      const data = resultsList.flat();
+      const results = await Promise.all(promises);
 
-      return { data };
+      return { results: results.flat() };
     } catch (error) {
       this.logger.error(error, 'An error occured while searching torrents');
       return { error };
     }
   }
 
-  private async addTorrent(torrent: string) {
+  private async addTorrent({ torrent, tag }: { torrent: string; tag: string }) {
     try {
-      const hashes = await this.qBittorrent.addTorrents({
+      const [hash] = await this.qBittorrent.addTorrents({
         torrents: [torrent],
+        tags: [tag],
       });
-      return { hashes };
+      return { hash };
     } catch (error) {
       this.logger.error(error, 'An error occured while adding new torrent');
       return { error };
@@ -166,6 +187,26 @@ export class Torrents<C extends Context> extends Composer<C> {
     try {
       const torrents = await this.qBittorrent.getTorrents({ hashes });
       return { torrents };
+    } catch (error) {
+      this.logger.error(error, 'An error occured while fetching torrents');
+      return { error };
+    }
+  }
+
+  private async getTorrentByTag(tag: string) {
+    try {
+      const [torrent] = await this.qBittorrent.getTorrents({ tag });
+      return { torrent };
+    } catch (error) {
+      this.logger.error(error, 'An error occured while fetching torrents');
+      return { error };
+    }
+  }
+
+  private async deleteTorrent(hash: string) {
+    try {
+      await this.qBittorrent.deleteTorrents([hash], true);
+      return {};
     } catch (error) {
       this.logger.error(error, 'An error occured while fetching torrents');
       return { error };
@@ -297,13 +338,13 @@ export class Torrents<C extends Context> extends Composer<C> {
     }
   }
 
-  private formatSearchResult(id: string, result: SearchResult) {
+  private formatSearchResult(engine: Engine, result: SearchResult) {
     const lines = [`<b>${result.title}</b>`];
 
     lines.push('---');
 
-    if (result.createdAt) {
-      lines.push(`Дата: ${result.createdAt.toLocaleDateString('ru')}`);
+    if (result.date) {
+      lines.push(`Дата: ${result.date.toLocaleDateString('ru')}`);
     }
 
     if (result.totalSize) {
@@ -317,7 +358,8 @@ export class Torrents<C extends Context> extends Composer<C> {
       lines.push(`Сиды/Пиры: ${result.seeds ?? 0} / ${result.leeches ?? 0}`);
     }
 
-    lines.push(`Скачать: /dl_${id}`);
+    const tag = `${engine.name}_${result.id}`;
+    lines.push(`Скачать: /dl_${tag}`);
     lines.push('');
 
     return lines.join('\n');
@@ -333,7 +375,16 @@ export class Torrents<C extends Context> extends Composer<C> {
     lines.push(`Пиры: ${torrent.num_leechs} (${torrent.num_incomplete})`);
     lines.push(`Скорость: ${formatBytes(torrent.dlspeed)}/s`);
     lines.push(`Осталось: ${eta}`);
-    lines.push(`<code>${formatProgress(torrent.progress)}</code>`);
+    lines.push(
+      `Прогресс: <code>${Math.round(torrent.progress * 100 * 100) / 100}%</code>`,
+    );
+
+    const [tag] = torrent.tags;
+
+    if (tag) {
+      lines.push(`Удалить: /rm_${tag}`);
+    }
+
     lines.push('');
 
     return lines.join('\n');
