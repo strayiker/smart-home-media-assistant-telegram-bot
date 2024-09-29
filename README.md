@@ -27,7 +27,7 @@ Before we get started, make sure you have the following:
 3. **Configure qBittorrent Web-UI:**
 
    - Open the qBittorrent client on your PC.
-   - Go to `Tools` > `Options` > `Web UI`.
+   - Go to `Options` > `Web UI`.
    - Enable the Web UI and set a username (default is `admin`) and a password.
    - Set the port to `9092` (or any other port you prefer).
    - Make sure the Web UI is accessible from your local network.
