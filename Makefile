@@ -2,12 +2,18 @@ IMAGE_NAME = smart-home-media-assistant-bot
 DATA_PATH = ./volumes/data
 ENV_FILE = .env
 
+ifneq "$(use)" ""
+BUILDTOOL = $(use)
+else
+BUILDTOOL = docker
+endif
+
 build:
-	docker build -t $(IMAGE_NAME) .
+	${BUILDTOOL} build -t $(IMAGE_NAME) .
 
 run:
-	docker rm --ignore $(IMAGE_NAME)
-	docker run -d \
+	${BUILDTOOL} rm --ignore $(IMAGE_NAME)
+	${BUILDTOOL} run -d \
 		-v $(DATA_PATH):/data \
 		--name $(IMAGE_NAME) \
 		--env-file $(ENV_FILE) \
@@ -16,10 +22,10 @@ run:
 		$(IMAGE_NAME)
 
 stop:
-	docker stop $(IMAGE_NAME)
-	docker rm $(IMAGE_NAME)
+	${BUILDTOOL} stop $(IMAGE_NAME)
+	${BUILDTOOL} rm $(IMAGE_NAME)
 
 clean:
-	docker container prune -f
+	${BUILDTOOL} container prune -f
 
 .PHONY: build run stop clean
