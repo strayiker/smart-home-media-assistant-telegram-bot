@@ -1,6 +1,6 @@
 # Smart Home Media Assistant Telegram Bot
 
-Hey there! This Telegram bot is designed to help you search for torrents and remotely download them to your PC using the qBittorrent client. It's written in TypeScript and runs in a Docker container on your PC.
+Hey there! This is the sources of a Telegram bot is designed to help you search for torrents and remotely download them to your PC using the qBittorrent client. It's written in TypeScript and runs in a Docker container on your PC.
 
 ## Prerequisites
 
