@@ -2,6 +2,7 @@ import './dayjs.js';
 
 import { Bot, GrammyError, HttpError } from 'grammy';
 
+import { TorrentsComposer } from './composers/TorrentsComposer.js';
 import {
   botToken,
   cookiesFilePath,
@@ -14,20 +15,13 @@ import {
   rutrackerUsername,
 } from './config.js';
 import { logger } from './logger.js';
-import { Torrents } from './middlewares/torrents.js';
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
-import { RuTrackerEngine } from './searchEngines/RutrackerEngine.js';
+import { RutrackerSearchEngine } from './searchEngines/RutrackerSearchEngine.js';
 import { CookieStorage } from './utils/CookieStorage.js';
 
 const bot = new Bot(botToken);
 const cookieStorage = new CookieStorage({
   filePath: cookiesFilePath,
-  logger,
-});
-const rutracker = new RuTrackerEngine({
-  username: rutrackerUsername,
-  password: rutrackerPassword,
-  cookieStorage,
   logger,
 });
 const qBittorrent = new QBittorrentClient({
@@ -36,9 +30,16 @@ const qBittorrent = new QBittorrentClient({
   password: qbtWebuiPassword,
   savePath: qbtSavePath,
 });
-const torrents = new Torrents({
+const torrents = new TorrentsComposer({
   bot,
-  engines: [rutracker],
+  searchEngines: [
+    new RutrackerSearchEngine({
+      username: rutrackerUsername,
+      password: rutrackerPassword,
+      cookieStorage,
+      logger,
+    }),
+  ],
   qBittorrent,
   logger,
 });

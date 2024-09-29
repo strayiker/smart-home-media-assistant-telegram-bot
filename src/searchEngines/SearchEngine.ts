@@ -9,7 +9,7 @@ export interface SearchResult {
   downloadUrl: string;
 }
 
-export abstract class Engine {
+export abstract class SearchEngine {
   abstract name: string;
   abstract search(query: string): Promise<SearchResult[]>;
   abstract downloadTorrentFile(id: string): Promise<string>;

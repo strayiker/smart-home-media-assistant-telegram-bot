@@ -9,34 +9,37 @@ import { type Message } from 'grammy/types';
 
 import { type QBTorrent } from '../qBittorrent/models.js';
 import { type QBittorrentClient } from '../qBittorrent/QBittorrentClient.js';
-import { type Engine, type SearchResult } from '../searchEngines/Engine.js';
+import {
+  type SearchEngine,
+  type SearchResult,
+} from '../searchEngines/SearchEngine.js';
 import { formatBytes } from '../utils/formatBytes.js';
 import { formatDuration } from '../utils/formatDuration.js';
 import { type Logger } from '../utils/Logger.js';
 
-export interface TorrentParams {
+export interface TorrentComposerOptions {
   bot: Bot;
-  engines: Engine[];
+  searchEngines: SearchEngine[];
   qBittorrent: QBittorrentClient;
   logger: Logger;
 }
 
-export class Torrents<C extends Context> extends Composer<C> {
+export class TorrentsComposer<C extends Context> extends Composer<C> {
   private bot: Bot;
-  private engines: Engine[];
+  private searchEngines: SearchEngine[];
   private qBittorrent: QBittorrentClient;
   private chatMessages = new Map<number, Message>();
   private chatTorrents = new Map<number, string[]>();
   private timeout: NodeJS.Timeout;
   private logger: Logger;
 
-  constructor(params: TorrentParams) {
+  constructor(options: TorrentComposerOptions) {
     super();
 
-    this.bot = params.bot;
-    this.engines = params.engines;
-    this.qBittorrent = params.qBittorrent;
-    this.logger = params.logger;
+    this.bot = options.bot;
+    this.searchEngines = options.searchEngines;
+    this.qBittorrent = options.qBittorrent;
+    this.logger = options.logger;
 
     this.timeout = setInterval(() => {
       this.createOrUpdateCardMessages();
@@ -76,8 +79,10 @@ export class Torrents<C extends Context> extends Composer<C> {
 
     const text = results
       .slice(0, 5)
-      .map(([engine, result]) => this.formatSearchResult(engine, result))
-      .join('\n\n');
+      .map(([searchEngines, result]) =>
+        this.formatSearchResult(searchEngines, result),
+      )
+      .join('\n\n\n');
 
     return ctx.reply(text, {
       parse_mode: 'HTML',
@@ -92,19 +97,21 @@ export class Torrents<C extends Context> extends Composer<C> {
     }
     const tag = ctx.message.text.replace('/dl_', '');
     const tagParts = tag.split('_');
-    const engineName = tagParts[0];
+    const searchEngineName = tagParts[0];
     const torrentId = tagParts[1];
 
-    const engine = this.engines.find((engine) => engine.name === engineName);
+    const searchEngine = this.searchEngines.find(
+      (searchEngine) => searchEngine.name === searchEngineName,
+    );
 
-    if (!engine) {
+    if (!searchEngine) {
       return ctx.reply('Трекер не поддерживается');
     }
 
     let torrent: string | undefined;
 
     try {
-      torrent = await engine.downloadTorrentFile(torrentId);
+      torrent = await searchEngine.downloadTorrentFile(torrentId);
     } catch {
       return ctx.reply('При добавлении торрента произошла ошибка');
     }
@@ -156,9 +163,9 @@ export class Torrents<C extends Context> extends Composer<C> {
 
   private async searchTorrents(query: string) {
     try {
-      const promises = this.engines.map(async (engine) => {
-        const results = await engine.search(query);
-        return results.map((result) => [engine, result] as const);
+      const promises = this.searchEngines.map(async (searchEngine) => {
+        const results = await searchEngine.search(query);
+        return results.map((result) => [searchEngine, result] as const);
       });
 
       const results = await Promise.all(promises);
@@ -325,7 +332,7 @@ export class Torrents<C extends Context> extends Composer<C> {
 
     const cardText = pending
       .map((torrent) => this.formatTorrent(torrent))
-      .join('\n\n');
+      .join('\n\n\n');
 
     await (message
       ? this.updateCardMessage(message, cardText)
@@ -338,54 +345,59 @@ export class Torrents<C extends Context> extends Composer<C> {
     }
   }
 
-  private formatSearchResult(engine: Engine, result: SearchResult) {
-    const lines = [`<b>${result.title}</b>`];
-
-    lines.push('---');
-
-    if (result.date) {
-      lines.push(`Дата: ${result.date.toLocaleDateString('ru')}`);
-    }
+  private formatSearchResult(searchEngine: SearchEngine, result: SearchResult) {
+    const lines = [`<b>${result.title}</b>`, '---'];
+    const info: string[] = [];
 
     if (result.totalSize) {
-      lines.push(`Размер: ${formatBytes(result.totalSize)}`);
+      info.push(formatBytes(result.totalSize));
     }
 
     if (
       typeof result.seeds === 'number' ||
       typeof result.leeches === 'number'
     ) {
-      lines.push(`Сиды/Пиры: ${result.seeds ?? 0} / ${result.leeches ?? 0}`);
+      const seeds = `${result.seeds ?? 0}`;
+      const peers = `${result.leeches ?? 0}`;
+      info.push(`${seeds}/${peers}`);
     }
 
-    const tag = `${engine.name}_${result.id}`;
+    if (result.date) {
+      info.push(result.date.toLocaleDateString('ru'));
+    }
+
+    lines.push(info.join('  |  '), '---');
+
+    const tag = `${searchEngine.name}_${result.id}`;
     lines.push(`Скачать: /dl_${tag}`);
-    lines.push('');
 
     return lines.join('\n');
   }
 
   private formatTorrent(torrent: QBTorrent) {
-    const lines = [`<b>${torrent.name}</b>`];
+    const lines = [`<b>${torrent.name}</b>`, '---'];
 
-    const eta = torrent.eta >= 8_640_000 ? '∞' : formatDuration(torrent.eta);
+    if (torrent.progress < 1) {
+      const seeds = `${torrent.num_seeds} (${torrent.num_complete})`;
+      const peers = `${torrent.num_leechs} (${torrent.num_incomplete})`;
+      const eta = torrent.eta >= 8_640_000 ? '∞' : formatDuration(torrent.eta);
+      const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
+
+      lines.push(`Сиды: ${seeds},  Личи: ${peers}`);
+      lines.push(`Скорость: ${formatBytes(torrent.dlspeed)}/s`);
+      lines.push(`Осталось: ${eta}`);
+      lines.push(`Прогресс: ${progress}`);
+    } else {
+      lines.push(`Статус: Загружен`);
+    }
 
     lines.push('---');
-    lines.push(`Сиды: ${torrent.num_seeds} (${torrent.num_complete})`);
-    lines.push(`Пиры: ${torrent.num_leechs} (${torrent.num_incomplete})`);
-    lines.push(`Скорость: ${formatBytes(torrent.dlspeed)}/s`);
-    lines.push(`Осталось: ${eta}`);
-    lines.push(
-      `Прогресс: <code>${Math.round(torrent.progress * 100 * 100) / 100}%</code>`,
-    );
 
     const [tag] = torrent.tags;
 
     if (tag) {
       lines.push(`Удалить: /rm_${tag}`);
     }
-
-    lines.push('');
 
     return lines.join('\n');
   }

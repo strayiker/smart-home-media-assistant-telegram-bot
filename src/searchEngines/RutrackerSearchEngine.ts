@@ -2,28 +2,28 @@ import * as cheerio from 'cheerio';
 
 import { type CookieStorage } from '../utils/CookieStorage.js';
 import { type Logger } from '../utils/Logger.js';
-import { Engine, type SearchResult } from './Engine.js';
+import { SearchEngine, type SearchResult } from './SearchEngine.js';
 
 const BASE_URL = 'https://rutracker.org/forum';
 const LOGIN_URL = `${BASE_URL}/login.php`;
 const SEARCH_URL = `${BASE_URL}/tracker.php`;
 const DOWNLOAD_URL = `${BASE_URL}/dl.php`;
 
-export interface RuTrackerEngineOptions {
+export interface RutrackerSearchEngineOptions {
   username: string;
   password: string;
   cookieStorage: CookieStorage;
   logger: Logger;
 }
 
-export class RuTrackerEngine extends Engine {
+export class RutrackerSearchEngine extends SearchEngine {
   public name = 'rutracker';
   private username: string;
   private password: string;
   private cookieStorage: CookieStorage;
   private logger: Logger;
 
-  constructor(options: RuTrackerEngineOptions) {
+  constructor(options: RutrackerSearchEngineOptions) {
     super();
 
     this.username = options.username;
