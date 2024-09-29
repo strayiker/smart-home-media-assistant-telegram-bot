@@ -52,7 +52,7 @@ export class QBittorrentClient {
     }
   }
 
-  private async validateSession() {
+  private async ensureLoggedIn() {
     const url = `${this.apiBase}/auth/login`;
     const cookies = this.cookieJar.getCookiesSync(url);
     const hasSessionId = cookies.some((cookie) => cookie.key === 'SID');
@@ -73,11 +73,11 @@ export class QBittorrentClient {
   }
 
   async request(url: string, init?: RequestInit) {
-    await this.validateSession();
+    await this.ensureLoggedIn();
 
     let response = await this.performRequest(url, init);
 
-    if (response.status === 401) {
+    if (response.status === 403) {
       await this.login();
       response = await this.performRequest(url, init);
     }
