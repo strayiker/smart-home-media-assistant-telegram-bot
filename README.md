@@ -4,6 +4,10 @@ Hey there! This is the sources of a Telegram bot is designed to help you search 
 
 ![alt text](./static/image.webp)
 
+## Disclaimer
+
+Currently, the bot is able to search torrents on Rutracker only. However, you are welcome to submit a pull request (PR) to add support for other torrent trackers.
+
 ## Prerequisites
 
 Before we get started, make sure you have the following:
