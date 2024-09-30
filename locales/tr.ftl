@@ -1,0 +1,11 @@
+search-torrents-empty = Sonuç yok
+search-torrents-result-download-link = İndir: {$link}
+search-torrents-unknown-error = Arama sırasında bir hata oluştu
+download-torrent-card-seeds-peers = Tohumlar: {$seeds}, Eşler: {$peers}
+download-torrent-card-speed = Hız: {$speed}s
+download-torrent-card-eta = Kalan süre: {$eta}
+download-torrent-card-progress = İlerleme: {$progress}
+download-torrent-card-remove-link = Kaldır: {$link}
+download-torrent-tracker-not-supported-error = İzleyici desteklenmiyor
+download-torrent-unknown-error = Torrent eklenirken bir hata oluştu
+remove-torrent-unknown-error = Torrent kaldırılırken bir hata oluştu

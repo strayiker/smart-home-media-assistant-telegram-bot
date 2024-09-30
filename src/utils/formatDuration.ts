@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
 
-export function formatDuration(seconds: number) {
-  return dayjs.duration(seconds, 'seconds').humanize();
+export function formatDuration(seconds: number, locale: string) {
+  return dayjs.duration(seconds, 'seconds').locale(locale).humanize();
 }

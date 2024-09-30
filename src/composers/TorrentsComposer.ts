@@ -1,3 +1,4 @@
+import { type FluentContextFlavor } from '@grammyjs/fluent';
 import {
   type Bot,
   Composer,
@@ -7,6 +8,7 @@ import {
 } from 'grammy';
 import { type Message } from 'grammy/types';
 
+import { fluent } from '../fluent.js';
 import { type QBTorrent } from '../qBittorrent/models.js';
 import { type QBittorrentClient } from '../qBittorrent/QBittorrentClient.js';
 import {
@@ -17,15 +19,17 @@ import { formatBytes } from '../utils/formatBytes.js';
 import { formatDuration } from '../utils/formatDuration.js';
 import { type Logger } from '../utils/Logger.js';
 
-export interface TorrentComposerOptions {
-  bot: Bot;
+export interface TorrentComposerOptions<C extends Context> {
+  bot: Bot<C>;
   searchEngines: SearchEngine[];
   qBittorrent: QBittorrentClient;
   logger: Logger;
 }
 
-export class TorrentsComposer<C extends Context> extends Composer<C> {
-  private bot: Bot;
+export class TorrentsComposer<
+  C extends Context & FluentContextFlavor,
+> extends Composer<C> {
+  private bot: Bot<C>;
   private searchEngines: SearchEngine[];
   private qBittorrent: QBittorrentClient;
   private chatMessages = new Map<number, Message>();
@@ -33,7 +37,7 @@ export class TorrentsComposer<C extends Context> extends Composer<C> {
   private timeout: NodeJS.Timeout;
   private logger: Logger;
 
-  constructor(options: TorrentComposerOptions) {
+  constructor(options: TorrentComposerOptions<C>) {
     super();
 
     this.bot = options.bot;
@@ -64,24 +68,23 @@ export class TorrentsComposer<C extends Context> extends Composer<C> {
     clearInterval(this.timeout);
   }
 
-  private async handleSearchQuery(ctx: Filter<Context, 'message:text'>) {
+  private async handleSearchQuery(ctx: Filter<C, 'message:text'>) {
     const query = ctx.message.text;
 
     const { results, error } = await this.searchTorrents(query);
 
     if (!results || error) {
-      return ctx.reply('Во время поиска произошла ошибка');
+      return ctx.reply(ctx.t('search-torrents-unknown-error'));
     }
 
     if (results.length === 0) {
-      return ctx.reply('Нет результов');
+      return ctx.reply(ctx.t('search-torrents-empty'));
     }
 
+    // TODO: Add buttons to navigate between pages
     const text = results
       .slice(0, 5)
-      .map(([searchEngines, result]) =>
-        this.formatSearchResult(searchEngines, result),
-      )
+      .map(([se, result]) => this.formatSearchResult(ctx, se, result))
       .join('\n\n\n');
 
     return ctx.reply(text, {
@@ -89,37 +92,38 @@ export class TorrentsComposer<C extends Context> extends Composer<C> {
     });
   }
 
-  private async handleDownloadCommand(
-    ctx: Filter<Context, 'message::bot_command'>,
-  ) {
+  private async handleDownloadCommand(ctx: Filter<C, 'message::bot_command'>) {
     if (!ctx.message.text) {
       return;
     }
-    const tag = ctx.message.text.replace('/dl_', '');
-    const tagParts = tag.split('_');
-    const searchEngineName = tagParts[0];
-    const torrentId = tagParts[1];
 
-    const searchEngine = this.searchEngines.find(
-      (searchEngine) => searchEngine.name === searchEngineName,
-    );
+    const uid = ctx.message.text.replace('/dl_', '');
+    const [seName, id] = uid.split('_');
 
-    if (!searchEngine) {
-      return ctx.reply('Трекер не поддерживается');
+    const se = this.searchEngines.find((se) => se.name === seName);
+
+    if (!se) {
+      return ctx.reply(ctx.t('download-torrent-tracker-not-supported-error'));
     }
 
     let torrent: string | undefined;
 
     try {
-      torrent = await searchEngine.downloadTorrentFile(torrentId);
+      torrent = await se.downloadTorrentFile(id);
     } catch {
-      return ctx.reply('При добавлении торрента произошла ошибка');
+      return ctx.reply(ctx.t('download-torrent-unknown-error'));
     }
 
-    const { hash, error } = await this.addTorrent({ torrent, tag });
+    const { hash, error } = await this.addTorrent({
+      torrent,
+      tags: [
+        `uid_${uid}`,
+        `i18n_${ctx.chatId}_${ctx.from.language_code ?? 'en'}`,
+      ],
+    });
 
     if (!hash || error) {
-      return ctx.reply('При добавлении торрента произошла ошибка');
+      return ctx.reply(ctx.t('download-torrent-unknown-error'));
     }
 
     this.logger.debug('A new torrent where successfully added: %s', hash);
@@ -135,25 +139,23 @@ export class TorrentsComposer<C extends Context> extends Composer<C> {
     await this.createOrUpdateCardMessage(ctx.chatId);
   }
 
-  private async handleRemoveCommand(
-    ctx: Filter<Context, 'message::bot_command'>,
-  ) {
+  private async handleRemoveCommand(ctx: Filter<C, 'message::bot_command'>) {
     if (!ctx.message.text) {
       return;
     }
-    const tag = ctx.message.text.replace('/rm_', '');
+    const uid = ctx.message.text.replace('/rm_', '');
 
-    const { torrent, error } = await this.getTorrentByTag(tag);
+    const { torrent, error } = await this.getTorrentByUid(uid);
 
     if (!torrent || error) {
-      return ctx.reply('При удалении торрента произошла ошибка');
+      return ctx.reply(ctx.t('remove-torrent-unknown-error'));
     }
 
     const { hash } = torrent;
     const { error: deletingError } = await this.deleteTorrent(hash);
 
     if (deletingError) {
-      return ctx.reply('При удалении торрента произошла ошибка');
+      return ctx.reply(ctx.t('remove-torrent-unknown-error'));
     }
 
     this.logger.debug('A torrent where successfully deleted: %s', hash);
@@ -163,9 +165,9 @@ export class TorrentsComposer<C extends Context> extends Composer<C> {
 
   private async searchTorrents(query: string) {
     try {
-      const promises = this.searchEngines.map(async (searchEngine) => {
-        const results = await searchEngine.search(query);
-        return results.map((result) => [searchEngine, result] as const);
+      const promises = this.searchEngines.map(async (se) => {
+        const results = await se.search(query);
+        return results.map((result) => [se, result] as const);
       });
 
       const results = await Promise.all(promises);
@@ -177,11 +179,17 @@ export class TorrentsComposer<C extends Context> extends Composer<C> {
     }
   }
 
-  private async addTorrent({ torrent, tag }: { torrent: string; tag: string }) {
+  private async addTorrent({
+    torrent,
+    tags,
+  }: {
+    torrent: string;
+    tags: string[];
+  }) {
     try {
       const [hash] = await this.qBittorrent.addTorrents({
         torrents: [torrent],
-        tags: [tag],
+        tags,
       });
       return { hash };
     } catch (error) {
@@ -200,9 +208,11 @@ export class TorrentsComposer<C extends Context> extends Composer<C> {
     }
   }
 
-  private async getTorrentByTag(tag: string) {
+  private async getTorrentByUid(uid: string) {
     try {
-      const [torrent] = await this.qBittorrent.getTorrents({ tag });
+      const [torrent] = await this.qBittorrent.getTorrents({
+        tag: `uid_${uid}`,
+      });
       return { torrent };
     } catch (error) {
       this.logger.error(error, 'An error occured while fetching torrents');
@@ -314,7 +324,8 @@ export class TorrentsComposer<C extends Context> extends Composer<C> {
 
     for await (const torrent of completed) {
       try {
-        await this.bot.api.sendMessage(chatId, this.formatTorrent(torrent), {
+        const text = this.formatTorrent(chatId, torrent);
+        await this.bot.api.sendMessage(chatId, text, {
           parse_mode: 'HTML',
         });
       } catch (error) {
@@ -331,7 +342,7 @@ export class TorrentsComposer<C extends Context> extends Composer<C> {
     }
 
     const cardText = pending
-      .map((torrent) => this.formatTorrent(torrent))
+      .map((torrent) => this.formatTorrent(chatId, torrent))
       .join('\n\n\n');
 
     await (message
@@ -345,7 +356,8 @@ export class TorrentsComposer<C extends Context> extends Composer<C> {
     }
   }
 
-  private formatSearchResult(searchEngine: SearchEngine, result: SearchResult) {
+  private formatSearchResult(ctx: C, se: SearchEngine, result: SearchResult) {
+    const uid = `${se.name}_${result.id}`;
     const lines = [`<b>${result.title}</b>`, '---'];
     const info: string[] = [];
 
@@ -363,40 +375,60 @@ export class TorrentsComposer<C extends Context> extends Composer<C> {
     }
 
     if (result.date) {
-      info.push(result.date.toLocaleDateString('ru'));
+      info.push(
+        result.date.toLocaleDateString(ctx.from?.language_code ?? 'en'),
+      );
     }
 
-    lines.push(info.join('  |  '), '---');
-
-    const tag = `${searchEngine.name}_${result.id}`;
-    lines.push(`Скачать: /dl_${tag}`);
+    lines.push(info.join('  |  '));
+    lines.push('---');
+    lines.push(
+      ctx.t('search-torrents-result-download-link', { link: `/dl_${uid}` }),
+    );
 
     return lines.join('\n');
   }
 
-  private formatTorrent(torrent: QBTorrent) {
+  private formatTorrent(chatId: number, torrent: QBTorrent) {
+    let uid: string | undefined;
+    let locale: string = 'en';
+
+    for (const tag of torrent.tags) {
+      if (tag.startsWith('uid_')) {
+        uid = tag.replace('uid_', '');
+      } else if (tag.startsWith(`i18n_${chatId}_`)) {
+        locale = tag.replace(`i18n_${chatId}_`, '');
+      }
+    }
+
+    const t = fluent.withLocale(locale);
+
     const lines = [`<b>${torrent.name}</b>`, '---'];
 
     if (torrent.progress < 1) {
       const seeds = `${torrent.num_seeds} (${torrent.num_complete})`;
       const peers = `${torrent.num_leechs} (${torrent.num_incomplete})`;
-      const eta = torrent.eta >= 8_640_000 ? '∞' : formatDuration(torrent.eta);
-      const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
+      const eta =
+        torrent.eta >= 8_640_000 ? '∞' : formatDuration(torrent.eta, locale);
 
-      lines.push(`Сиды: ${seeds},  Личи: ${peers}`);
-      lines.push(`Скорость: ${formatBytes(torrent.dlspeed)}/s`);
-      lines.push(`Осталось: ${eta}`);
-      lines.push(`Прогресс: ${progress}`);
-    } else {
-      lines.push(`Статус: Загружен`);
+      lines.push(t('download-torrent-card-seeds-peers', { seeds, peers }));
+      lines.push(
+        t('download-torrent-card-speed', {
+          speed: formatBytes(torrent.dlspeed),
+        }),
+      );
+      lines.push(t('download-torrent-card-eta', { eta }));
     }
 
+    const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
+
+    lines.push(t('download-torrent-card-progress', { progress }));
     lines.push('---');
 
-    const [tag] = torrent.tags;
-
-    if (tag) {
-      lines.push(`Удалить: /rm_${tag}`);
+    if (uid) {
+      lines.push(
+        t('download-torrent-card-remove-link', { link: `/rm_${uid}` }),
+      );
     }
 
     return lines.join('\n');

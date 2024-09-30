@@ -1,0 +1,11 @@
+search-torrents-empty = אין תוצאות
+search-torrents-result-download-link = הורד: {$link}
+search-torrents-unknown-error = אירעה שגיאה במהלך החיפוש
+download-torrent-card-seeds-peers = Seeds: {$seeds}, Peers: {$peers}
+download-torrent-card-speed = מהירות: {$speed}s
+download-torrent-card-eta = זמן שנותר: {$eta}
+download-torrent-card-progress = התקדמות: {$progress}
+download-torrent-card-remove-link = הסר: {$link}
+download-torrent-tracker-not-supported-error = המעקב אינו נתמך
+download-torrent-unknown-error = אירעה שגיאה בעת הוספת הטורנט
+remove-torrent-unknown-error = אירעה שגיאה בעת הסרת הטורנט

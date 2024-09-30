@@ -1,0 +1,11 @@
+search-torrents-empty = Inga resultat
+search-torrents-result-download-link = Ladda ner: {$link}
+search-torrents-unknown-error = Ett fel inträffade under sökningen
+download-torrent-card-seeds-peers = Frön: {$seeds}, Jämlikar: {$peers}
+download-torrent-card-speed = Hastighet: {$speed}s
+download-torrent-card-eta = Återstående tid: {$eta}
+download-torrent-card-progress = Framsteg: {$progress}
+download-torrent-card-remove-link = Ta bort: {$link}
+download-torrent-tracker-not-supported-error = Tracker stöds inte
+download-torrent-unknown-error = Ett fel inträffade när torrenten lades till
+remove-torrent-unknown-error = Ett fel inträffade när torrenten togs bort

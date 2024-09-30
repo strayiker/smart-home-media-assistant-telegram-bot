@@ -1,0 +1,11 @@
+search-torrents-empty = कोई परिणाम नहीं
+search-torrents-result-download-link = डाउनलोड: {$link}
+search-torrents-unknown-error = खोज के दौरान एक त्रुटि हुई
+download-torrent-card-seeds-peers = बीज: {$seeds}, साथियों: {$peers}
+download-torrent-card-speed = गति: {$speed}s
+download-torrent-card-eta = शेष समय: {$eta}
+download-torrent-card-progress = प्रगति: {$progress}
+download-torrent-card-remove-link = हटाएं: {$link}
+download-torrent-tracker-not-supported-error = ट्रैकर समर्थित नहीं है
+download-torrent-unknown-error = टोरेंट जोड़ते समय एक त्रुटि हुई
+remove-torrent-unknown-error = टोरेंट हटाते समय एक त्रुटि हुई

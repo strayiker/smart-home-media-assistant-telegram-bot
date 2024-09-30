@@ -1,0 +1,11 @@
+search-torrents-empty = 結果がありません
+search-torrents-result-download-link = ダウンロード: {$link}
+search-torrents-unknown-error = 検索中にエラーが発生しました
+download-torrent-card-seeds-peers = シード: {$seeds}, ピア: {$peers}
+download-torrent-card-speed = 速度: {$speed}s
+download-torrent-card-eta = 残り時間: {$eta}
+download-torrent-card-progress = 進行状況: {$progress}
+download-torrent-card-remove-link = 削除: {$link}
+download-torrent-tracker-not-supported-error = トラッカーはサポートされていません
+download-torrent-unknown-error = トレントの追加中にエラーが発生しました
+remove-torrent-unknown-error = トレントの削除中にエラーが発生しました

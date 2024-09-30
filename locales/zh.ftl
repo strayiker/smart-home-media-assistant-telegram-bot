@@ -1,0 +1,11 @@
+search-torrents-empty = 没有结果
+search-torrents-result-download-link = 下载: {$link}
+search-torrents-unknown-error = 搜索时发生错误
+download-torrent-card-seeds-peers = 种子: {$seeds}, 同伴: {$peers}
+download-torrent-card-speed = 速度: {$speed}s
+download-torrent-card-eta = 剩余时间: {$eta}
+download-torrent-card-progress = 进度: {$progress}
+download-torrent-card-remove-link = 删除: {$link}
+download-torrent-tracker-not-supported-error = 不支持的追踪器
+download-torrent-unknown-error = 添加种子时发生错误
+remove-torrent-unknown-error = 删除种子时发生错误

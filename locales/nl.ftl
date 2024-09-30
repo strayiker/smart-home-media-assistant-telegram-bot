@@ -1,0 +1,11 @@
+search-torrents-empty = Geen resultaten
+search-torrents-result-download-link = Download: {$link}
+search-torrents-unknown-error = Er is een fout opgetreden tijdens het zoeken
+download-torrent-card-seeds-peers = Zaden: {$seeds}, Peers: {$peers}
+download-torrent-card-speed = Snelheid: {$speed}s
+download-torrent-card-eta = Resterende tijd: {$eta}
+download-torrent-card-progress = Voortgang: {$progress}
+download-torrent-card-remove-link = Verwijderen: {$link}
+download-torrent-tracker-not-supported-error = Tracker wordt niet ondersteund
+download-torrent-unknown-error = Er is een fout opgetreden bij het toevoegen van de torrent
+remove-torrent-unknown-error = Er is een fout opgetreden bij het verwijderen van de torrent

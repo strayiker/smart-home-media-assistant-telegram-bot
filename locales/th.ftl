@@ -1,0 +1,11 @@
+search-torrents-empty = ไม่มีผลลัพธ์
+search-torrents-result-download-link = ดาวน์โหลด: {$link}
+search-torrents-unknown-error = เกิดข้อผิดพลาดระหว่างการค้นหา
+download-torrent-card-seeds-peers = Seeds: {$seeds}, Peers: {$peers}
+download-torrent-card-speed = ความเร็ว: {$speed}s
+download-torrent-card-eta = เวลาที่เหลือ: {$eta}
+download-torrent-card-progress = ความคืบหน้า: {$progress}
+download-torrent-card-remove-link = ลบ: {$link}
+download-torrent-tracker-not-supported-error = ไม่รองรับตัวติดตาม
+download-torrent-unknown-error = เกิดข้อผิดพลาดขณะเพิ่มทอร์เรนต์
+remove-torrent-unknown-error = เกิดข้อผิดพลาดขณะลบทอร์เรนต์

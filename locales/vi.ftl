@@ -1,0 +1,11 @@
+search-torrents-empty = Không có kết quả
+search-torrents-result-download-link = Tải xuống: {$link}
+search-torrents-unknown-error = Đã xảy ra lỗi trong quá trình tìm kiếm
+download-torrent-card-seeds-peers = Seeds: {$seeds}, Peers: {$peers}
+download-torrent-card-speed = Tốc độ: {$speed}s
+download-torrent-card-eta = Thời gian còn lại: {$eta}
+download-torrent-card-progress = Tiến độ: {$progress}
+download-torrent-card-remove-link = Xóa: {$link}
+download-torrent-tracker-not-supported-error = Trình theo dõi không được hỗ trợ
+download-torrent-unknown-error = Đã xảy ra lỗi khi thêm torrent
+remove-torrent-unknown-error = Đã xảy ra lỗi khi xóa torrent

@@ -1,0 +1,11 @@
+search-torrents-empty = Tidak ada hasil
+search-torrents-result-download-link = Unduh: {$link}
+search-torrents-unknown-error = Terjadi kesalahan saat pencarian
+download-torrent-card-seeds-peers = Seeds: {$seeds}, Peers: {$peers}
+download-torrent-card-speed = Kecepatan: {$speed}s
+download-torrent-card-eta = Waktu tersisa: {$eta}
+download-torrent-card-progress = Kemajuan: {$progress}
+download-torrent-card-remove-link = Hapus: {$link}
+download-torrent-tracker-not-supported-error = Pelacak tidak didukung
+download-torrent-unknown-error = Terjadi kesalahan saat menambahkan torrent
+remove-torrent-unknown-error = Terjadi kesalahan saat menghapus torrent

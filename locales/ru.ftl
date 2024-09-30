@@ -1,0 +1,11 @@
+search-torrents-empty = Нет результатов
+search-torrents-result-download-link = Скачать: {$link}
+search-torrents-unknown-error = Во время поиска произошла ошибка
+download-torrent-card-seeds-peers = Сиды: {$seeds},  Личи: {$peers}
+download-torrent-card-speed = Скорость: {$speed}s
+download-torrent-card-eta = Осталось: {$eta}
+download-torrent-card-progress = Прогресс: {$progress}
+download-torrent-card-remove-link = Удалить: {$link}
+download-torrent-tracker-not-supported-error = Трекер не поддерживается
+download-torrent-unknown-error = При добавлении торрента произошла ошибка
+remove-torrent-unknown-error = При удалении торрента произошла ошибка

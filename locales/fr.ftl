@@ -1,0 +1,11 @@
+search-torrents-empty = Aucun résultat
+search-torrents-result-download-link = Télécharger: {$link}
+search-torrents-unknown-error = Une erreur s'est produite lors de la recherche
+download-torrent-card-seeds-peers = Seeds: {$seeds}, Peers: {$peers}
+download-torrent-card-speed = Vitesse: {$speed}s
+download-torrent-card-eta = Temps restant: {$eta}
+download-torrent-card-progress = Progression: {$progress}
+download-torrent-card-remove-link = Supprimer: {$link}
+download-torrent-tracker-not-supported-error = Tracker non supporté
+download-torrent-unknown-error = Une erreur s'est produite lors de l'ajout du torrent
+remove-torrent-unknown-error = Une erreur s'est produite lors de la suppression du torrent

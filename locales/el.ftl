@@ -1,0 +1,11 @@
+search-torrents-empty = Δεν υπάρχουν αποτελέσματα
+search-torrents-result-download-link = Λήψη: {$link}
+search-torrents-unknown-error = Παρουσιάστηκε σφάλμα κατά την αναζήτηση
+download-torrent-card-seeds-peers = Seeds: {$seeds}, Peers: {$peers}
+download-torrent-card-speed = Ταχύτητα: {$speed}s
+download-torrent-card-eta = Υπολειπόμενος χρόνος: {$eta}
+download-torrent-card-progress = Πρόοδος: {$progress}
+download-torrent-card-remove-link = Αφαίρεση: {$link}
+download-torrent-tracker-not-supported-error = Ο tracker δεν υποστηρίζεται
+download-torrent-unknown-error = Παρουσιάστηκε σφάλμα κατά την προσθήκη του torrent
+remove-torrent-unknown-error = Παρουσιάστηκε σφάλμα κατά την αφαίρεση του torrent

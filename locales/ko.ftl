@@ -1,0 +1,11 @@
+search-torrents-empty = 결과 없음
+search-torrents-result-download-link = 다운로드: {$link}
+search-torrents-unknown-error = 검색 중 오류가 발생했습니다
+download-torrent-card-seeds-peers = 시드: {$seeds}, 피어: {$peers}
+download-torrent-card-speed = 속도: {$speed}s
+download-torrent-card-eta = 남은 시간: {$eta}
+download-torrent-card-progress = 진행 상황: {$progress}
+download-torrent-card-remove-link = 제거: {$link}
+download-torrent-tracker-not-supported-error = 트래커가 지원되지 않습니다
+download-torrent-unknown-error = 토렌트 추가 중 오류가 발생했습니다
+remove-torrent-unknown-error = 토렌트 제거 중 오류가 발생했습니다

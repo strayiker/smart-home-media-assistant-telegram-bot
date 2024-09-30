@@ -1,5 +1,6 @@
 import './dayjs.js';
 
+import { useFluent } from '@grammyjs/fluent';
 import { Bot, GrammyError, HttpError } from 'grammy';
 
 import { TorrentsComposer } from './composers/TorrentsComposer.js';
@@ -14,12 +15,14 @@ import {
   rutrackerPassword,
   rutrackerUsername,
 } from './config.js';
+import { type MyContext } from './Context.js';
+import { fluent } from './fluent.js';
 import { logger } from './logger.js';
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
 import { RutrackerSearchEngine } from './searchEngines/RutrackerSearchEngine.js';
 import { CookieStorage } from './utils/CookieStorage.js';
 
-const bot = new Bot(botToken);
+const bot = new Bot<MyContext>(botToken);
 const cookieStorage = new CookieStorage({
   filePath: cookiesFilePath,
   logger,
@@ -44,6 +47,12 @@ const torrents = new TorrentsComposer({
   logger,
 });
 
+bot.use(
+  useFluent({
+    fluent,
+    defaultLocale: 'en',
+  }),
+);
 bot.use(torrents);
 
 // eslint-disable-next-line unicorn/prefer-top-level-await

@@ -310,6 +310,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fluent/bundle@npm:^0.17.1":
+  version: 0.17.1
+  resolution: "@fluent/bundle@npm:0.17.1"
+  checksum: 10c0/d1cc3db338e099c04838c18f55275b6956c5ea62e4a9a09467c1868f955b1549a2abc2e46206d0aa565912010144e31ac2cbce0a813c56c707dd20f9c98aaed0
+  languageName: node
+  linkType: hard
+
+"@fluent/langneg@npm:^0.6.1":
+  version: 0.6.2
+  resolution: "@fluent/langneg@npm:0.6.2"
+  checksum: 10c0/1f1af0dabe46da5e77b032659d60e48c1fc9c1824f6bd9919ac0c465d87626078c132b02f7bbc08ba5a342869292952078dbd0f7abebdee887201186a92a55ec
+  languageName: node
+  linkType: hard
+
+"@grammyjs/fluent@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@grammyjs/fluent@npm:1.0.3"
+  peerDependencies:
+    "@moebius/fluent": ^1.0.0
+    grammy: ^1.5.0
+  checksum: 10c0/a7bd15d15fea094ea8286ec2d0d8da944c5c85abbc63e73a9912f03d633955e1bd6354af7387b76b6c6d51f29f1d5fc92b079da5197866a5c53a9f753a89b0e5
+  languageName: node
+  linkType: hard
+
 "@grammyjs/types@npm:3.14.0":
   version: 3.14.0
   resolution: "@grammyjs/types@npm:3.14.0"
@@ -352,6 +376,16 @@ __metadata:
     "@jridgewell/resolve-uri": "npm:^3.0.3"
     "@jridgewell/sourcemap-codec": "npm:^1.4.10"
   checksum: 10c0/fa425b606d7c7ee5bfa6a31a7b050dd5814b4082f318e0e4190f991902181b4330f43f4805db1dd4f2433fd0ed9cc7a7b9c2683f1deeab1df1b0a98b1e24055b
+  languageName: node
+  linkType: hard
+
+"@moebius/fluent@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@moebius/fluent@npm:1.1.0"
+  dependencies:
+    "@fluent/bundle": "npm:^0.17.1"
+    "@fluent/langneg": "npm:^0.6.1"
+  checksum: 10c0/df6f6c0d7b6c2b60f76419fd6e2ce5a949e13da6ea18557172ea9cfde267ccce38de5eb468019ddb8450197610ea1a129103572d7afa4137255a6b0326c46f18
   languageName: node
   linkType: hard
 
@@ -3122,6 +3156,8 @@ __metadata:
   dependencies:
     "@commitlint/cli": "npm:^19.5.0"
     "@commitlint/config-conventional": "npm:^19.5.0"
+    "@grammyjs/fluent": "npm:^1.0.3"
+    "@moebius/fluent": "npm:^1.1.0"
     "@types/node": "npm:^22.7.3"
     "@types/parse-torrent": "npm:^5.8.7"
     "@types/uuid": "npm:^10"

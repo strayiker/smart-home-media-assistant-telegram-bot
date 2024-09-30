@@ -157,7 +157,7 @@ export class QBittorrentClient {
 
     return json.map((item) => ({
       ...item,
-      tags: item.tags.split(','),
+      tags: item.tags.split(',').map((tag) => tag.trim()),
     })) as QBTorrent[];
   }
 
