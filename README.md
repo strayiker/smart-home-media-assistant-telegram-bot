@@ -45,7 +45,7 @@ Before we get started, make sure you have the following:
    - In the cloned repository, you'll find a file named `.env.template`.
    - Rename this file to `.env` and open it in a text editor.
    - Replace the placeholders with your actual values:
-     ```plaintext
+     ```
      BOT_TOKEN=<your-bot-token>
      RUTRACKER_USERNAME=<username-in-rutracker>
      RUTRACKER_PASSWORD=<password-in-rutracker>
@@ -59,8 +59,14 @@ Before we get started, make sure you have the following:
 6. **Build the Docker Container:**
 
    - Run the following command to build the Docker container:
+
      ```bash
      make build
+     ```
+
+   - If you prefer to use Podman instead of Docker, you can use the `use` option:
+     ```bash
+     make build use=podman
      ```
 
 7. **Start the Docker Container:**
@@ -69,11 +75,15 @@ Before we get started, make sure you have the following:
      ```bash
      make run
      ```
+   - Or:
+     ```bash
+     make run use=podman
+     ```
 
 8. **Interact with the Bot:**
 
    - Open Telegram and start a chat with your bot.
-   - Send a message to the bot to search for torrents. For example, you can type "Wall-E 1080p".
+   - Send a message to the bot to search for torrents. For example, you can type `Wall-E 1080p`.
    - The bot will respond with search results, each containing a link to download the torrent.
    - Click on the link, and the bot will add the torrent to the qBittorrent client running on your PC.
    - The bot will provide you with the download stats and periodically update them.
@@ -83,7 +93,15 @@ Before we get started, make sure you have the following:
      ```bash
      make stop
      ```
+   - Or:
+     ```bash
+     make stop use=podman
+     ```
    - To clean up Docker resources, run:
      ```bash
      make clean
+     ```
+   - Or:
+     ```bash
+     make clean use=podman
      ```
