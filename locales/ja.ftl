@@ -1,11 +1,11 @@
 search-torrents-empty = 結果がありません
-search-torrents-result-download-link = ダウンロード: {$link}
+search-torrents-result-download = ダウンロード: {$link}
 search-torrents-unknown-error = 検索中にエラーが発生しました
 torrent-message-seeds-peers = シード: {$seeds}, ピア: {$peers}
 torrent-message-speed = 速度: {$speed}s
 torrent-message-eta = 残り時間: {$eta}
 torrent-message-progress = 進行状況: {$progress}
-torrent-message-remove-link = 削除: {$link}
+torrent-message-remove = 削除: {$link}
 torrent-unsupported-tracker-error = トラッカーはサポートされていません
 torrent-download-error = トレントの追加中にエラーが発生しました
 torrent-remove-error = トレントの削除中にエラーが発生しました

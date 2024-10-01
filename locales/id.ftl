@@ -1,11 +1,11 @@
 search-torrents-empty = Tidak ada hasil
-search-torrents-result-download-link = Unduh: {$link}
+search-torrents-result-download = Unduh: {$link}
 search-torrents-unknown-error = Terjadi kesalahan saat pencarian
 torrent-message-seeds-peers = Seeds: {$seeds}, Peers: {$peers}
 torrent-message-speed = Kecepatan: {$speed}s
 torrent-message-eta = Waktu tersisa: {$eta}
 torrent-message-progress = Kemajuan: {$progress}
-torrent-message-remove-link = Hapus: {$link}
+torrent-message-remove = Hapus: {$link}
 torrent-unsupported-tracker-error = Pelacak tidak didukung
 torrent-download-error = Terjadi kesalahan saat menambahkan torrent
 torrent-remove-error = Terjadi kesalahan saat menghapus torrent

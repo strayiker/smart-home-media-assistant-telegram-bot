@@ -1,11 +1,11 @@
 search-torrents-empty = Sonuç yok
-search-torrents-result-download-link = İndir: {$link}
+search-torrents-result-download = İndir: {$link}
 search-torrents-unknown-error = Arama sırasında bir hata oluştu
 torrent-message-seeds-peers = Tohumlar: {$seeds}, Eşler: {$peers}
 torrent-message-speed = Hız: {$speed}s
 torrent-message-eta = Kalan süre: {$eta}
 torrent-message-progress = İlerleme: {$progress}
-torrent-message-remove-link = Kaldır: {$link}
+torrent-message-remove = Kaldır: {$link}
 torrent-unsupported-tracker-error = İzleyici desteklenmiyor
 torrent-download-error = Torrent eklenirken bir hata oluştu
 torrent-remove-error = Torrent kaldırılırken bir hata oluştu

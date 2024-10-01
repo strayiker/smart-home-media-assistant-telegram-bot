@@ -1,11 +1,11 @@
 search-torrents-empty = Không có kết quả
-search-torrents-result-download-link = Tải xuống: {$link}
+search-torrents-result-download = Tải xuống: {$link}
 search-torrents-unknown-error = Đã xảy ra lỗi trong quá trình tìm kiếm
 torrent-message-seeds-peers = Seeds: {$seeds}, Peers: {$peers}
 torrent-message-speed = Tốc độ: {$speed}s
 torrent-message-eta = Thời gian còn lại: {$eta}
 torrent-message-progress = Tiến độ: {$progress}
-torrent-message-remove-link = Xóa: {$link}
+torrent-message-remove = Xóa: {$link}
 torrent-unsupported-tracker-error = Trình theo dõi không được hỗ trợ
 torrent-download-error = Đã xảy ra lỗi khi thêm torrent
 torrent-remove-error = Đã xảy ra lỗi khi xóa torrent

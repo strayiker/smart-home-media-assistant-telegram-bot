@@ -1,11 +1,11 @@
 search-torrents-empty = Δεν υπάρχουν αποτελέσματα
-search-torrents-result-download-link = Λήψη: {$link}
+search-torrents-result-download = Λήψη: {$link}
 search-torrents-unknown-error = Παρουσιάστηκε σφάλμα κατά την αναζήτηση
 torrent-message-seeds-peers = Seeds: {$seeds}, Peers: {$peers}
 torrent-message-speed = Ταχύτητα: {$speed}s
 torrent-message-eta = Υπολειπόμενος χρόνος: {$eta}
 torrent-message-progress = Πρόοδος: {$progress}
-torrent-message-remove-link = Αφαίρεση: {$link}
+torrent-message-remove = Αφαίρεση: {$link}
 torrent-unsupported-tracker-error = Ο tracker δεν υποστηρίζεται
 torrent-download-error = Παρουσιάστηκε σφάλμα κατά την προσθήκη του torrent
 torrent-remove-error = Παρουσιάστηκε σφάλμα κατά την αφαίρεση του torrent

@@ -1,11 +1,11 @@
 search-torrents-empty = Nenhum resultado
-search-torrents-result-download-link = Baixar: {$link}
+search-torrents-result-download = Baixar: {$link}
 search-torrents-unknown-error = Ocorreu um erro durante a pesquisa
 torrent-message-seeds-peers = Seeds: {$seeds}, Peers: {$peers}
 torrent-message-speed = Velocidade: {$speed}s
 torrent-message-eta = Tempo restante: {$eta}
 torrent-message-progress = Progresso: {$progress}
-torrent-message-remove-link = Remover: {$link}
+torrent-message-remove = Remover: {$link}
 torrent-unsupported-tracker-error = Tracker não suportado
 torrent-download-error = Ocorreu um erro ao adicionar o torrent
 torrent-remove-error = Ocorreu um erro ao remover o torrent
