@@ -47,7 +47,7 @@ export class TorrentsComposer<
 
     this.timeout = setInterval(() => {
       this.createOrUpdateCardMessages();
-    }, 10 * 1000);
+    }, 5 * 1000);
 
     this.on('message::bot_command', async (ctx, next) => {
       if (ctx.message.text?.startsWith('/dl_')) {
@@ -82,14 +82,12 @@ export class TorrentsComposer<
     }
 
     // TODO: Add buttons to navigate between pages
-    const text = results
-      .slice(0, 5)
-      .map(([se, result]) => this.formatSearchResult(ctx, se, result))
-      .join('\n\n\n');
-
-    return ctx.reply(text, {
-      parse_mode: 'HTML',
-    });
+    for await (const [se, result] of results.slice(0, 5)) {
+      const text = this.formatSearchResult(ctx, se, result);
+      await ctx.reply(text, {
+        parse_mode: 'HTML',
+      });
+    }
   }
 
   private async handleDownloadCommand(ctx: Filter<C, 'message::bot_command'>) {
@@ -136,7 +134,7 @@ export class TorrentsComposer<
       this.chatTorrents.set(ctx.chatId, [hash]);
     }
 
-    await this.createOrUpdateCardMessage(ctx.chatId);
+    await this.createOrUpdateCardMessage(ctx.chatId, true);
   }
 
   private async handleRemoveCommand(ctx: Filter<C, 'message::bot_command'>) {
@@ -160,7 +158,7 @@ export class TorrentsComposer<
 
     this.logger.debug('A torrent where successfully deleted: %s', hash);
 
-    await this.createOrUpdateCardMessage(ctx.chatId);
+    await this.createOrUpdateCardMessage(ctx.chatId, true);
   }
 
   private async searchTorrents(query: string) {
@@ -282,7 +280,10 @@ export class TorrentsComposer<
     }
   }
 
-  private async createOrUpdateCardMessage(chatId: number) {
+  private async createOrUpdateCardMessage(
+    chatId: number,
+    refresh: boolean = false,
+  ) {
     const hashes = this.chatTorrents.get(chatId);
 
     if (!hashes || hashes.length === 0) {
@@ -310,7 +311,7 @@ export class TorrentsComposer<
 
     let message = this.chatMessages.get(chatId);
 
-    if (message && (completed.length > 0 || pending.length === 0)) {
+    if (message && (completed.length > 0 || pending.length === 0 || refresh)) {
       await this.deleteCardMessage(message);
       message = undefined;
     }
@@ -357,11 +358,17 @@ export class TorrentsComposer<
   }
 
   private formatSearchResult(ctx: C, se: SearchEngine, result: SearchResult) {
+    const lines = [];
+
     const uid = `${se.name}_${result.id}`;
-    const lines = [`<b>${result.title}</b>`, '---'];
+    const title = `<b>${result.title}</b>`;
+    const download = ctx.t('search-torrents-result-download-link', {
+      link: `/dl_${uid}`,
+    });
+
     const info: string[] = [];
 
-    if (result.totalSize) {
+    if (typeof result.totalSize === 'number') {
       info.push(formatBytes(result.totalSize));
     }
 
@@ -375,60 +382,74 @@ export class TorrentsComposer<
     }
 
     if (result.date) {
-      info.push(
-        result.date.toLocaleDateString(ctx.from?.language_code ?? 'en'),
+      const date = result.date.toLocaleDateString(
+        ctx.from?.language_code ?? 'en',
       );
+      info.push(date);
     }
 
+    lines.push(title);
+    lines.push('---');
     lines.push(info.join('  |  '));
     lines.push('---');
-    lines.push(
-      ctx.t('search-torrents-result-download-link', { link: `/dl_${uid}` }),
-    );
+    lines.push(download);
 
     return lines.join('\n');
   }
 
   private formatTorrent(chatId: number, torrent: QBTorrent) {
+    const lines = [];
+
     let uid: string | undefined;
     let locale: string = 'en';
 
+    const prefixUid = 'uid_';
+    const prefixI18n = `i18n_${chatId}_`;
+    const completed = torrent.progress === 1;
+
     for (const tag of torrent.tags) {
-      if (tag.startsWith('uid_')) {
-        uid = tag.replace('uid_', '');
-      } else if (tag.startsWith(`i18n_${chatId}_`)) {
-        locale = tag.replace(`i18n_${chatId}_`, '');
+      if (tag.startsWith(prefixUid)) {
+        uid = tag.replace(prefixUid, '');
+      } else if (tag.startsWith(prefixI18n)) {
+        locale = tag.replace(prefixI18n, '');
       }
     }
 
     const t = fluent.withLocale(locale);
 
-    const lines = [`<b>${torrent.name}</b>`, '---'];
+    lines.push(`<b>${torrent.name}</b>`);
+    lines.push('---');
 
-    if (torrent.progress < 1) {
-      const seeds = `${torrent.num_seeds} (${torrent.num_complete})`;
-      const peers = `${torrent.num_leechs} (${torrent.num_incomplete})`;
-      const eta =
-        torrent.eta >= 8_640_000 ? '∞' : formatDuration(torrent.eta, locale);
+    if (!completed) {
+      const seedAndPeers = t('download-torrent-card-seeds-peers', {
+        seeds: `${torrent.num_seeds} (${torrent.num_complete})`,
+        peers: `${torrent.num_leechs} (${torrent.num_incomplete})`,
+      });
+      const speed = t('download-torrent-card-speed', {
+        speed: formatBytes(torrent.dlspeed),
+      });
+      const eta = t('download-torrent-card-eta', {
+        eta:
+          torrent.eta >= 8_640_000 ? '∞' : formatDuration(torrent.eta, locale),
+      });
 
-      lines.push(t('download-torrent-card-seeds-peers', { seeds, peers }));
-      lines.push(
-        t('download-torrent-card-speed', {
-          speed: formatBytes(torrent.dlspeed),
-        }),
-      );
-      lines.push(t('download-torrent-card-eta', { eta }));
+      lines.push(seedAndPeers);
+      lines.push(speed);
+      lines.push(eta);
     }
 
-    const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
+    const progress = t('download-torrent-card-progress', {
+      progress: `${Math.round(torrent.progress * 100 * 100) / 100}%`,
+    });
 
-    lines.push(t('download-torrent-card-progress', { progress }));
+    lines.push(progress);
     lines.push('---');
 
     if (uid) {
-      lines.push(
-        t('download-torrent-card-remove-link', { link: `/rm_${uid}` }),
-      );
+      const remove = t('download-torrent-card-remove-link', {
+        link: `/rm_${uid}`,
+      });
+      lines.push(remove);
     }
 
     return lines.join('\n');
