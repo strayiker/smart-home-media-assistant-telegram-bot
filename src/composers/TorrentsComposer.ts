@@ -82,11 +82,17 @@ export class TorrentsComposer<
     }
 
     // TODO: Add buttons to navigate between pages
-    for await (const [se, result] of results.slice(0, 5)) {
-      const text = this.formatSearchResult(ctx, se, result);
+    const text = results
+      .slice(0, 5)
+      .map(([se, result]) => this.formatSearchResult(ctx, se, result))
+      .join('\n\n\n');
+
+    try {
       await ctx.reply(text, {
         parse_mode: 'HTML',
       });
+    } catch {
+      return ctx.reply(ctx.t('search-torrents-unknown-error'));
     }
   }
 
