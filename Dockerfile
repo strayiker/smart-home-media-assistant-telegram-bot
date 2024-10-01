@@ -24,6 +24,7 @@ WORKDIR /app
 
 # Copy only the necessary files from the build stage
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/locales ./locales
 COPY --from=builder /app/package.json /app/yarn.lock /app/.yarnrc.yml ./
 COPY --from=builder /app/.yarn ./.yarn
 
