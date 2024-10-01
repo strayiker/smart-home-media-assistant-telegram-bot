@@ -46,7 +46,7 @@ export class TorrentsComposer<
     this.logger = options.logger;
 
     this.timeout = setInterval(() => {
-      this.createOrUpdateCardMessages();
+      this.createOrUpdateTorrentsMessages();
     }, 5 * 1000);
 
     this.on('message::bot_command', async (ctx, next) => {
@@ -101,7 +101,7 @@ export class TorrentsComposer<
     const se = this.searchEngines.find((se) => se.name === seName);
 
     if (!se) {
-      return ctx.reply(ctx.t('download-torrent-tracker-not-supported-error'));
+      return ctx.reply(ctx.t('torrent-unsupported-tracker-error'));
     }
 
     let torrent: string | undefined;
@@ -109,7 +109,7 @@ export class TorrentsComposer<
     try {
       torrent = await se.downloadTorrentFile(id);
     } catch {
-      return ctx.reply(ctx.t('download-torrent-unknown-error'));
+      return ctx.reply(ctx.t('torrent-download-error'));
     }
 
     const { hash, error } = await this.addTorrent({
@@ -121,7 +121,7 @@ export class TorrentsComposer<
     });
 
     if (!hash || error) {
-      return ctx.reply(ctx.t('download-torrent-unknown-error'));
+      return ctx.reply(ctx.t('torrent-download-error'));
     }
 
     this.logger.debug('A new torrent where successfully added: %s', hash);
@@ -134,7 +134,7 @@ export class TorrentsComposer<
       this.chatTorrents.set(ctx.chatId, [hash]);
     }
 
-    await this.createOrUpdateCardMessage(ctx.chatId, true);
+    await this.createOrUpdateTorrentsMessage(ctx.chatId, true);
   }
 
   private async handleRemoveCommand(ctx: Filter<C, 'message::bot_command'>) {
@@ -146,19 +146,19 @@ export class TorrentsComposer<
     const { torrent, error } = await this.getTorrentByUid(uid);
 
     if (!torrent || error) {
-      return ctx.reply(ctx.t('remove-torrent-unknown-error'));
+      return ctx.reply(ctx.t('torrent-remove-error'));
     }
 
     const { hash } = torrent;
     const { error: deletingError } = await this.deleteTorrent(hash);
 
     if (deletingError) {
-      return ctx.reply(ctx.t('remove-torrent-unknown-error'));
+      return ctx.reply(ctx.t('torrent-remove-error'));
     }
 
     this.logger.debug('A torrent where successfully deleted: %s', hash);
 
-    await this.createOrUpdateCardMessage(ctx.chatId, true);
+    await this.createOrUpdateTorrentsMessage(ctx.chatId, true);
   }
 
   private async searchTorrents(query: string) {
@@ -228,20 +228,23 @@ export class TorrentsComposer<
     }
   }
 
-  private async sendCardMessage(chatId: number, cardText: string) {
+  private async sendTorrentsMessage(chatId: number, text: string) {
     try {
-      const message = await this.bot.api.sendMessage(chatId, cardText, {
+      const message = await this.bot.api.sendMessage(chatId, text, {
         parse_mode: 'HTML',
       });
-      message.text = cardText;
+      message.text = text;
       this.chatMessages.set(chatId, message);
     } catch (error) {
-      this.logger.error(error, 'An error occured while sending card message');
+      this.logger.error(
+        error,
+        'An error occured while sending torrents message',
+      );
     }
   }
 
-  private async updateCardMessage(message: Message, cardText: string) {
-    if (message.text === cardText) {
+  private async updateTorrentsMessage(message: Message, text: string) {
+    if (message.text === text) {
       return;
     }
 
@@ -249,38 +252,41 @@ export class TorrentsComposer<
       await this.bot.api.editMessageText(
         message.chat.id,
         message.message_id,
-        cardText,
+        text,
         {
           parse_mode: 'HTML',
         },
       );
-      message.text = cardText;
+      message.text = text;
     } catch (error) {
       if (
         error instanceof GrammyError &&
         error.description === 'Bad Request: message to edit not found'
       ) {
-        await this.sendCardMessage(message.chat.id, cardText);
+        await this.sendTorrentsMessage(message.chat.id, text);
       } else {
         this.logger.error(
           error,
-          'An error occured while updating card message',
+          'An error occured while updating torrents message',
         );
       }
     }
   }
 
-  private async deleteCardMessage(message: Message) {
+  private async deleteTorrentsMessage(message: Message) {
     try {
       await this.bot.api.deleteMessage(message.chat.id, message.message_id);
     } catch (error) {
-      this.logger.error(error, 'An error occured while deleting card message');
+      this.logger.error(
+        error,
+        'An error occured while deleting torrent message',
+      );
     } finally {
       this.chatMessages.delete(message.chat.id);
     }
   }
 
-  private async createOrUpdateCardMessage(
+  private async createOrUpdateTorrentsMessage(
     chatId: number,
     refresh: boolean = false,
   ) {
@@ -312,7 +318,7 @@ export class TorrentsComposer<
     let message = this.chatMessages.get(chatId);
 
     if (message && (completed.length > 0 || pending.length === 0 || refresh)) {
-      await this.deleteCardMessage(message);
+      await this.deleteTorrentsMessage(message);
       message = undefined;
     }
 
@@ -323,16 +329,18 @@ export class TorrentsComposer<
       this.chatTorrents.delete(chatId);
     }
 
-    for await (const torrent of completed) {
+    if (completed.length > 0) {
       try {
-        const text = this.formatTorrent(chatId, torrent);
-        await this.bot.api.sendMessage(chatId, text, {
+        const completedText = completed
+          .map((torrent) => this.formatTorrent(chatId, torrent))
+          .join('\n\n\n');
+        await this.bot.api.sendMessage(chatId, completedText, {
           parse_mode: 'HTML',
         });
       } catch (error) {
         this.logger.error(
           error,
-          'An error occured while sending card message',
+          'An error occured while sending completed torrents message',
           error,
         );
       }
@@ -342,18 +350,18 @@ export class TorrentsComposer<
       return;
     }
 
-    const cardText = pending
+    const pendingText = pending
       .map((torrent) => this.formatTorrent(chatId, torrent))
       .join('\n\n\n');
 
     await (message
-      ? this.updateCardMessage(message, cardText)
-      : this.sendCardMessage(chatId, cardText));
+      ? this.updateTorrentsMessage(message, pendingText)
+      : this.sendTorrentsMessage(chatId, pendingText));
   }
 
-  private async createOrUpdateCardMessages() {
+  private async createOrUpdateTorrentsMessages() {
     for (const chatId of this.chatTorrents.keys()) {
-      this.createOrUpdateCardMessage(chatId);
+      this.createOrUpdateTorrentsMessage(chatId);
     }
   }
 
@@ -362,7 +370,7 @@ export class TorrentsComposer<
 
     const uid = `${se.name}_${result.id}`;
     const title = `<b>${result.title}</b>`;
-    const download = ctx.t('search-torrents-result-download-link', {
+    const download = ctx.t('search-torrents-result-download', {
       link: `/dl_${uid}`,
     });
 
@@ -421,14 +429,14 @@ export class TorrentsComposer<
     lines.push('---');
 
     if (!completed) {
-      const seedAndPeers = t('download-torrent-card-seeds-peers', {
+      const seedAndPeers = t('download-torrent-message-seeds-peers', {
         seeds: `${torrent.num_seeds} (${torrent.num_complete})`,
         peers: `${torrent.num_leechs} (${torrent.num_incomplete})`,
       });
-      const speed = t('download-torrent-card-speed', {
+      const speed = t('torrent-message-speed', {
         speed: formatBytes(torrent.dlspeed),
       });
-      const eta = t('download-torrent-card-eta', {
+      const eta = t('torrent-message-eta', {
         eta:
           torrent.eta >= 8_640_000 ? '∞' : formatDuration(torrent.eta, locale),
       });
@@ -438,7 +446,7 @@ export class TorrentsComposer<
       lines.push(eta);
     }
 
-    const progress = t('download-torrent-card-progress', {
+    const progress = t('torrent-message-progress', {
       progress: `${Math.round(torrent.progress * 100 * 100) / 100}%`,
     });
 
@@ -446,7 +454,7 @@ export class TorrentsComposer<
     lines.push('---');
 
     if (uid) {
-      const remove = t('download-torrent-card-remove-link', {
+      const remove = t('torrent-message-remove', {
         link: `/rm_${uid}`,
       });
       lines.push(remove);
