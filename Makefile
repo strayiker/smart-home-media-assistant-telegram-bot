@@ -12,6 +12,7 @@ build:
 	${BUILDTOOL} build -t $(IMAGE_NAME) .
 
 run:
+	${BUILDTOOL} stop $(IMAGE_NAME)
 	${BUILDTOOL} rm --ignore $(IMAGE_NAME)
 	${BUILDTOOL} run -d \
 		-v $(DATA_PATH):/data \
@@ -20,6 +21,9 @@ run:
 		--network host \
 		--restart unless-stopped \
 		$(IMAGE_NAME)
+
+logs:
+	${BUILDTOOL} logs -f $(IMAGE_NAME)
 
 stop:
 	${BUILDTOOL} stop $(IMAGE_NAME)
