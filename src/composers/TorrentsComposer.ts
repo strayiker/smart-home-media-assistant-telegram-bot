@@ -435,7 +435,7 @@ export class TorrentsComposer<
     lines.push('---');
 
     if (!completed) {
-      const seedAndPeers = t('download-torrent-message-seeds-peers', {
+      const seedAndPeers = t('torrent-message-seeds-peers', {
         seeds: `${torrent.num_seeds} (${torrent.num_complete})`,
         peers: `${torrent.num_leechs} (${torrent.num_incomplete})`,
       });
