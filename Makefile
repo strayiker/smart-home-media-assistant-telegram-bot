@@ -12,8 +12,6 @@ build:
 	${BUILDTOOL} build -t $(IMAGE_NAME) .
 
 run:
-	${BUILDTOOL} stop $(IMAGE_NAME)
-	${BUILDTOOL} rm --ignore $(IMAGE_NAME)
 	${BUILDTOOL} run -d \
 		-v $(DATA_PATH):/data \
 		--name $(IMAGE_NAME) \
