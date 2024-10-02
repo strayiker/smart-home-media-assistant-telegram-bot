@@ -2,7 +2,7 @@
 
 Hey there! This is the sources of a Telegram bot is designed to help you search for torrents and remotely download them to your PC using the qBittorrent client. It's written in TypeScript and runs in a Docker container on your PC.
 
-![alt text](./static/image.webp)
+![example](./static/image.webp)
 
 ## Disclaimer
 
@@ -12,7 +12,7 @@ Currently, the bot is able to search torrents on Rutracker only. However, you ar
 
 Before we get started, make sure you have the following:
 
-- Docker installed on your PC
+- Docker installed on your PC (or Podman or any other you prefer)
 - qBittorrent client installed and configured on your PC
 - Telegram account
 
@@ -74,7 +74,7 @@ In addition to the listed prerequisites, Windows users also need to install `mak
      make build
      ```
 
-   - If you prefer to use Podman instead of Docker, you can use the `use` option:
+   - If you prefer some other tool instead of Docker, you can use the `use` option, for example:
      ```bash
      make build use=podman
      ```
@@ -85,12 +85,15 @@ In addition to the listed prerequisites, Windows users also need to install `mak
      ```bash
      make run
      ```
-   - Or:
+
+8. **See the logs of Docker Container:**
+
+   - To start the bot, run:
      ```bash
-     make run use=podman
+     make logs
      ```
 
-8. **Interact with the Bot:**
+9. **Interact with the Bot:**
 
    - Open Telegram and start a chat with your bot.
    - Send a message to the bot to search for torrents. For example, you can type `Wall-E 1080p`.
@@ -98,20 +101,17 @@ In addition to the listed prerequisites, Windows users also need to install `mak
    - Click on the link, and the bot will add the torrent to the qBittorrent client running on your PC.
    - The bot will provide you with the download stats and periodically update them.
 
-9. **Stop and Clean Up:**
-   - When you're done, you can stop the Docker container by running:
-     ```bash
-     make stop
-     ```
-   - Or:
-     ```bash
-     make stop use=podman
-     ```
-   - To clean up Docker resources, run:
-     ```bash
-     make clean
-     ```
-   - Or:
-     ```bash
-     make clean use=podman
-     ```
+10. **Stop and Clean Up:**
+
+    - To start the bot, run:
+      ```bash
+      make run
+      ```
+    - When you're done, you can stop the Docker container by running:
+      ```bash
+      make stop
+      ```
+    - To clean up Docker resources, run:
+      ```bash
+      make clean
+      ```
