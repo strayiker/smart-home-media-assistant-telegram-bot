@@ -1,11 +1,26 @@
-search-torrents-empty = No hay resultados
-search-torrents-result-download = Descargar: {$link}
-search-torrents-unknown-error = Se produjo un error durante la búsqueda
-torrent-message-seeds-peers = Seeds: {$seeds}, Peers: {$peers}
-torrent-message-speed = Velocidad: {$speed}s
-torrent-message-eta = Tiempo restante: {$eta}
-torrent-message-progress = Progreso: {$progress}
-torrent-message-remove = Eliminar: {$link}
-torrent-unsupported-tracker-error = El tracker no es compatible
-torrent-download-error = Se produjo un error al agregar el torrent
-torrent-remove-error = Se produjo un error al eliminar el torrent
+search-message =
+    <b>{$title}</b>
+    ---
+    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    ---
+    Descargar: {$download}
+search-empty-results = No hay resultados
+search-unknown-error = Ocurrió un error durante la búsqueda
+torrent-message-in-progress =
+    <b>{$title}</b>
+    ---
+    Semillas: {$seeds} ({$maxSeeds}),  Pares: {$peers} ({$maxPeers})
+    Velocidad: {$speed}
+    ETA: {$eta}
+    Progreso: {$progress}
+    ---
+    Eliminar: {$remove}
+torrent-message-completed =
+    <b>{$title}</b>
+    ---
+    Progreso: {$progress}
+    ---
+    Eliminar: {$remove}
+torrent-unsupported-tracker-error = Rastreador no soportado
+torrent-download-error = Ocurrió un error al agregar el torrent
+torrent-remove-error = Ocurrió un error al eliminar el torrent

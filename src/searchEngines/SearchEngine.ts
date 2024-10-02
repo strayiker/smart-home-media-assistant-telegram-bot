@@ -1,11 +1,11 @@
 export interface SearchResult {
   id: string;
   title: string;
-  totalSize?: number;
-  seeds?: number;
-  leeches?: number;
-  date?: Date;
-  trackerUrl?: string;
+  size: number;
+  seeds: number;
+  peers: number;
+  publishDate?: Date;
+  detailsUrl?: string;
   downloadUrl: string;
 }
 

@@ -1,11 +1,26 @@
-search-torrents-empty = Brak wyników
-search-torrents-result-download = Pobierz: {$link}
-search-torrents-unknown-error = Wystąpił błąd podczas wyszukiwania
-torrent-message-seeds-peers = Nasiona: {$seeds}, Rówieśnicy: {$peers}
-torrent-message-speed = Prędkość: {$speed}s
-torrent-message-eta = Pozostały czas: {$eta}
-torrent-message-progress = Postęp: {$progress}
-torrent-message-remove = Usuń: {$link}
+search-message =
+    <b>{$title}</b>
+    ---
+    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    ---
+    Pobierz: {$download}
+search-empty-results = Brak wyników
+search-unknown-error = Wystąpił błąd podczas wyszukiwania
+torrent-message-in-progress =
+    <b>{$title}</b>
+    ---
+    Seedy: {$seeds} ({$maxSeeds}),  Peery: {$peers} ({$maxPeers})
+    Prędkość: {$speed}
+    ETA: {$eta}
+    Postęp: {$progress}
+    ---
+    Usuń: {$remove}
+torrent-message-completed =
+    <b>{$title}</b>
+    ---
+    Postęp: {$progress}
+    ---
+    Usuń: {$remove}
 torrent-unsupported-tracker-error = Tracker nie jest obsługiwany
 torrent-download-error = Wystąpił błąd podczas dodawania torrenta
 torrent-remove-error = Wystąpił błąd podczas usuwania torrenta

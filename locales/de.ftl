@@ -1,11 +1,26 @@
-search-torrents-empty = Keine Ergebnisse
-search-torrents-result-download = Herunterladen: {$link}
-search-torrents-unknown-error = Beim Suchen ist ein Fehler aufgetreten
-torrent-message-seeds-peers = Seeds: {$seeds}, Peers: {$peers}
-torrent-message-speed = Geschwindigkeit: {$speed}\/s
-torrent-message-eta = Verbleibende Zeit: {$eta}
-torrent-message-progress = Fortschritt: {$progress}
-torrent-message-remove = Entfernen: {$link}
-torrent-unsupported-tracker-error = Tracker wird nicht unterstützt
-torrent-download-error = Beim Hinzufügen des Torrents ist ein Fehler aufgetreten
-torrent-remove-error = Beim Entfernen des Torrents ist ein Fehler aufgetreten
+search-message =
+    <b>{$title}</b>
+    ---
+    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    ---
+    Herunterladen: {$download}
+search-empty-results = Keine Ergebnisse
+search-unknown-error = Bei der Suche ist ein Fehler aufgetreten
+torrent-message-in-progress =
+    <b>{$title}</b>
+    ---
+    Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
+    Geschwindigkeit: {$speed}
+    ETA: {$eta}
+    Fortschritt: {$progress}
+    ---
+    Entfernen: {$remove}
+torrent-message-completed =
+    <b>{$title}</b>
+    ---
+    Fortschritt: {$progress}
+    ---
+    Entfernen: {$remove}
+torrent-unsupported-tracker-error = Tracker nicht unterstützt
+torrent-download-error = Fehler beim Hinzufügen des Torrents
+torrent-remove-error = Fehler beim Entfernen des Torrents

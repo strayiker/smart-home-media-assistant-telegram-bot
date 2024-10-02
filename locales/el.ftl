@@ -1,11 +1,26 @@
-search-torrents-empty = Δεν υπάρχουν αποτελέσματα
-search-torrents-result-download = Λήψη: {$link}
-search-torrents-unknown-error = Παρουσιάστηκε σφάλμα κατά την αναζήτηση
-torrent-message-seeds-peers = Seeds: {$seeds}, Peers: {$peers}
-torrent-message-speed = Ταχύτητα: {$speed}s
-torrent-message-eta = Υπολειπόμενος χρόνος: {$eta}
-torrent-message-progress = Πρόοδος: {$progress}
-torrent-message-remove = Αφαίρεση: {$link}
-torrent-unsupported-tracker-error = Ο tracker δεν υποστηρίζεται
+search-message =
+    <b>{$title}</b>
+    ---
+    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    ---
+    Λήψη: {$download}
+search-empty-results = Δεν υπάρχουν αποτελέσματα
+search-unknown-error = Παρουσιάστηκε σφάλμα κατά την αναζήτηση
+torrent-message-in-progress =
+    <b>{$title}</b>
+    ---
+    Σπόροι: {$seeds} ({$maxSeeds}),  Ομότιμοι: {$peers} ({$maxPeers})
+    Ταχύτητα: {$speed}
+    ETA: {$eta}
+    Πρόοδος: {$progress}
+    ---
+    Κατάργηση: {$remove}
+torrent-message-completed =
+    <b>{$title}</b>
+    ---
+    Πρόοδος: {$progress}
+    ---
+    Κατάργηση: {$remove}
+torrent-unsupported-tracker-error = Ο ιχνηλάτης δεν υποστηρίζεται
 torrent-download-error = Παρουσιάστηκε σφάλμα κατά την προσθήκη του torrent
-torrent-remove-error = Παρουσιάστηκε σφάλμα κατά την αφαίρεση του torrent
+torrent-remove-error = Παρουσιάστηκε σφάλμα κατά την κατάργηση του torrent

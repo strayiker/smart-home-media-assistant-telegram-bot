@@ -1,11 +1,26 @@
-search-torrents-empty = Нет результатов
-search-torrents-result-download = Скачать: {$link}
-search-torrents-unknown-error = Во время поиска произошла ошибка
-torrent-message-seeds-peers = Сиды: {$seeds},  Личи: {$peers}
-torrent-message-speed = Скорость: {$speed}s
-torrent-message-eta = Осталось: {$eta}
-torrent-message-progress = Прогресс: {$progress}
-torrent-message-remove = Удалить: {$link}
+search-message =
+    <b>{$title}</b>
+    ---
+    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    ---
+    Скачать: {$download}
+search-empty-results = Нет результатов
+search-unknown-error = Произошла ошибка во время поиска
+torrent-message-in-progress =
+    <b>{$title}</b>
+    ---
+    Сиды: {$seeds} ({$maxSeeds}),  Пиры: {$peers} ({$maxPeers})
+    Скорость: {$speed}
+    Ожидаемое время: {$eta}
+    Прогресс: {$progress}
+    ---
+    Удалить: {$remove}
+torrent-message-completed =
+    <b>{$title}</b>
+    ---
+    Прогресс: {$progress}
+    ---
+    Удалить: {$remove}
 torrent-unsupported-tracker-error = Трекер не поддерживается
-torrent-download-error = При добавлении торрента произошла ошибка
-torrent-remove-error = При удалении торрента произошла ошибка
+torrent-download-error = Произошла ошибка при добавлении торрента
+torrent-remove-error = Произошла ошибка при удалении торрента

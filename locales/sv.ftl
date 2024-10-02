@@ -1,11 +1,26 @@
-search-torrents-empty = Inga resultat
-search-torrents-result-download = Ladda ner: {$link}
-search-torrents-unknown-error = Ett fel inträffade under sökningen
-torrent-message-seeds-peers = Frön: {$seeds}, Jämlikar: {$peers}
-torrent-message-speed = Hastighet: {$speed}s
-torrent-message-eta = Återstående tid: {$eta}
-torrent-message-progress = Framsteg: {$progress}
-torrent-message-remove = Ta bort: {$link}
+search-message =
+    <b>{$title}</b>
+    ---
+    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    ---
+    Ladda ner: {$download}
+search-empty-results = Inga resultat
+search-unknown-error = Ett fel inträffade under sökningen
+torrent-message-in-progress =
+    <b>{$title}</b>
+    ---
+    Frön: {$seeds} ({$maxSeeds}),  Jämlikar: {$peers} ({$maxPeers})
+    Hastighet: {$speed}
+    ETA: {$eta}
+    Framsteg: {$progress}
+    ---
+    Ta bort: {$remove}
+torrent-message-completed =
+    <b>{$title}</b>
+    ---
+    Framsteg: {$progress}
+    ---
+    Ta bort: {$remove}
 torrent-unsupported-tracker-error = Tracker stöds inte
-torrent-download-error = Ett fel inträffade när torrenten lades till
-torrent-remove-error = Ett fel inträffade när torrenten togs bort
+torrent-download-error = Ett fel inträffade vid tillägg av torrent
+torrent-remove-error = Ett fel inträffade vid borttagning av torrent

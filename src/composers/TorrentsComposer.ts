@@ -33,7 +33,7 @@ export class TorrentsComposer<
   private searchEngines: SearchEngine[];
   private qBittorrent: QBittorrentClient;
   private chatMessages = new Map<number, Message>();
-  private chatTorrents = new Map<number, string[]>();
+  private chatTorrents = new Map<number, Set<string>>();
   private timeout: NodeJS.Timeout;
   private logger: Logger;
 
@@ -71,14 +71,16 @@ export class TorrentsComposer<
   private async handleSearchQuery(ctx: Filter<C, 'message:text'>) {
     const query = ctx.message.text;
 
-    const { results, error } = await this.searchTorrents(query);
+    let results: (readonly [SearchEngine, SearchResult])[];
 
-    if (!results || error) {
-      return ctx.reply(ctx.t('search-torrents-unknown-error'));
+    try {
+      results = await this.searchTorrents(query);
+    } catch {
+      return ctx.reply(ctx.t('search-unknown-error'));
     }
 
     if (results.length === 0) {
-      return ctx.reply(ctx.t('search-torrents-empty'));
+      return ctx.reply(ctx.t('search-empty-results'));
     }
 
     // TODO: Add buttons to navigate between pages
@@ -88,11 +90,9 @@ export class TorrentsComposer<
       .join('\n\n\n');
 
     try {
-      await ctx.reply(text, {
-        parse_mode: 'HTML',
-      });
-    } catch {
-      return ctx.reply(ctx.t('search-torrents-unknown-error'));
+      await ctx.reply(text, { parse_mode: 'HTML' });
+    } catch (error) {
+      this.logger.error(error, 'An error occured whire sending search results');
     }
   }
 
@@ -118,15 +118,16 @@ export class TorrentsComposer<
       return ctx.reply(ctx.t('torrent-download-error'));
     }
 
-    const { hash, error } = await this.addTorrent({
-      torrent,
-      tags: [
-        `uid_${uid}`,
-        `i18n_${ctx.chatId}_${ctx.from.language_code ?? 'en'}`,
-      ],
-    });
+    let hash: string;
 
-    if (!hash || error) {
+    try {
+      const uidTag = `uid_${uid}`;
+      const i18nTag = `i18n_${ctx.chatId}_${ctx.from.language_code ?? 'en'}`;
+      hash = await this.addTorrent({
+        torrent,
+        tags: [uidTag, i18nTag],
+      });
+    } catch {
       return ctx.reply(ctx.t('torrent-download-error'));
     }
 
@@ -135,9 +136,9 @@ export class TorrentsComposer<
     const chatTorrents = this.chatTorrents.get(ctx.chatId);
 
     if (chatTorrents) {
-      chatTorrents.push(hash);
+      chatTorrents.add(hash);
     } else {
-      this.chatTorrents.set(ctx.chatId, [hash]);
+      this.chatTorrents.set(ctx.chatId, new Set([hash]));
     }
 
     await this.createOrUpdateTorrentsMessage(ctx.chatId, true);
@@ -147,18 +148,20 @@ export class TorrentsComposer<
     if (!ctx.message.text) {
       return;
     }
+
     const uid = ctx.message.text.replace('/rm_', '');
 
-    const { torrent, error } = await this.getTorrentByUid(uid);
+    let hash: string;
 
-    if (!torrent || error) {
+    try {
+      ({ hash } = await this.getTorrentByUid(uid));
+    } catch {
       return ctx.reply(ctx.t('torrent-remove-error'));
     }
 
-    const { hash } = torrent;
-    const { error: deletingError } = await this.deleteTorrent(hash);
-
-    if (deletingError) {
+    try {
+      await this.deleteTorrent(hash);
+    } catch {
       return ctx.reply(ctx.t('torrent-remove-error'));
     }
 
@@ -173,13 +176,11 @@ export class TorrentsComposer<
         const results = await se.search(query);
         return results.map((result) => [se, result] as const);
       });
-
       const results = await Promise.all(promises);
-
-      return { results: results.flat() };
+      return results.flat();
     } catch (error) {
       this.logger.error(error, 'An error occured while searching torrents');
-      return { error };
+      throw error;
     }
   }
 
@@ -195,20 +196,19 @@ export class TorrentsComposer<
         torrents: [torrent],
         tags,
       });
-      return { hash };
+      return hash;
     } catch (error) {
       this.logger.error(error, 'An error occured while adding new torrent');
-      return { error };
+      throw error;
     }
   }
 
   private async getTorrents(hashes: string[]) {
     try {
-      const torrents = await this.qBittorrent.getTorrents({ hashes });
-      return { torrents };
+      return this.qBittorrent.getTorrents({ hashes });
     } catch (error) {
       this.logger.error(error, 'An error occured while fetching torrents');
-      return { error };
+      throw error;
     }
   }
 
@@ -217,20 +217,19 @@ export class TorrentsComposer<
       const [torrent] = await this.qBittorrent.getTorrents({
         tag: `uid_${uid}`,
       });
-      return { torrent };
+      return torrent;
     } catch (error) {
       this.logger.error(error, 'An error occured while fetching torrents');
-      return { error };
+      throw error;
     }
   }
 
   private async deleteTorrent(hash: string) {
     try {
       await this.qBittorrent.deleteTorrents([hash], true);
-      return {};
     } catch (error) {
       this.logger.error(error, 'An error occured while fetching torrents');
-      return { error };
+      throw error;
     }
   }
 
@@ -296,73 +295,74 @@ export class TorrentsComposer<
     chatId: number,
     refresh: boolean = false,
   ) {
-    const hashes = this.chatTorrents.get(chatId);
+    const hashMap = this.chatTorrents.get(chatId);
 
-    if (!hashes || hashes.length === 0) {
+    if (!hashMap || hashMap.size === 0) {
       this.chatMessages.delete(chatId);
       this.chatTorrents.delete(chatId);
       return;
     }
 
-    const { torrents, error } = await this.getTorrents(hashes);
+    let torrents: QBTorrent[];
 
-    if (!torrents || error) {
+    try {
+      torrents = await this.getTorrents([...hashMap.values()]);
+    } catch {
       return;
     }
 
-    const pending: QBTorrent[] = [];
-    const completed: QBTorrent[] = [];
+    const completedTorrents: QBTorrent[] = [];
+    const pendingTorrents: QBTorrent[] = [];
 
     for (const torrent of torrents) {
       if (torrent.progress < 1) {
-        pending.push(torrent);
+        pendingTorrents.push(torrent);
       } else {
-        completed.push(torrent);
+        completedTorrents.push(torrent);
       }
     }
 
     let message = this.chatMessages.get(chatId);
 
-    if (message && (completed.length > 0 || pending.length === 0 || refresh)) {
+    if (
+      message &&
+      (completedTorrents.length > 0 || pendingTorrents.length === 0 || refresh)
+    ) {
       await this.deleteTorrentsMessage(message);
       message = undefined;
     }
 
-    if (pending.length > 0) {
-      const hashes = pending.map((torrent) => torrent.hash);
-      this.chatTorrents.set(chatId, hashes);
-    } else {
-      this.chatTorrents.delete(chatId);
-    }
+    if (completedTorrents.length > 0) {
+      const text = completedTorrents
+        .map((torrent) => this.formatTorrent(chatId, torrent))
+        .join('\n\n\n');
 
-    if (completed.length > 0) {
       try {
-        const completedText = completed
-          .map((torrent) => this.formatTorrent(chatId, torrent))
-          .join('\n\n\n');
-        await this.bot.api.sendMessage(chatId, completedText, {
+        await this.bot.api.sendMessage(chatId, text, {
           parse_mode: 'HTML',
         });
       } catch (error) {
         this.logger.error(
           error,
           'An error occured while sending completed torrents message',
-          error,
         );
       }
     }
 
-    if (pending.length === 0) {
-      return;
+    if (pendingTorrents.length > 0) {
+      const hashes = pendingTorrents.map((torrent) => torrent.hash);
+      this.chatTorrents.set(chatId, new Set(hashes));
+
+      const text = pendingTorrents
+        .map((torrent) => this.formatTorrent(chatId, torrent))
+        .join('\n\n\n');
+
+      await (message
+        ? this.updateTorrentsMessage(message, text)
+        : this.sendTorrentsMessage(chatId, text));
+    } else {
+      this.chatTorrents.delete(chatId);
     }
-
-    const pendingText = pending
-      .map((torrent) => this.formatTorrent(chatId, torrent))
-      .join('\n\n\n');
-
-    await (message
-      ? this.updateTorrentsMessage(message, pendingText)
-      : this.sendTorrentsMessage(chatId, pendingText));
   }
 
   private async createOrUpdateTorrentsMessages() {
@@ -372,100 +372,51 @@ export class TorrentsComposer<
   }
 
   private formatSearchResult(ctx: C, se: SearchEngine, result: SearchResult) {
-    const lines = [];
-
     const uid = `${se.name}_${result.id}`;
-    const title = `<b>${result.title}</b>`;
-    const download = ctx.t('search-torrents-result-download', {
-      link: `/dl_${uid}`,
+    const size = formatBytes(result.size ?? 0);
+    const download = `/dl_${uid}`;
+
+    return ctx.t('search-message', {
+      title: result.title,
+      size,
+      seeds: result.seeds ?? 0,
+      peers: result.peers ?? 0,
+      publishDate: result.publishDate ?? '---',
+      download,
     });
-
-    const info: string[] = [];
-
-    if (typeof result.totalSize === 'number') {
-      info.push(formatBytes(result.totalSize));
-    }
-
-    if (
-      typeof result.seeds === 'number' ||
-      typeof result.leeches === 'number'
-    ) {
-      const seeds = `${result.seeds ?? 0}`;
-      const peers = `${result.leeches ?? 0}`;
-      info.push(`${seeds}/${peers}`);
-    }
-
-    if (result.date) {
-      const date = result.date.toLocaleDateString(
-        ctx.from?.language_code ?? 'en',
-      );
-      info.push(date);
-    }
-
-    lines.push(title);
-    lines.push('---');
-    lines.push(info.join('  |  '));
-    lines.push('---');
-    lines.push(download);
-
-    return lines.join('\n');
   }
 
   private formatTorrent(chatId: number, torrent: QBTorrent) {
-    const lines = [];
-
-    let uid: string | undefined;
-    let locale: string = 'en';
-
-    const prefixUid = 'uid_';
-    const prefixI18n = `i18n_${chatId}_`;
-    const completed = torrent.progress === 1;
-
-    for (const tag of torrent.tags) {
-      if (tag.startsWith(prefixUid)) {
-        uid = tag.replace(prefixUid, '');
-      } else if (tag.startsWith(prefixI18n)) {
-        locale = tag.replace(prefixI18n, '');
-      }
-    }
+    const tagPrefixI18n = `i18n_${chatId}_`;
+    const tagPrefixUid = 'uid_';
+    const tagI18n = torrent.tags.find((tag) => tag.startsWith(tagPrefixI18n));
+    const tagUid = torrent.tags.find((tag) => tag.startsWith(tagPrefixUid));
+    const locale = tagI18n?.replace(tagPrefixI18n, '') ?? 'en';
+    const uid = tagUid?.replace(tagPrefixUid, '');
+    const speed = `${formatBytes(torrent.dlspeed)}/s`;
+    const eta =
+      torrent.eta >= 8_640_000 ? '∞' : formatDuration(torrent.eta, locale);
+    const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
+    const remove = `/rm_${uid}`;
 
     const t = fluent.withLocale(locale);
 
-    lines.push(`<b>${torrent.name}</b>`);
-    lines.push('---');
-
-    if (!completed) {
-      const seedAndPeers = t('torrent-message-seeds-peers', {
-        seeds: `${torrent.num_seeds} (${torrent.num_complete})`,
-        peers: `${torrent.num_leechs} (${torrent.num_incomplete})`,
-      });
-      const speed = t('torrent-message-speed', {
-        speed: formatBytes(torrent.dlspeed),
-      });
-      const eta = t('torrent-message-eta', {
-        eta:
-          torrent.eta >= 8_640_000 ? '∞' : formatDuration(torrent.eta, locale),
-      });
-
-      lines.push(seedAndPeers);
-      lines.push(speed);
-      lines.push(eta);
-    }
-
-    const progress = t('torrent-message-progress', {
-      progress: `${Math.round(torrent.progress * 100 * 100) / 100}%`,
-    });
-
-    lines.push(progress);
-    lines.push('---');
-
-    if (uid) {
-      const remove = t('torrent-message-remove', {
-        link: `/rm_${uid}`,
-      });
-      lines.push(remove);
-    }
-
-    return lines.join('\n');
+    return torrent.progress < 1
+      ? t('torrent-message-in-progress', {
+          title: torrent.name,
+          seeds: torrent.num_seeds,
+          maxSeeds: torrent.num_complete,
+          peers: torrent.num_leechs,
+          maxPeers: torrent.num_incomplete,
+          speed,
+          eta,
+          progress,
+          remove,
+        })
+      : t('torrent-message-completed', {
+          title: torrent.name,
+          progress,
+          remove,
+        });
   }
 }

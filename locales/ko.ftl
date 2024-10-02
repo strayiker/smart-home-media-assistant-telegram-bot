@@ -1,11 +1,26 @@
-search-torrents-empty = 결과 없음
-search-torrents-result-download = 다운로드: {$link}
-search-torrents-unknown-error = 검색 중 오류가 발생했습니다
-torrent-message-seeds-peers = 시드: {$seeds}, 피어: {$peers}
-torrent-message-speed = 속도: {$speed}s
-torrent-message-eta = 남은 시간: {$eta}
-torrent-message-progress = 진행 상황: {$progress}
-torrent-message-remove = 제거: {$link}
+search-message =
+    <b>{$title}</b>
+    ---
+    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    ---
+    다운로드: {$download}
+search-empty-results = 결과 없음
+search-unknown-error = 검색 중 오류가 발생했습니다
+torrent-message-in-progress =
+    <b>{$title}</b>
+    ---
+    배포: {$seeds} ({$maxSeeds}),  피어: {$peers} ({$maxPeers})
+    속도: {$speed}
+    ETA: {$eta}
+    진행: {$progress}
+    ---
+    제거: {$remove}
+torrent-message-completed =
+    <b>{$title}</b>
+    ---
+    진행: {$progress}
+    ---
+    제거: {$remove}
 torrent-unsupported-tracker-error = 트래커가 지원되지 않습니다
-torrent-download-error = 토렌트 추가 중 오류가 발생했습니다
-torrent-remove-error = 토렌트 제거 중 오류가 발생했습니다
+torrent-download-error = 토렌트를 추가하는 동안 오류가 발생했습니다
+torrent-remove-error = 토렌트를 제거하는 동안 오류가 발생했습니다

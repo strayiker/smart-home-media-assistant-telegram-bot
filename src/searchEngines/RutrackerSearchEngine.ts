@@ -107,22 +107,22 @@ export class RutrackerSearchEngine extends SearchEngine {
       }
 
       const title = tds.eq(3).find('a').text();
-      const totalSize = Number.parseInt(tds.eq(5).attr('data-ts_text') ?? '0');
+      const size = Number.parseInt(tds.eq(5).attr('data-ts_text') ?? '0');
       const seeds = Number.parseInt(tds.eq(6).text()) ?? 0;
-      const leeches = Number.parseInt(tds.eq(7).text()) ?? 0;
-      const date = this.parseDate(tds.eq(9).attr('data-ts_text'));
-      const trackerUrl = tds.eq(3).find('a').attr('href');
+      const peers = Number.parseInt(tds.eq(7).text()) ?? 0;
+      const publishDate = this.parseDate(tds.eq(9).attr('data-ts_text'));
+      const detailsUrl = tds.eq(3).find('a').attr('href');
       const downloadUrl = tds.eq(5).find('a').attr('href');
 
-      if (title && trackerUrl && downloadUrl) {
+      if (title && downloadUrl) {
         results.push({
           id,
           title,
-          totalSize,
+          size,
           seeds,
-          leeches,
-          date,
-          trackerUrl: `${BASE_URL}/${trackerUrl}`,
+          peers,
+          publishDate,
+          detailsUrl: detailsUrl && `${BASE_URL}/${detailsUrl}`,
           downloadUrl: `${BASE_URL}/${downloadUrl}`,
         });
       }
@@ -132,8 +132,6 @@ export class RutrackerSearchEngine extends SearchEngine {
   }
 
   async downloadTorrentFile(id: string) {
-    await this.ensureLoggedIn();
-
     const url = `${DOWNLOAD_URL}?t=${id}`;
     const response = await fetch(url, {
       headers: {

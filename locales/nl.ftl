@@ -1,11 +1,26 @@
-search-torrents-empty = Geen resultaten
-search-torrents-result-download = Download: {$link}
-search-torrents-unknown-error = Er is een fout opgetreden tijdens het zoeken
-torrent-message-seeds-peers = Zaden: {$seeds}, Peers: {$peers}
-torrent-message-speed = Snelheid: {$speed}s
-torrent-message-eta = Resterende tijd: {$eta}
-torrent-message-progress = Voortgang: {$progress}
-torrent-message-remove = Verwijderen: {$link}
-torrent-unsupported-tracker-error = Tracker wordt niet ondersteund
+search-message =
+    <b>{$title}</b>
+    ---
+    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    ---
+    Downloaden: {$download}
+search-empty-results = Geen resultaten
+search-unknown-error = Er is een fout opgetreden tijdens het zoeken
+torrent-message-in-progress =
+    <b>{$title}</b>
+    ---
+    Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
+    Snelheid: {$speed}
+    ETA: {$eta}
+    Voortgang: {$progress}
+    ---
+    Verwijderen: {$remove}
+torrent-message-completed =
+    <b>{$title}</b>
+    ---
+    Voortgang: {$progress}
+    ---
+    Verwijderen: {$remove}
+torrent-unsupported-tracker-error = Tracker niet ondersteund
 torrent-download-error = Er is een fout opgetreden bij het toevoegen van de torrent
 torrent-remove-error = Er is een fout opgetreden bij het verwijderen van de torrent
