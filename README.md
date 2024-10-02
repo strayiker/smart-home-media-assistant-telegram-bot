@@ -16,6 +16,10 @@ Before we get started, make sure you have the following:
 - qBittorrent client installed and configured on your PC
 - Telegram account
 
+## Note for Windows Users
+
+In addition to the listed prerequisites, Windows users also need to install `make` for Windows. Download the make utility for Windows from the [GnuWin32 project](https://gnuwin32.sourceforge.net/downlinks/make.php).
+
 ## Step-by-Step
 
 1. **Create a New Bot on Telegram:**
