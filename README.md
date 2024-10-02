@@ -56,17 +56,7 @@ In addition to the listed prerequisites, Windows users also need to install `mak
 
    - In the cloned repository, you'll find a file named `.env.template`.
    - Rename this file to `.env` and open it in a text editor.
-   - Replace the placeholders with your actual values:
-     ```
-     BOT_TOKEN=<your-bot-token>
-     RUTRACKER_USERNAME=<username-in-rutracker>
-     RUTRACKER_PASSWORD=<password-in-rutracker>
-     QBT_WEBUI_HOST=host.docker.internal
-     QBT_WEBUI_PORT=9092
-     QBT_WEBUI_USERNAME=admin
-     QBT_WEBUI_PASSWORD=<qbittorrent-client-web-ui-password>
-     QBT_SAVE_PATH=/path/to/downloads
-     ```
+   - Replace the placeholders with your actual values.
 
 6. **Build the Docker Container:**
 
