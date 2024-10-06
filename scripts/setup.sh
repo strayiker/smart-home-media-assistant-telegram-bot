@@ -366,42 +366,20 @@ fi
 sed -i '' -e "s/{{VERSION}}/$VERSION/g" -e "s/{{CONTAINER_TOOL}}/$CONTAINER_TOOL/g" start.sh
 sed -i '' -e "s/{{CONTAINER_TOOL}}/$CONTAINER_TOOL/g" stop.sh
 
-SETUP_COMPLETE=$( [ ${#SKIPPED_INSTALLATIONS[@]} -eq 0 ] && echo true || echo false )
-BOT_RUNNING=false
-
-if $SETUP_COMPLETE; then
-    print_green "Setup complete!"
-    echo ""
-
-    read -p "Do you want to start the bot now? (y/n): " CHOICE
-    if [[ "$CHOICE" == [Yy]* ]]; then
-        run_qbittorrent &
-        ./start.sh &
-
-        BOT_RUNNING=true
-        echo "Bot is running!"
-    fi
-    echo ""
-fi
-
-if ! $SETUP_COMPLETE || ! $BOT_RUNNING; then
+if [ ${#SKIPPED_INSTALLATIONS[@]} -gt 0 ]; then
     echo "To finish, follow these steps:"
     echo ""
 
-    N=1
+    print_blue "1. Install the following software:"
 
-    if [ ${#SKIPPED_INSTALLATIONS[@]} -gt 0 ]; then
-        print_blue "$N. Install the following software:"
-        for SOFTWARE in "${SKIPPED_INSTALLATIONS[@]}"; do
-            echo " - $SOFTWARE"
-        done
-        N=$((N+1))
-    fi
+    for SOFTWARE in "${SKIPPED_INSTALLATIONS[@]}"; do
+        echo " - $SOFTWARE"
+    done
 
     if $QBT_CONFIGURED; then
-        print_blue "${N}. Launch qBittorrent."
+        print_blue "2. Launch qBittorrent."
     else
-        print_blue "${N}. Launch qBittorrent and make sure it is configured correctly:"
+        print_blue "2. Launch qBittorrent and make sure it is configured correctly:"
         echo " - Go to the Options menu and select the Web UI tab"
         if ! $QBT_WEB_UI_ENABLED; then
             echo " - Enable Web User Interface (Remote control)"
@@ -409,18 +387,29 @@ if ! $SETUP_COMPLETE || ! $BOT_RUNNING; then
         echo " - Ensure the username, password and port match your answers above"
     fi
 
-    print_blue "${N+1}. Start the bot:"
+    print_blue "3. Start the bot:"
     echo -e " - Execute the \033[1;32mstart.sh\033[0m script"
-    print_blue "${N+2}. Chat with your bot!"
-
-    if ! $SETUP_COMPLETE; then
-        echo ""
-        print_green "Setup complete!"
-    fi
+    print_blue "4. Chat with your bot!"
+    echo ""
 fi
 
-echo ""
 print_blue "Bot management instructions:"
 echo -e " - To start the bot, execute the \033[1;32mstart.sh\033[0m script"
 echo -e " - To stop the bot, execute the \033[1;32mstop.sh\033[0m script"
 echo -e " - To update the bot, execute the \033[1;32mupdate.sh\033[0m script"
+echo ""
+
+print_green "Setup complete!"
+echo ""
+
+if [ ${#SKIPPED_INSTALLATIONS[@]} -eq 0 ]; then
+    read -p "Do you want to start the bot now? (y/n): " CHOICE
+    if [[ "$CHOICE" == [Yy]* ]]; then
+        run_qbittorrent &
+        ./stop.sh
+        ./start.sh
+
+        BOT_RUNNING=true
+        echo "Bot is running!"
+    fi
+fi
