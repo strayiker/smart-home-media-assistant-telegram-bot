@@ -3,12 +3,12 @@ on:
   push:
     branches: [main]
 jobs:
-  # build and test code, up version, create release in github
-  gh-release:
-    name: GitHub Release
+  # build
+  build:
+    name: Build
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.release.outputs.version }}
+      version: ${{ steps.version.outputs.version }}
     steps:
       # checkout
       - name: Checkout
@@ -30,14 +30,6 @@ jobs:
       # build
       - name: Build
         run: yarn build
-      # release
-      - id: release
-        name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          yarn semantic-release
-          echo "version=$(npm pkg get version | tr -d \")" >> $GITHUB_OUTPUT
       # upload artifacts
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -46,10 +38,17 @@ jobs:
           path: |
             dist
             package.json
-  # build and push docker image
+      # determine release version
+      - id: version
+        name: Determine Release Version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "version=$(yarn semantic-release -d | grep "The next release version is " | sed 's/.*The next release version is //')" >> $GITHUB_OUTPUT
+  # create docker image
   docker:
+    if: needs.build.outputs.version != ''
     name: Docker
-    needs: [gh-release]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       # checkout
@@ -79,4 +78,27 @@ jobs:
           cache-to: type=gha,mode=max
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:${{ needs.gh-release.outputs.version }}
+            ghcr.io/${{ github.repository }}:${{ needs.build.outputs.version }}
+  # build and test code, up version, create release in github
+  gh-release:
+    if: needs.build.outputs.version != ''
+    name: GitHub Release
+    needs: [build, docker]
+    runs-on: ubuntu-latest
+    steps:
+      # checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # to fetch all history for all branches and tags
+      # setup node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      # release
+      - id: release
+        name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
