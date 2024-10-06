@@ -1,7 +1,5 @@
 FROM node:lts-alpine
 
-ENV NODE_ENV=production
-
 WORKDIR /app
 
 COPY ./package.json ./yarn.lock ./.yarnrc.yml ./
