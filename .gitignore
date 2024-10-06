@@ -22,7 +22,6 @@ node_modules/
 
 # Environment
 .env*
-!.env.template
 
 # Eslint
 .eslintcache
@@ -31,4 +30,4 @@ node_modules/
 dist/
 
 # Runtime
-volumes/
+data/
