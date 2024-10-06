@@ -79,10 +79,10 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository }}:${{ needs.build.outputs.version }}
-  # build and test code, up version, create release in github
-  gh-release:
+  # up version and create release in github
+  release:
     if: needs.build.outputs.version != ''
-    name: GitHub Release
+    name: Release
     needs: [build, docker]
     runs-on: ubuntu-latest
     steps:
