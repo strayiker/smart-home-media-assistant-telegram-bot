@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Check if the script is running in a non-interactive shell
-if [[ $- != *i* ]]; then
-    bash -i "$0" "$@"
-    exit
-fi
-
 print_blue() {
     echo -e "\033[1;34m$1\033[0m"
 }
