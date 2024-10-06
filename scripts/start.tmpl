@@ -1,13 +1,12 @@
 #!/bin/bash
 
-NAME=smart-home-media-assistant-telegram-bot
 VERSION={{VERSION}}
 
 {{CONTAINER_TOOL}} run -d \
     -v ./data:/data \
-    --name $NAME \
     --env-file .env \
     --network host \
     --restart unless-stopped \
-    ghcr.io/strayiker/$NAME:$VERSION
-{{CONTAINER_TOOL}} logs $NAME
+    --name smart-home-media-assistant-telegram-bot \
+    ghcr.io/strayiker/smart-home-media-assistant-telegram-bot:$VERSION
+{{CONTAINER_TOOL}} logs -f smart-home-media-assistant-telegram-bot

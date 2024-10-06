@@ -57,7 +57,7 @@ install_container_engine() {
     if [[ "$CHOICE" != [Yy]* ]]; then
         SKIPPED_INSTALLATIONS+=("Container Tool (e.g. Docker or Podman)")
         print_yellow "Skipping Podman installation."
-        echo
+        echo ""
         return
     fi
 
@@ -82,7 +82,7 @@ install_container_engine() {
     CONTAINER_TOOL=podman
 
     print_green "Podman installed successfully."
-    echo
+    echo ""
 }
 
 install_qbittorrent() {
@@ -105,7 +105,7 @@ install_qbittorrent() {
     if [[ "$CHOICE" != [Yy]* ]]; then
         SKIPPED_INSTALLATIONS+=("qBittorrent")
         print_yellow "Skipping qBittorrent installation."
-        echo
+        echo ""
         return
     fi
 
@@ -124,7 +124,7 @@ install_qbittorrent() {
     fi
 
     print_green "qBittorrent installed successfully."
-    echo
+    echo ""
 }
 
 install_winget() {
@@ -142,7 +142,7 @@ install_winget() {
     Add-AppxPackage Microsoft.WinGet.msixbundle
 
     print_green "WinGet installed successfully."
-    echo
+    echo ""
 }
 
 stop_qbittorrent() {
@@ -206,9 +206,9 @@ configure_qbittorrent() {
     # Check if WebUI is already enabled
     if grep -q "^WebUI\\\\Enabled=true" $CONFIG_FILE; then
         echo "qBittorrent WebUI is already enabled."
-        echo
+        echo ""
         print_blue "Answer the questions to access the qBittorrent WebUI."
-        echo
+        echo ""
         QBT_WEB_UI_ENABLED=true
         QBT_WEB_UI_USERNAME=$(grep 'WebUI\\Username' $CONFIG_FILE | cut -d'=' -f2-)
         QBT_WEB_UI_PASSWORD_PBKDF2=$(grep 'WebUI\\Password_PBKDF2' $CONFIG_FILE | cut -d'=' -f2-)
@@ -259,7 +259,7 @@ $1=$2\\
     QBT_CONFIGURED=true
 
     print_green "qBittorrent configured successfully."
-    echo
+    echo ""
 }
 
 run_qbittorrent() {
@@ -312,7 +312,7 @@ elif ! $QBT_CONFIGURED; then
 fi
 if [ "$QBT_WEB_UI_PASSWORD" == "" ]; then
     read -sp "Enter qBittorrent WebUI password (default: $QBT_WEB_UI_DEFAULT_PASSWORD): " QBT_WEB_UI_PASSWORD
-    echo
+    echo ""
 elif ! $QBT_CONFIGURED; then
     echo "Enter qBittorrent WebUI password (auto populated): $QBT_WEB_UI_PASSWORD"
 fi
@@ -329,7 +329,7 @@ QBT_WEB_UI_PORT=${QBITTORRENT_PORT:-$QBT_WEB_UI_DEFAULT_PORT}
 read -p "Enter your Telegram Bot token: " BOT_TOKEN
 read -p "Enter your Rutracker username: " RUTRACKER_USERNAME
 read -sp "Enter your Rutracker password: " RUTRACKER_PASSWORD
-echo
+echo ""
 
 mkdir -p ./smart-home-media-assistant-telegram-bot/data
 cd ./smart-home-media-assistant-telegram-bot
@@ -343,22 +343,19 @@ QBT_WEB_UI_USERNAME=$QBT_WEB_UI_USERNAME
 QBT_WEB_UI_PASSWORD=$QBT_WEB_UI_PASSWORD
 QBT_WEB_UI_HOST=host.docker.internal
 QBT_WEB_UI_PORT=$QBT_WEB_UI_PORT
-# Customize the path where downloaded files will be saved
-# QBT_SAVE_PATH=
+# Uncomment to customize the path where downloaded files will be saved
+# QBT_SAVE_PATH=<downloads-save-path>
 EOF
 
 print_green "Environment variables set up!"
-echo
+echo ""
 
 echo "Downloading scripts..."
-# curl -s "$REPO_RAW_URL/scripts/start.tmpl" -o start.sh
-# curl -s "$REPO_RAW_URL/scripts/stop.tmpl" -o stop.sh
-# curl -s "$REPO_RAW_URL/scripts/update.tmpl" -o update.sh
-cp ../scripts/start.tmpl ./start.sh
-cp ../scripts/stop.tmpl ./stop.sh
-cp ../scripts/update.tmpl ./update.sh
+curl -s "$REPO_RAW_URL/scripts/start.tmpl" -o start.sh
+curl -s "$REPO_RAW_URL/scripts/stop.tmpl" -o stop.sh
+curl -s "$REPO_RAW_URL/scripts/update.tmpl" -o update.sh
 print_green "Downloading complete!"
-echo
+echo ""
 
 if $LINUX || $MACOS; then
     chmod +x start.sh
@@ -374,7 +371,7 @@ BOT_RUNNING=false
 
 if $SETUP_COMPLETE; then
     print_green "Setup complete!"
-    echo
+    echo ""
 
     read -p "Do you want to start the bot now? (y/n): " CHOICE
     if [[ "$CHOICE" == [Yy]* ]]; then
@@ -384,12 +381,12 @@ if $SETUP_COMPLETE; then
         BOT_RUNNING=true
         echo "Bot is running!"
     fi
-    echo
+    echo ""
 fi
 
 if ! $SETUP_COMPLETE || ! $BOT_RUNNING; then
     echo "To finish, follow these steps:"
-    echo
+    echo ""
 
     N=1
 
@@ -413,12 +410,17 @@ if ! $SETUP_COMPLETE || ! $BOT_RUNNING; then
     fi
 
     print_blue "${N+1}. Start the bot:"
-    echo " - start.sh"
+    echo -e " - Execute the \033[1;32mstart.sh\033[0m script"
     print_blue "${N+2}. Chat with your bot!"
 
     if ! $SETUP_COMPLETE; then
-        echo
+        echo ""
         print_green "Setup complete!"
     fi
 fi
 
+echo ""
+print_blue "Bot management instructions:"
+echo -e " - To start the bot, execute the \033[1;32mstart.sh\033[0m script"
+echo -e " - To stop the bot, execute the \033[1;32mstop.sh\033[0m script"
+echo -e " - To update the bot, execute the \033[1;32mupdate.sh\033[0m script"
