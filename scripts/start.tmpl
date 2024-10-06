@@ -1,10 +1,11 @@
 #!/bin/bash
 
 VERSION={{VERSION}}
+CURRENT_DIR=$(dirname "$(realpath "$0")")
 
 {{CONTAINER_TOOL}} run -d \
-    -v ./data:/data \
-    --env-file .env \
+    -v $CURRENT_DIR/data:/data \
+    --env-file $CURRENT_DIR/.env \
     --network host \
     --restart unless-stopped \
     --name smart-home-media-assistant-telegram-bot \
