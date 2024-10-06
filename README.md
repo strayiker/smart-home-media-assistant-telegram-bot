@@ -26,7 +26,7 @@ This bot started as a personal hobby project, so it might have some bugs or not 
 
 ## Semi-Automatic Installation
 
-Open your terminal and paste the following command:
+Open your terminal and run the following command:
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/strayiker/smart-home-media-assistant-telegram-bot/refs/heads/main/scripts/setup.sh | bash
@@ -34,7 +34,7 @@ curl -sSL https://raw.githubusercontent.com/strayiker/smart-home-media-assistant
 
 **This script will perform the following tasks:**
 
-1.  Check for a container tools. If none is found, it installs `Podman` (fast and light open source container tools)
+1.  Check for a container tools. If none is found, it installs `Podman` (fast and light open source container tool)
 2.  Install `qBittorrent` if it's not already installed
 3.  Configure qBittorrent `WebUI`
 4.  Configure environment and the bot
@@ -52,12 +52,11 @@ Throughout the setup process, the script will interact with you, asking for the 
 
 ### For Windows Users
 
-Make sure you have `Make` for Windows.
+Make sure you have `Make` for Windows. You can download it from the [GnuWin](https://gnuwin32.sourceforge.net/packages/make.htm), or install using `winget:`
 
-- Download it from the [GnuWin](https://gnuwin32.sourceforge.net/packages/make.htm), or install using `winget:`
-  ```bash
-  winget install -e --id GnuWin32.Make
-  ```
+```bash
+winget install -e --id GnuWin32.Make
+```
 
 ### Step-by-step
 
@@ -65,9 +64,9 @@ Make sure you have `Make` for Windows.
 
    - Open the qBittorrent client on your PC.
    - Go to `Options` > `Web UI`.
-   - Enable the Web UI and set a username (default is `admin`) and a password.
-   - Set the port to `9092` (or any other port you prefer).
-   - Make sure the Web UI is accessible from your local network.
+   - Enable the Web UI and set a username (default is `admin`) and password.
+   - Set the port (default is `8080`).
+   - Make sure the Web UI is accessible from your local network (open [http://localhost:8080](http://localhost:8080) in your web browser).
 
 2. **Clone the Repository:**
 
@@ -108,22 +107,14 @@ Make sure you have `Make` for Windows.
      make logs
      ```
 
-7. **Interact with the Bot:**
-
-   - Open Telegram and start a chat with your bot.
-   - Send a message to the bot to search for torrents. For example, you can type `Wall-E 1080p`.
-   - The bot will respond with search results, each containing a link to download the torrent.
-   - Click on the link, and the bot will add the torrent to the qBittorrent client running on your PC.
-   - The bot will provide you with the download stats and periodically update them.
-
-8. **Stop and Clean Up:**
+7. **Stop and Clean Up:**
 
    - When you're done, you can stop the Docker container by running:
      ```bash
      make stop
      ```
 
-9. **Updating the Bot**
+8. **Updating the Bot**
 
    - Pull the updates from the repository
      ```bash
@@ -133,3 +124,11 @@ Make sure you have `Make` for Windows.
      ```bash
      make stop build run logs
      ```
+
+## Interacting with the Bot
+
+1. Open Telegram and start a chat with your bot.
+2. Send a message to the bot to search for torrents. For example, you can type `Wall-E 1080p`.
+3. The bot will respond with search results, each containing a link to download the torrent.
+4. Click on the link, and the bot will add the torrent to the qBittorrent client running on your PC.
+5. The bot will provide you with the download stats and periodically update them.
