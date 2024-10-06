@@ -1,8 +1,7 @@
 .git
+.github
 .vscode
 
-node_modules/
-volumes/
-dist/
+node_modules
 
 Dockerfile*
