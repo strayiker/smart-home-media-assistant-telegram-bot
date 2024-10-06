@@ -31,7 +31,7 @@ If you find this bot helpful, a star would be greatly appreciated!
 Open your terminal and run the following command:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/strayiker/smart-home-media-assistant-telegram-bot/refs/heads/main/scripts/setup.sh | bash
+tmpfile=$(mktemp) && curl -sSL https://raw.githubusercontent.com/strayiker/smart-home-media-assistant-telegram-bot/refs/heads/main/scripts/setup.sh -o $tmpfile && chmod +x $tmpfile && bash -i $tmpfile && rm $tmpfile
 ```
 
 **This script will perform the following tasks:**
