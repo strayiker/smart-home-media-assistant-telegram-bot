@@ -8,7 +8,9 @@ Hey there! This is the sources of a Telegram bot is designed to help you search 
 
 ## Disclaimer
 
-This bot started as a personal hobby project, so it might have some bugs or not work perfectly. However, I hope you find it useful. If you have any improvements or want to add support for other torrent trackers, feel free to submit a pull request. If you find this project helpful, a star would be greatly appreciated!
+This bot is created for a personal usage, so it might have some bugs or not work perfectly. However, I hope you find it useful. If you have any improvements or want to add support for other torrent trackers, feel free to submit a pull request.
+
+If you find this bot helpful, a star would be greatly appreciated!
 
 ## Before You Get Started
 
