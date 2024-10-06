@@ -12,7 +12,7 @@ Currently, the bot is able to search torrents on Rutracker only. However, you ar
 
 ## Prerequisites
 
-Before we get started, make sure you have the following:
+Before you get started, make sure you have the following:
 
 - Docker installed on your PC (or Podman or any other you prefer)
 - qBittorrent client installed and configured on your PC
