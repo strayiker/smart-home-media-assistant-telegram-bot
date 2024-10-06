@@ -1,33 +1,28 @@
-IMAGE_NAME = smart-home-media-assistant-bot
-DATA_PATH = ./volumes/data
-ENV_FILE = .env
+NAME = smart-home-media-assistant-telegram-bot
 
 ifneq "$(use)" ""
-BUILDTOOL = $(use)
+CONTAINER_TOOL = $(use)
 else
-BUILDTOOL = docker
+CONTAINER_TOOL = docker
 endif
 
 build:
-	${BUILDTOOL} build -t $(IMAGE_NAME) .
+	${CONTAINER_TOOL} build -t $(NAME) .
 
 run:
-	${BUILDTOOL} run -d \
-		-v $(DATA_PATH):/data \
-		--name $(IMAGE_NAME) \
-		--env-file $(ENV_FILE) \
+	${CONTAINER_TOOL} run -d \
+		-v ./data:/data \
+		--name $(NAME) \
+		--env-file .env \
 		--network host \
 		--restart unless-stopped \
-		$(IMAGE_NAME)
+		$(NAME)
 
 logs:
-	${BUILDTOOL} logs -f $(IMAGE_NAME)
+	${CONTAINER_TOOL} logs -f $(NAME)
 
 stop:
-	${BUILDTOOL} stop $(IMAGE_NAME)
-	${BUILDTOOL} rm $(IMAGE_NAME)
-
-clean:
-	${BUILDTOOL} container prune -f
+	${CONTAINER_TOOL} stop $(NAME)
+	${CONTAINER_TOOL} rm $(NAME)
 
 .PHONY: build run stop clean
