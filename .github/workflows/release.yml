@@ -96,9 +96,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
+          cache: yarn
+      # dependencies
+      - name: Dependencies
+        run: yarn install --immutable
       # release
       - id: release
         name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
+        run: yarn semantic-release
