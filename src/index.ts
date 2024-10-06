@@ -76,6 +76,6 @@ process.once('SIGTERM', shutdown);
 
 const promise = bot.start();
 
-logger.info('Bot is running!');
+console.log('Bot is running!');
 
 await promise;
