@@ -24,7 +24,7 @@ export const rutrackerUsername = config.get('RUTRACKER_USERNAME', {
 export const rutrackerPassword = config.get('RUTRACKER_PASSWORD', {
   required: true,
 });
-export const qbtWebuiHost = config.get('QBT_WEB_UII_HOST', {
+export const qbtWebuiHost = config.get('QBT_WEB_UI_HOST', {
   required: true,
 });
 export const qbtWebuiPort: number = config.get('QBT_WEB_UI_PORT', {
