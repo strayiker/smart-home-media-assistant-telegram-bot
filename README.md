@@ -36,11 +36,11 @@ tmpfile=$(mktemp) && curl -sSL https://raw.githubusercontent.com/strayiker/smart
 
 **This script will perform the following tasks:**
 
-1.  Check for a container tools. If none is found, it installs `Podman` (fast and light open source container tool)
-2.  Install `qBittorrent` if it's not already installed
-3.  Configure qBittorrent `WebUI`
-4.  Configure environment and the bot
-5.  Create scripts to **start**, **stop**, and **update** the bot
+1.  Check for a container tools. If none is found, it installs `Podman` (fast and light open source container tool).
+2.  Install `qBittorrent` if it's not already installed.
+3.  Configure qBittorrent `WebUI`.
+4.  Configure environment and the bot.
+5.  Create scripts to **start**, **stop**, and **update** the bot.
 6.  Run the `qBittorrent` and the bot for you.
 
 Throughout the setup process, the script will interact with you, asking for the necessary information to configure the software and the bot itself.
@@ -49,8 +49,8 @@ Throughout the setup process, the script will interact with you, asking for the 
 
 ### Prerequisites
 
-- Docker installed on your PC (or Podman, or any other container tool you prefer)
-- qBittorrent client installed and configured on your PC
+1. Docker installed on your PC (or Podman, or any other container tool you prefer)
+2. qBittorrent client installed and configured on your PC
 
 ### For Windows Users
 
@@ -60,7 +60,7 @@ Make sure you have `Make` for Windows. You can download it from the [GnuWin](htt
 winget install -e --id GnuWin32.Make
 ```
 
-### Step-by-step
+### Step-by-Step
 
 1. **Configure qBittorrent Web-UI:**
 
