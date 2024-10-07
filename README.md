@@ -49,12 +49,15 @@ Throughout the setup process, the script will interact with you, asking for the 
 
 ### Prerequisites
 
-1. Docker installed on your PC (or Podman, or any other container tool you prefer)
-2. qBittorrent client installed and configured on your PC
+**The following software is required to be installed on your PC:**
 
-### For Windows Users
+1. Git.
+1. Docker (or Podman, or any other container tool you prefer).
+1. qBittorrent.
 
-Make sure you have `Make` for Windows. You can download it from the [GnuWin](https://gnuwin32.sourceforge.net/packages/make.htm), or install using `winget:`
+**For Windows Users:**
+
+Additionally, make sure you have `Make` for Windows. You can download it from [GnuWin](https://gnuwin32.sourceforge.net/packages/make.htm), or install it using `winget:`
 
 ```bash
 winget install -e --id GnuWin32.Make
