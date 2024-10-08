@@ -1,16 +1,20 @@
-# Smart Home Media Assistant Telegram Bot
-
-Hey there! This is the sources of a Telegram bot is designed to help you search for torrents and remotely download them to your PC using the qBittorrent client. It's written in TypeScript and runs in a Docker container on your PC.
+<h1 align="center">Media Assistant Bot</h1>
 
 <p align="center">
 <img alt="example" src="./static/image.webp" width="768" />
 </p>
+
+## About
+
+This is the sources of a Telegram bot is designed to help you search for torrents and remotely download them to your PC using the qBittorrent client. It's written in TypeScript and runs in a Docker container on your PC.
 
 ## Disclaimer
 
 This bot is created for a personal usage, so it might have some bugs or not work perfectly. However, I hope you find it useful. If you have any improvements or want to add support for other torrent trackers, feel free to submit a pull request.
 
 If you find this bot helpful, a star would be greatly appreciated!
+
+---
 
 ## Before You Get Started
 
@@ -43,11 +47,11 @@ tmpfile=$(mktemp) && curl -sSL https://raw.githubusercontent.com/strayiker/smart
 5.  Create scripts to **start**, **stop**, and **update** the bot.
 6.  Run the `qBittorrent` and the bot for you.
 
-Throughout the setup process, the script will interact with you, asking for the necessary information to configure the software and the bot itself.
+It will ask you for the necessary information to configure the software and the bot itself.
 
 ## Manual Installation
 
-### Prerequisites
+### Requirements
 
 **The following software is required to be installed on your PC:**
 
@@ -57,7 +61,7 @@ Throughout the setup process, the script will interact with you, asking for the 
 
 **For Windows Users:**
 
-Additionally, make sure you have `Make` for Windows. You can download it from [GnuWin](https://gnuwin32.sourceforge.net/packages/make.htm), or install it using `winget:`
+On Windows you also need to install `Make` for Windows. You can download it from [GnuWin](https://gnuwin32.sourceforge.net/packages/make.htm), or install it using `winget:`
 
 ```bash
 winget install -e --id GnuWin32.Make
@@ -76,6 +80,7 @@ winget install -e --id GnuWin32.Make
 2. **Clone the Repository:**
 
    - Open your terminal and run the following commands:
+
      ```bash
      git clone https://github.com/strayiker/smart-home-media-assistant-telegram-bot.git
      cd smart-home-media-assistant-telegram-bot
@@ -90,10 +95,13 @@ winget install -e --id GnuWin32.Make
 4. **Build the Docker Image:**
 
    - Run the following command to build the Docker container:
+
      ```bash
      make build
      ```
+
    - If you prefer some other tool instead of Docker, you can use the `use` option, for example:
+
      ```bash
      make build use=podman
      ```
@@ -101,6 +109,7 @@ winget install -e --id GnuWin32.Make
 5. **Start the Docker Container:**
 
    - To start the bot, run:
+
      ```bash
      make run
      ```
@@ -108,6 +117,7 @@ winget install -e --id GnuWin32.Make
 6. **Inspect the logs of Docker Container:**
 
    - To start the bot, run:
+
      ```bash
      make logs
      ```
@@ -115,6 +125,7 @@ winget install -e --id GnuWin32.Make
 7. **Stop and Clean Up:**
 
    - When you're done, you can stop the Docker container by running:
+
      ```bash
      make stop
      ```
@@ -122,15 +133,18 @@ winget install -e --id GnuWin32.Make
 8. **Updating the Bot**
 
    - Pull the updates from the repository
+
      ```bash
      git pull
      ```
+
    - Stop, rebuild, and start the bot
+
      ```bash
      make stop build run logs
      ```
 
-## Interacting with the Bot
+## How to use
 
 1. Open Telegram and start a chat with your bot.
 2. Send a message to the bot to search for torrents. For example, you can type `Wall-E 1080p`.
