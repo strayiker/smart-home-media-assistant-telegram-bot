@@ -304,35 +304,66 @@ install_qbittorrent
 
 configure_qbittorrent
 
-# Collect user inputs for environment variables
+CURRENT_DIR_NAME=${PWD##*/}
+
+if [ "$CURRENT_DIR_NAME" != "smart-home-media-assistant-telegram-bot" ]; then
+    mkdir -p ./smart-home-media-assistant-telegram-bot/data
+    cd ./smart-home-media-assistant-telegram-bot
+fi
+
+if [ -f ".env" ]; then
+    BOT_TOKEN=$(grep 'BOT_TOKEN' ".env" | cut -d'=' -f2-)
+    RUTRACKER_USERNAME=$(grep 'RUTRACKER_USERNAME' ".env" | cut -d'=' -f2-)
+    RUTRACKER_PASSWORD=$(grep 'RUTRACKER_PASSWORD' ".env" | cut -d'=' -f2-)
+
+    if [ "$QBT_WEB_UI_USERNAME" == "" ]; then
+        QBT_WEB_UI_USERNAME=$(grep 'QBT_WEB_UI_USERNAME' ".env" | cut -d'=' -f2-)
+    fi
+
+    if [ "$QBT_WEB_UI_PASSWORD" == "" ]; then
+        QBT_WEB_UI_PASSWORD=$(grep 'QBT_WEB_UI_PASSWORD' ".env" | cut -d'=' -f2-)
+    fi
+
+    if [ "$QBT_WEB_UI_PORT" == "" ]; then
+        QBT_WEB_UI_PORT=$(grep 'QBT_WEB_UI_PORT' ".env" | cut -d'=' -f2-)
+    fi
+fi
+
 if [ "$QBT_WEB_UI_USERNAME" == "" ]; then
     read -p "Enter qBittorrent WebUI username (default: $QBT_WEB_UI_DEFAULT_USERNAME): " QBT_WEB_UI_USERNAME
 elif ! $QBT_CONFIGURED; then
     echo "Enter qBittorrent WebUI username (auto populated): $QBT_WEB_UI_USERNAME"
 fi
+
 if [ "$QBT_WEB_UI_PASSWORD" == "" ]; then
     read -sp "Enter qBittorrent WebUI password (default: $QBT_WEB_UI_DEFAULT_PASSWORD): " QBT_WEB_UI_PASSWORD
     echo ""
 elif ! $QBT_CONFIGURED; then
     echo "Enter qBittorrent WebUI password (auto populated): $QBT_WEB_UI_PASSWORD"
 fi
+
 if [ "$QBT_WEB_UI_PORT" == "" ]; then
     read -p "Enter qBittorrent WebUI port (default: $QBT_WEB_UI_DEFAULT_PORT): " QBT_WEB_UI_PORT
 elif ! $QBT_CONFIGURED; then
     echo "Enter qBittorrent WebUI port (auto populated): $QBT_WEB_UI_PORT"
 fi
 
+if [ "$BOT_TOKEN" == "" ]; then
+    read -p "Enter your Telegram Bot token: " BOT_TOKEN
+fi
+
+if [ "$RUTRACKER_USERNAME" == "" ]; then
+    read -p "Enter your Rutracker username: " RUTRACKER_USERNAME
+fi
+
+if [ "$RUTRACKER_PASSWORD" == "" ]; then
+    read -sp "Enter your Rutracker password: " RUTRACKER_PASSWORD
+    echo ""
+fi
+
 QBT_WEB_UI_USERNAME=${QBT_WEB_UI_USERNAME:-$QBT_WEB_UI_DEFAULT_USERNAME}
 QBT_WEB_UI_PASSWORD=${QBT_WEB_UI_PASSWORD:-$QBT_WEB_UI_DEFAULT_PASSWORD}
 QBT_WEB_UI_PORT=${QBITTORRENT_PORT:-$QBT_WEB_UI_DEFAULT_PORT}
-
-read -p "Enter your Telegram Bot token: " BOT_TOKEN
-read -p "Enter your Rutracker username: " RUTRACKER_USERNAME
-read -sp "Enter your Rutracker password: " RUTRACKER_PASSWORD
-echo ""
-
-mkdir -p ./smart-home-media-assistant-telegram-bot/data
-cd ./smart-home-media-assistant-telegram-bot
 
 # Create .env file with user inputs
 cat <<EOF > .env
