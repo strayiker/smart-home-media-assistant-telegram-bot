@@ -36,6 +36,7 @@ CONTAINER_TOOL=podman
 QBT_WEB_UI_DEFAULT_USERNAME=admin
 QBT_WEB_UI_DEFAULT_PASSWORD=adminadmin
 QBT_WEB_UI_DEFAULT_PASSWORD_PBKDF2="\"@ByteArray(RJtnunecy+/FjxRHFhqo3w==:TYkjECu4PhU/47hJyZkx6AajoyDbAgiw40f8tE3ygkMpuM0coG+KcRnt/6oE4ZepzpzYnd4ltWNB5ytnVqUBHA==)\""
+QBT_WEB_UI_DEFAULT_HOST=host.docker.internal
 QBT_WEB_UI_DEFAULT_PORT=8080
 QBT_WEB_UI_ENABLED=false
 QBT_CONFIGURED=false
@@ -327,6 +328,8 @@ if [ -f ".env" ]; then
     if [ "$QBT_WEB_UI_PORT" == "" ]; then
         QBT_WEB_UI_PORT=$(grep 'QBT_WEB_UI_PORT' ".env" | cut -d'=' -f2-)
     fi
+
+    QBT_WEB_UI_HOST=$(grep 'QBT_WEB_UI_HOST' ".env" | cut -d'=' -f2-)
 fi
 
 if [ "$QBT_WEB_UI_USERNAME" == "" ]; then
@@ -363,6 +366,7 @@ fi
 
 QBT_WEB_UI_USERNAME=${QBT_WEB_UI_USERNAME:-$QBT_WEB_UI_DEFAULT_USERNAME}
 QBT_WEB_UI_PASSWORD=${QBT_WEB_UI_PASSWORD:-$QBT_WEB_UI_DEFAULT_PASSWORD}
+QBT_WEB_UI_HOST=${QBT_WEB_UI_HOST:-$QBT_WEB_UI_DEFAULT_HOST}
 QBT_WEB_UI_PORT=${QBT_WEB_UI_PORT:-$QBT_WEB_UI_DEFAULT_PORT}
 
 # Create .env file with user inputs
@@ -372,7 +376,7 @@ RUTRACKER_USERNAME=$RUTRACKER_USERNAME
 RUTRACKER_PASSWORD=$RUTRACKER_PASSWORD
 QBT_WEB_UI_USERNAME=$QBT_WEB_UI_USERNAME
 QBT_WEB_UI_PASSWORD=$QBT_WEB_UI_PASSWORD
-QBT_WEB_UI_HOST=host.docker.internal
+QBT_WEB_UI_HOST=$QBT_WEB_UI_HOST
 QBT_WEB_UI_PORT=$QBT_WEB_UI_PORT
 # Uncomment to customize the path where downloaded files will be saved
 # QBT_SAVE_PATH=<downloads-save-path>
