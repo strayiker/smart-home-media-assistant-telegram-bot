@@ -39,6 +39,7 @@ QBT_WEB_UI_DEFAULT_PASSWORD_PBKDF2="\"@ByteArray(RJtnunecy+/FjxRHFhqo3w==:TYkjEC
 QBT_WEB_UI_DEFAULT_HOST=host.docker.internal
 QBT_WEB_UI_DEFAULT_PORT=8080
 QBT_WEB_UI_ENABLED=false
+QBT_SAVE_PATH=""
 QBT_CONFIGURED=false
 QBT_RUNNING=false
 
@@ -330,6 +331,7 @@ if [ -f ".env" ]; then
     fi
 
     QBT_WEB_UI_HOST=$(grep 'QBT_WEB_UI_HOST' ".env" | cut -d'=' -f2-)
+    QBT_SAVE_PATH=$(grep 'QBT_SAVE_PATH' ".env" | cut -d'=' -f2-)
 fi
 
 if [ "$QBT_WEB_UI_USERNAME" == "" ]; then
@@ -379,7 +381,7 @@ QBT_WEB_UI_PASSWORD=$QBT_WEB_UI_PASSWORD
 QBT_WEB_UI_HOST=$QBT_WEB_UI_HOST
 QBT_WEB_UI_PORT=$QBT_WEB_UI_PORT
 # Uncomment to customize the path where downloaded files will be saved
-# QBT_SAVE_PATH=<downloads-save-path>
+# QBT_SAVE_PATH=$QBT_SAVE_PATH
 EOF
 
 print_green "Environment variables set up!"
