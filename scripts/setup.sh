@@ -380,8 +380,7 @@ QBT_WEB_UI_USERNAME=$QBT_WEB_UI_USERNAME
 QBT_WEB_UI_PASSWORD=$QBT_WEB_UI_PASSWORD
 QBT_WEB_UI_HOST=$QBT_WEB_UI_HOST
 QBT_WEB_UI_PORT=$QBT_WEB_UI_PORT
-# Uncomment to customize the path where downloaded files will be saved
-# QBT_SAVE_PATH=$QBT_SAVE_PATH
+QBT_SAVE_PATH=$QBT_SAVE_PATH
 EOF
 
 print_green "Environment variables set up!"
