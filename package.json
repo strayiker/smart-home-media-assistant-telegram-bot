@@ -24,7 +24,7 @@
     "pino": "^9.5.0",
     "pino-pretty": "^11.3.0",
     "tough-cookie": "^5.0.0",
-    "uuid": "^10.0.0"
+    "uuid": "^11.0.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.5.0",
