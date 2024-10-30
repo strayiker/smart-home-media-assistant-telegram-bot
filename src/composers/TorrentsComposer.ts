@@ -90,7 +90,12 @@ export class TorrentsComposer<
       .join('\n\n\n');
 
     try {
-      await ctx.reply(text, { parse_mode: 'HTML' });
+      await ctx.reply(text, {
+        parse_mode: 'HTML',
+        link_preview_options: {
+          is_disabled: true,
+        },
+      });
     } catch (error) {
       this.logger.error(error, 'An error occured whire sending search results');
     }
@@ -375,6 +380,9 @@ export class TorrentsComposer<
     const uid = `${se.name}_${result.id}`;
     const size = formatBytes(result.size ?? 0);
     const download = `/dl_${uid}`;
+    const detailsLink = result.detailsUrl
+      ? `<a href="${result.detailsUrl}">[⇲]</a>`
+      : '';
 
     return ctx.t('search-message', {
       title: result.title,
@@ -382,6 +390,7 @@ export class TorrentsComposer<
       seeds: result.seeds ?? 0,
       peers: result.peers ?? 0,
       publishDate: result.publishDate ?? '---',
+      detailsLink,
       download,
     });
   }

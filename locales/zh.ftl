@@ -1,5 +1,5 @@
 search-message =
-    <b>{$title}</b>
+    <b>{$title}</b> {$detailsLink}
     ---
     {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
     ---
