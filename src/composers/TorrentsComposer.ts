@@ -263,7 +263,7 @@ export class TorrentsComposer<
       return ctx.reply(ctx.t('torrent-file-empty'));
     }
 
-    const filePath = path.join(save_path, qbFile.name);
+    const filePath = path.normalize(path.join(save_path, qbFile.name));
     const fileType = await fileTypeFromFile(filePath);
 
     this.logger.debug(fileType);
