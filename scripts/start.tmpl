@@ -10,8 +10,9 @@ API_ENV_FILE=$DIR/.env.api
 OS=$(uname)
 
 if [[ "$OS" =~ ^(CYGWIN|MINGW|MSYS) ]]; then
-    DATA_PATH=$(cygpath -w "$DATA_PATH")
-    ENV_FILE_PATH=$(cygpath -w "$ENV_FILE_PATH")
+    BOT_DATA_DIR=$(cygpath -w "$BOT_DATA_DIR")
+    BOT_ENV_FILE=$(cygpath -w "$BOT_ENV_FILE")
+    API_ENV_FILE=$(cygpath -w "$API_ENV_FILE")
 fi
 
 {{CONTAINER_TOOL}} run -d \
