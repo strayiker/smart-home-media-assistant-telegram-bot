@@ -24,3 +24,15 @@ torrent-message-completed =
 torrent-unsupported-tracker-error = Pelacak tidak didukung
 torrent-download-error = Terjadi kesalahan saat menambahkan torrent
 torrent-remove-error = Terjadi kesalahan saat menghapus torrent
+torrent-file-message =
+    <b>{$name}</b>
+    ---
+    Ukuran: {$size}
+    Unduh: {$download}
+torrent-files-empty = Tidak ada file
+torrent-files-error = Terjadi kesalahan saat mengambil file
+torrent-file-uploading = Mengunggah, harap tunggu...
+torrent-file-encoding = Mengkodekan video, harap tunggu... {$progress}%
+torrent-file-too-large = File terlalu besar
+torrent-file-error = Terjadi kesalahan saat mengirim file
+torrent-file-empty = File tidak ditemukan

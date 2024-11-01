@@ -33,13 +33,14 @@ SKIPPED_INSTALLATIONS=()
 
 CONTAINER_TOOL=podman
 
+BOT_API_DEFAULT_ADDRESS=http://localhost:8081
 QBT_WEB_UI_DEFAULT_USERNAME=admin
 QBT_WEB_UI_DEFAULT_PASSWORD=adminadmin
 QBT_WEB_UI_DEFAULT_PASSWORD_PBKDF2="\"@ByteArray(RJtnunecy+/FjxRHFhqo3w==:TYkjECu4PhU/47hJyZkx6AajoyDbAgiw40f8tE3ygkMpuM0coG+KcRnt/6oE4ZepzpzYnd4ltWNB5ytnVqUBHA==)\""
 QBT_WEB_UI_DEFAULT_HOST=host.docker.internal
 QBT_WEB_UI_DEFAULT_PORT=8080
+
 QBT_WEB_UI_ENABLED=false
-QBT_SAVE_PATH=""
 QBT_CONFIGURED=false
 QBT_RUNNING=false
 
@@ -205,11 +206,11 @@ configure_qbittorrent() {
         touch $CONFIG_FILE
     fi
 
+    echo "Configuring qBittorrent..."
+
     # Check if WebUI is already enabled
     if grep -q "^WebUI\\\\Enabled=true" $CONFIG_FILE; then
-        echo "qBittorrent WebUI is already enabled."
-        echo ""
-        print_blue "Answer the questions to access the qBittorrent WebUI."
+        print_blue "qBittorrent WebUI is already configured, reading config..."
         echo ""
         QBT_WEB_UI_ENABLED=true
         QBT_WEB_UI_USERNAME=$(grep 'WebUI\\Username' $CONFIG_FILE | cut -d'=' -f2-)
@@ -226,11 +227,9 @@ configure_qbittorrent() {
     stop_qbittorrent
 
     if $QBT_RUNNING; then
-        print_yellow "Skipping qBittorrent configuration."
+        print_yellow "Skip qBittorrent configuration."
         return
     fi
-
-    echo "Configuring qBittorrent..."
 
     # Ensure [Preferences] section exists
     if ! grep -q "^\[Preferences\]" $CONFIG_FILE; then
@@ -313,8 +312,11 @@ if [ "$CURRENT_DIR_NAME" != "smart-home-media-assistant-telegram-bot" ]; then
     cd ./smart-home-media-assistant-telegram-bot
 fi
 
+echo "Setup environment variables..."
+
 if [ -f ".env" ]; then
     BOT_TOKEN=$(grep 'BOT_TOKEN' ".env" | cut -d'=' -f2-)
+    BOT_API_ADDRESS=$(grep 'BOT_API_ADDRESS' ".env" | cut -d'=' -f2-)
     RUTRACKER_USERNAME=$(grep 'RUTRACKER_USERNAME' ".env" | cut -d'=' -f2-)
     RUTRACKER_PASSWORD=$(grep 'RUTRACKER_PASSWORD' ".env" | cut -d'=' -f2-)
 
@@ -331,30 +333,38 @@ if [ -f ".env" ]; then
     fi
 
     QBT_WEB_UI_HOST=$(grep 'QBT_WEB_UI_HOST' ".env" | cut -d'=' -f2-)
+    QBT_WEB_UI_ADDRESS=$(grep 'QBT_WEB_UI_ADDRESS' ".env" | cut -d'=' -f2-)
     QBT_SAVE_PATH=$(grep 'QBT_SAVE_PATH' ".env" | cut -d'=' -f2-)
+fi
+
+if [ -f ".env.api" ]; then
+    TELEGRAM_API_ID=$(grep 'TELEGRAM_API_ID' ".env.api" | cut -d'=' -f2-)
+    TELEGRAM_API_HASH=$(grep 'TELEGRAM_API_HASH' ".env.api" | cut -d'=' -f2-)
 fi
 
 if [ "$QBT_WEB_UI_USERNAME" == "" ]; then
     read -p "Enter qBittorrent WebUI username (default: $QBT_WEB_UI_DEFAULT_USERNAME): " QBT_WEB_UI_USERNAME
-elif ! $QBT_CONFIGURED; then
-    echo "Enter qBittorrent WebUI username (auto populated): $QBT_WEB_UI_USERNAME"
 fi
 
 if [ "$QBT_WEB_UI_PASSWORD" == "" ]; then
     read -sp "Enter qBittorrent WebUI password (default: $QBT_WEB_UI_DEFAULT_PASSWORD): " QBT_WEB_UI_PASSWORD
     echo ""
-elif ! $QBT_CONFIGURED; then
-    echo "Enter qBittorrent WebUI password (auto populated): $QBT_WEB_UI_PASSWORD"
 fi
 
 if [ "$QBT_WEB_UI_PORT" == "" ]; then
     read -p "Enter qBittorrent WebUI port (default: $QBT_WEB_UI_DEFAULT_PORT): " QBT_WEB_UI_PORT
-elif ! $QBT_CONFIGURED; then
-    echo "Enter qBittorrent WebUI port (auto populated): $QBT_WEB_UI_PORT"
 fi
 
 if [ "$BOT_TOKEN" == "" ]; then
     read -p "Enter your Telegram Bot token: " BOT_TOKEN
+fi
+
+if [ "$TELEGRAM_API_ID" == "" ]; then
+    read -p "Enter your Telegram Api Id: " TELEGRAM_API_ID
+fi
+
+if [ "$TELEGRAM_API_HASH" == "" ]; then
+    read -p "Enter your Telegram Api Hash: " TELEGRAM_API_HASH
 fi
 
 if [ "$RUTRACKER_USERNAME" == "" ]; then
@@ -366,24 +376,36 @@ if [ "$RUTRACKER_PASSWORD" == "" ]; then
     echo ""
 fi
 
+BOT_API_ADDRESS=${BOT_API_ADDRESS:-$BOT_API_DEFAULT_ADDRESS}
 QBT_WEB_UI_USERNAME=${QBT_WEB_UI_USERNAME:-$QBT_WEB_UI_DEFAULT_USERNAME}
 QBT_WEB_UI_PASSWORD=${QBT_WEB_UI_PASSWORD:-$QBT_WEB_UI_DEFAULT_PASSWORD}
 QBT_WEB_UI_HOST=${QBT_WEB_UI_HOST:-$QBT_WEB_UI_DEFAULT_HOST}
 QBT_WEB_UI_PORT=${QBT_WEB_UI_PORT:-$QBT_WEB_UI_DEFAULT_PORT}
+QBT_WEB_UI_ADDRESS=${QBT_WEB_UI_ADDRESS:-"http://$QBT_WEB_UI_HOST:$QBT_WEB_UI_PORT"}
 
-# Create .env file with user inputs
+# Create .env file
 cat <<EOF > .env
 BOT_TOKEN=$BOT_TOKEN
+BOT_API_ADDRESS=$BOT_API_ADDRESS
 RUTRACKER_USERNAME=$RUTRACKER_USERNAME
 RUTRACKER_PASSWORD=$RUTRACKER_PASSWORD
 QBT_WEB_UI_USERNAME=$QBT_WEB_UI_USERNAME
 QBT_WEB_UI_PASSWORD=$QBT_WEB_UI_PASSWORD
-QBT_WEB_UI_HOST=$QBT_WEB_UI_HOST
-QBT_WEB_UI_PORT=$QBT_WEB_UI_PORT
-QBT_SAVE_PATH=$QBT_SAVE_PATH
+QBT_WEB_UI_ADDRESS=http://$QBT_WEB_UI_HOST:$QBT_WEB_UI_PORT
 EOF
 
-print_green "Environment variables set up!"
+if [ "$QBT_SAVE_PATH" != "" ]; then
+echo "QBT_SAVE_PATH=$QBT_SAVE_PATH" >> .env
+fi
+
+# Create .env.api file
+cat <<EOF > .env.api
+TELEGRAM_API_ID=$TELEGRAM_API_ID
+TELEGRAM_API_HASH=$TELEGRAM_API_HASH
+TELEGRAM_LOCAL=1
+EOF
+
+print_green "Environment variables setup completed!"
 echo ""
 
 echo "Downloading scripts..."

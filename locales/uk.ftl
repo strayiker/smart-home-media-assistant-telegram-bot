@@ -24,3 +24,15 @@ torrent-message-completed =
 torrent-unsupported-tracker-error = Трекер не підтримується
 torrent-download-error = Під час додавання торрента сталася помилка
 torrent-remove-error = Під час видалення торрента сталася помилка
+torrent-file-message =
+    <b>{$name}</b>
+    ---
+    Розмір: {$size}
+    Завантажити: {$download}
+torrent-files-empty = Немає файлів
+torrent-files-error = Виникла помилка при отриманні файлів
+torrent-file-uploading = Завантаження, будь ласка, зачекайте...
+torrent-file-encoding = Кодування відео, будь ласка, зачекайте... {$progress}%
+torrent-file-too-large = Файл занадто великий
+torrent-file-error = Виникла помилка при надсиланні файлу
+torrent-file-empty = Файл не знайдено

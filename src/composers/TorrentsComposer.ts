@@ -1,4 +1,8 @@
+import path from 'node:path';
+
 import { type FluentContextFlavor } from '@grammyjs/fluent';
+import { fileTypeFromFile } from 'file-type';
+import ffmpeg, { type FfprobeData } from 'fluent-ffmpeg';
 import {
   type Bot,
   Composer,
@@ -6,10 +10,11 @@ import {
   type Filter,
   GrammyError,
 } from 'grammy';
-import { type Message } from 'grammy/types';
+import { InputFile, type Message } from 'grammy/types';
+import { tmpNameSync } from 'tmp';
 
 import { fluent } from '../fluent.js';
-import { type QBTorrent } from '../qBittorrent/models.js';
+import { type QBFile, type QBTorrent } from '../qBittorrent/models.js';
 import { type QBittorrentClient } from '../qBittorrent/QBittorrentClient.js';
 import {
   type SearchEngine,
@@ -18,6 +23,8 @@ import {
 import { formatBytes } from '../utils/formatBytes.js';
 import { formatDuration } from '../utils/formatDuration.js';
 import { type Logger } from '../utils/Logger.js';
+
+const MAX_FILE_SIZE = 2_000_000; // 2 GB telegram limit
 
 export interface TorrentComposerOptions<C extends Context> {
   bot: Bot<C>;
@@ -50,10 +57,14 @@ export class TorrentsComposer<
     }, 5 * 1000);
 
     this.on('message::bot_command', async (ctx, next) => {
-      if (ctx.message.text?.startsWith('/dl_')) {
+      if (ctx.message.text?.startsWith('/dl_file_')) {
+        await this.handleDownloadFileCommand(ctx);
+      } else if (ctx.message.text?.startsWith('/dl_')) {
         await this.handleDownloadCommand(ctx);
       } else if (ctx.message.text?.startsWith('/rm_')) {
         await this.handleRemoveCommand(ctx);
+      } else if (ctx.message.text?.startsWith('/ls_')) {
+        await this.handleListFilesCommand(ctx);
       } else {
         return next();
       }
@@ -87,7 +98,7 @@ export class TorrentsComposer<
     const text = results
       .slice(0, 5)
       .map(([se, result]) => this.formatSearchResult(ctx, se, result))
-      .join('\n\n\n');
+      .join('\n\n');
 
     try {
       await ctx.reply(text, {
@@ -175,6 +186,194 @@ export class TorrentsComposer<
     await this.createOrUpdateTorrentsMessage(ctx.chatId, true);
   }
 
+  private async handleListFilesCommand(ctx: Filter<C, 'message::bot_command'>) {
+    if (!ctx.message.text) {
+      return;
+    }
+
+    const uid = ctx.message.text.replace('/ls_', '');
+
+    let hash: string;
+
+    try {
+      ({ hash } = await this.getTorrentByUid(uid));
+    } catch (error) {
+      console.log(error);
+      return ctx.reply(ctx.t('torrent-files-error'));
+    }
+
+    let files: QBFile[];
+
+    try {
+      files = await this.getTorrentFiles(hash);
+    } catch (error) {
+      console.log(error);
+      return ctx.reply(ctx.t('torrent-files-error'));
+    }
+
+    if (files.length === 0) {
+      return ctx.reply(ctx.t('torrent-files-empty'));
+    }
+
+    const text = files
+      .map((file) => this.formatTorrentFile(ctx, uid, file))
+      .join('\n\n');
+
+    try {
+      await ctx.reply(text, {
+        parse_mode: 'HTML',
+      });
+    } catch (error) {
+      this.logger.error(error, 'An error occured while sending torrent files');
+    }
+  }
+
+  private async handleDownloadFileCommand(
+    ctx: Filter<C, 'message::bot_command'>,
+  ) {
+    if (!ctx.message.text) {
+      return;
+    }
+
+    const [trackerName, id, fileIndex] = ctx.message.text
+      .replace('/dl_file_', '')
+      .split('_');
+    const uid = `${trackerName}_${id}`;
+
+    let hash: string;
+    let save_path: string;
+
+    try {
+      ({ hash, save_path } = await this.getTorrentByUid(uid));
+    } catch (error) {
+      console.log(error);
+      return ctx.reply(ctx.t('torrent-file-error'));
+    }
+
+    let qbFile: QBFile;
+
+    try {
+      [qbFile] = await this.getTorrentFiles(hash, [Number(fileIndex)]);
+    } catch (error) {
+      console.log(error);
+      return ctx.reply(ctx.t('torrent-file-error'));
+    }
+
+    if (!qbFile) {
+      return ctx.reply(ctx.t('torrent-file-empty'));
+    }
+
+    const filePath = path.join(save_path, qbFile.name);
+    const fileType = await fileTypeFromFile(filePath);
+
+    this.logger.debug(fileType);
+
+    if (!fileType) {
+      return;
+    }
+
+    try {
+      const file = new InputFile(filePath);
+
+      if (['mp4', 'mkv', 'avi'].includes(fileType.ext)) {
+        const metadata = await new Promise<FfprobeData>((resolve) => {
+          ffmpeg.ffprobe(filePath, function (err, metadata) {
+            if (err) {
+              throw err;
+            }
+            resolve(metadata);
+          });
+        });
+
+        const duration = metadata.format.duration;
+
+        if (!duration) {
+          return await ctx.reply(ctx.t('torrent-file-error'));
+        }
+
+        const videoStream = metadata.streams.find((stream) => {
+          return stream.codec_type === 'video';
+        });
+
+        if (qbFile.size <= MAX_FILE_SIZE) {
+          await ctx.reply(ctx.t('torrent-file-uploading'));
+          await ctx.replyWithVideo(file, {
+            duration,
+            height: videoStream?.height,
+            width: videoStream?.width,
+          });
+        } else {
+          const size = MAX_FILE_SIZE;
+
+          const aBitrate = 192;
+          const vBitrate = Math.floor((size * 8) / duration - aBitrate);
+
+          this.logger.debug('Duration: %s', duration);
+          this.logger.debug('Video bitrate: %s', vBitrate);
+          this.logger.debug('Audio bitrate: %s', aBitrate);
+
+          const tmpFile = tmpNameSync({ postfix: '.mp4' });
+
+          ffmpeg(filePath)
+            .videoBitrate(vBitrate)
+            .audioBitrate(aBitrate)
+            .videoCodec('libx264')
+            .audioCodec('aac')
+            .outputOptions('-map', '0:a:0')
+            .outputOptions('-map', '0:v:0')
+            .outputOptions('-pix_fmt', 'yuv420p')
+            .outputOptions('-preset', 'fast')
+            .outputFormat('mp4')
+            .on('start', (cmd) => {
+              this.logger.debug(cmd);
+            })
+            .on('progress', async (progress) => {
+              const text = ctx.t('torrent-file-encoding', {
+                progress: Math.round(progress.percent || 0),
+              });
+              if (text !== progressMessage.text) {
+                try {
+                  await this.bot.api.editMessageText(
+                    progressMessage.chat.id,
+                    progressMessage.message_id,
+                    text,
+                  );
+                  progressMessage.text = text;
+                } catch {
+                  /* empty */
+                }
+              }
+            })
+            .on('end', async () => {
+              try {
+                await ctx.reply(ctx.t('torrent-file-uploading'));
+                await ctx.replyWithVideo(new InputFile(tmpFile), {
+                  duration,
+                  height: videoStream?.height,
+                  width: videoStream?.width,
+                });
+              } catch (error) {
+                this.logger.error(error, 'An error occured while sending file');
+              }
+            })
+            .saveToFile(tmpFile);
+
+          const progressMessage = await ctx.reply(
+            ctx.t('torrent-file-encoding', { progress: 0 }),
+          );
+        }
+      } else {
+        if (qbFile.size <= MAX_FILE_SIZE) {
+          ctx.replyWithDocument(file);
+        } else {
+          await ctx.reply(ctx.t('torrent-file-too-large'));
+        }
+      }
+    } catch (error) {
+      this.logger.error(error, 'An error occured while sending file');
+    }
+  }
+
   private async searchTorrents(query: string) {
     try {
       const promises = this.searchEngines.map(async (se) => {
@@ -225,6 +424,18 @@ export class TorrentsComposer<
       return torrent;
     } catch (error) {
       this.logger.error(error, 'An error occured while fetching torrents');
+      throw error;
+    }
+  }
+
+  private async getTorrentFiles(hash: string, indexes?: number[]) {
+    try {
+      return await this.qBittorrent.getTorrentFiles(hash, indexes);
+    } catch (error) {
+      this.logger.error(
+        error,
+        'An error occured while retrieving torrent files',
+      );
       throw error;
     }
   }
@@ -406,6 +617,7 @@ export class TorrentsComposer<
     const eta =
       torrent.eta >= 8_640_000 ? '∞' : formatDuration(torrent.eta, locale);
     const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
+    const files = `/ls_${uid}`;
     const remove = `/rm_${uid}`;
 
     const t = fluent.withLocale(locale);
@@ -425,7 +637,19 @@ export class TorrentsComposer<
       : t('torrent-message-completed', {
           title: torrent.name,
           progress,
+          files,
           remove,
         });
+  }
+
+  private formatTorrentFile(ctx: C, torrentUid: string, file: QBFile) {
+    const download = `/dl_file_${torrentUid}_${file.index}`;
+    const size = formatBytes(file.size ?? 0);
+
+    return ctx.t('torrent-file-message', {
+      name: file.name,
+      size,
+      download,
+    });
   }
 }

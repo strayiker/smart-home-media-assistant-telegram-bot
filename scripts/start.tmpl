@@ -2,9 +2,10 @@
 
 VERSION={{VERSION}}
 
-SCRIPT_DIR=$(dirname "$(realpath "$0")")
-DATA_PATH=$SCRIPT_DIR/data
-ENV_FILE_PATH=$SCRIPT_DIR/.env
+DIR=$(dirname "$(realpath "$0")")
+BOT_DATA_DIR=$DIR/data
+BOT_ENV_FILE=$DIR/.env
+API_ENV_FILE=$DIR/.env.api
 
 OS=$(uname)
 
@@ -14,10 +15,18 @@ if [[ "$OS" =~ ^(CYGWIN|MINGW|MSYS) ]]; then
 fi
 
 {{CONTAINER_TOOL}} run -d \
-    -v $DATA_PATH:/data \
-    --env-file $ENV_FILE_PATH \
+    -p 8081:8081 \
+    --env-file $API_ENV_FILE \
+    --restart unless-stopped \
+    --name smart-home-media-assistant-telegram-bot-api \
+    aiogram/telegram-bot-api:latest
+
+{{CONTAINER_TOOL}} run -d \
+    -v $BOT_DATA_DIR:/data \
+    --env-file $BOT_ENV_FILE \
     --network host \
     --restart unless-stopped \
     --name smart-home-media-assistant-telegram-bot \
     ghcr.io/strayiker/smart-home-media-assistant-telegram-bot:$VERSION
+
 {{CONTAINER_TOOL}} logs -f smart-home-media-assistant-telegram-bot

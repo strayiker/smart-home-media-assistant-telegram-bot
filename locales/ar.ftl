@@ -24,3 +24,15 @@ torrent-message-completed =
 torrent-unsupported-tracker-error = المتتبع غير مدعوم
 torrent-download-error = حدث خطأ أثناء إضافة التورنت
 torrent-remove-error = حدث خطأ أثناء إزالة التورنت
+torrent-file-message =
+    <b>{$name}</b>
+    ---
+    الحجم: {$size}
+    التحميل: {$download}
+torrent-files-empty = لا توجد ملفات
+torrent-files-error = حدث خطأ أثناء استرجاع الملفات
+torrent-file-uploading = جارٍ التحميل، يرجى الانتظار...
+torrent-file-encoding = جارٍ ترميز الفيديو، يرجى الانتظار... {$progress}%
+torrent-file-too-large = الملف كبير جدًا
+torrent-file-error = حدث خطأ أثناء إرسال الملف
+torrent-file-empty = لم يتم العثور على الملف

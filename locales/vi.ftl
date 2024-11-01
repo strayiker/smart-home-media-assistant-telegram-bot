@@ -24,3 +24,15 @@ torrent-message-completed =
 torrent-unsupported-tracker-error = Trình theo dõi không được hỗ trợ
 torrent-download-error = Đã xảy ra lỗi khi thêm torrent
 torrent-remove-error = Đã xảy ra lỗi khi xóa torrent
+torrent-file-message =
+    <b>{$name}</b>
+    ---
+    Kích thước: {$size}
+    Tải về: {$download}
+torrent-files-empty = Không có tệp nào
+torrent-files-error = Đã xảy ra lỗi khi truy xuất tệp
+torrent-file-uploading = Đang tải lên, vui lòng đợi...
+torrent-file-encoding = Đang mã hóa video, vui lòng đợi... {$progress}%
+torrent-file-too-large = Tệp quá lớn
+torrent-file-error = Đã xảy ra lỗi khi gửi tệp
+torrent-file-empty = Không tìm thấy tệp

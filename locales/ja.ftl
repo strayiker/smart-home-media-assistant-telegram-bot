@@ -24,3 +24,15 @@ torrent-message-completed =
 torrent-unsupported-tracker-error = トラッカーがサポートされていません
 torrent-download-error = トレントの追加中にエラーが発生しました
 torrent-remove-error = トレントの削除中にエラーが発生しました
+torrent-file-message =
+    <b>{$name}</b>
+    ---
+    サイズ: {$size}
+    ダウンロード: {$download}
+torrent-files-empty = ファイルがありません
+torrent-files-error = ファイルの取得中にエラーが発生しました
+torrent-file-uploading = アップロード中です、お待ちください...
+torrent-file-encoding = ビデオをエンコード中です、お待ちください... {$progress}%
+torrent-file-too-large = ファイルが大きすぎます
+torrent-file-error = ファイルの送信中にエラーが発生しました
+torrent-file-empty = ファイルが見つかりません

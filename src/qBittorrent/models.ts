@@ -111,3 +111,29 @@ export interface QBTorrent {
   /** Current upload speed (bytes/second) */
   upspeed: number;
 }
+
+export enum QBFilePriority {
+  DO_NOT_DOWNLOAD,
+  NORMAL,
+  HIGH,
+  MAXIMAL,
+}
+
+export interface QBFile {
+  /** File index */
+  index: number;
+  /** File name (including relative path) */
+  name: string;
+  /** File size (bytes) */
+  size: number;
+  /** File progress (percentage/100) */
+  progress: number;
+  /** File priority */
+  priority: QBFilePriority;
+  /** True if file is seeding/complete */
+  is_seed: boolean;
+  /** The first number is the starting piece index and the second number is the ending piece index (inclusive) */
+  piece_range: [number, number];
+  /** Percentage of file pieces currently available (percentage/100) */
+  availability: number;
+}

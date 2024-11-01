@@ -15,6 +15,10 @@ import { CookieStorage } from './utils/CookieStorage.js';
 const botToken = config.get('BOT_TOKEN', {
   required: true,
 });
+
+const botApiAddress = config.get('BOT_API_ADDRESS', {
+  required: true,
+});
 const cookiesFilePath = config.get('COOKIES_FILE_PATH', {
   default: '/data/cookies.json',
 });
@@ -24,12 +28,8 @@ const rutrackerUsername = config.get('RUTRACKER_USERNAME', {
 const rutrackerPassword = config.get('RUTRACKER_PASSWORD', {
   required: true,
 });
-const qbtWebuiHost = config.get('QBT_WEB_UI_HOST', {
+const qbtWebuiAddress = config.get('QBT_WEB_UI_ADDRESS', {
   required: true,
-});
-const qbtWebuiPort: number = config.get('QBT_WEB_UI_PORT', {
-  required: true,
-  parse: true,
 });
 const qbtWebuiUsername = config.get('QBT_WEB_UI_USERNAME', {
   required: true,
@@ -39,13 +39,17 @@ const qbtWebuiPassword = config.get('QBT_WEB_UI_PASSWORD', {
 });
 const qbtSavePath = config.get('QBT_SAVE_PATH');
 
-const bot = new Bot<MyContext>(botToken);
+const bot = new Bot<MyContext>(botToken, {
+  client: {
+    apiRoot: botApiAddress,
+  },
+});
 const cookieStorage = new CookieStorage({
   filePath: cookiesFilePath,
   logger,
 });
 const qBittorrent = new QBittorrentClient({
-  url: `http://${qbtWebuiHost}:${qbtWebuiPort}`,
+  url: qbtWebuiAddress,
   username: qbtWebuiUsername,
   password: qbtWebuiPassword,
   savePath: qbtSavePath,

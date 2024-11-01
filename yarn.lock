@@ -1097,6 +1097,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tokenizer/token@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@tokenizer/token@npm:0.3.0"
+  checksum: 10c0/7ab9a822d4b5ff3f5bca7f7d14d46bdd8432528e028db4a52be7fbf90c7f495cc1af1324691dda2813c6af8dc4b8eb29de3107d4508165f9aa5b53e7d501f155
+  languageName: node
+  linkType: hard
+
 "@tsconfig/node10@npm:^1.0.7":
   version: 1.0.11
   resolution: "@tsconfig/node10@npm:1.0.11"
@@ -1155,6 +1162,15 @@ __metadata:
   version: 1.0.6
   resolution: "@types/estree@npm:1.0.6"
   checksum: 10c0/cdfd751f6f9065442cd40957c07fd80361c962869aa853c1c2fd03e101af8b9389d8ff4955a43a6fcfa223dd387a089937f95be0f3eec21ca527039fd2d9859a
+  languageName: node
+  linkType: hard
+
+"@types/fluent-ffmpeg@npm:^2":
+  version: 2.1.27
+  resolution: "@types/fluent-ffmpeg@npm:2.1.27"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/2362e7d240d4d8a0b775b5abf9ab5f26a85b17dc335276f0c3ff3bf935f913ccc9e1e10e756a6a3cebf78c1cd1eff835a253f73a3cd1bbcb343b28089a9957f3
   languageName: node
   linkType: hard
 
@@ -1223,6 +1239,13 @@ __metadata:
   version: 7.5.8
   resolution: "@types/semver@npm:7.5.8"
   checksum: 10c0/8663ff927234d1c5fcc04b33062cb2b9fcfbe0f5f351ed26c4d1e1581657deebd506b41ff7fdf89e787e3d33ce05854bc01686379b89e9c49b564c4cfa988efa
+  languageName: node
+  linkType: hard
+
+"@types/tmp@npm:^0":
+  version: 0.2.6
+  resolution: "@types/tmp@npm:0.2.6"
+  checksum: 10c0/a11bfa2cd8eaa6c5d62f62a3569192d7a2c28efdc5c17af0b0551db85816b2afc8156f3ca15ac76f0b142ae1403f04f44279871424233a1f3390b2e5fc828cd0
   languageName: node
   linkType: hard
 
@@ -1558,6 +1581,13 @@ __metadata:
   version: 1.0.0
   resolution: "array-ify@npm:1.0.0"
   checksum: 10c0/75c9c072faac47bd61779c0c595e912fe660d338504ac70d10e39e1b8a4a0c9c87658703d619b9d1b70d324177ae29dc8d07dda0d0a15d005597bc4c5a59c70c
+  languageName: node
+  linkType: hard
+
+"async@npm:^0.2.9":
+  version: 0.2.10
+  resolution: "async@npm:0.2.10"
+  checksum: 10c0/714d284dc6c3ae59f3e8b347083e32c7657ba4ffc4ff945eb152ad4fb08def27e768992fcd4d9fd3b411c6b42f1541862ac917446bf2a1acfa0f302d1001f7d2
   languageName: node
   linkType: hard
 
@@ -2905,6 +2935,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"file-type@npm:^19.6.0":
+  version: 19.6.0
+  resolution: "file-type@npm:19.6.0"
+  dependencies:
+    get-stream: "npm:^9.0.1"
+    strtok3: "npm:^9.0.1"
+    token-types: "npm:^6.0.0"
+    uint8array-extras: "npm:^1.3.0"
+  checksum: 10c0/ae90ab618d0e759f26806024eb25ade851406301d2deae4b2dca6e9df0de13b4be575114a5f8129e73f6de537644a45fc4eb7cfa8b7dad63316b01b0e6f3bd2e
+  languageName: node
+  linkType: hard
+
 "fill-range@npm:^7.1.1":
   version: 7.1.1
   resolution: "fill-range@npm:7.1.1"
@@ -2985,6 +3027,16 @@ __metadata:
   version: 3.3.1
   resolution: "flatted@npm:3.3.1"
   checksum: 10c0/324166b125ee07d4ca9bcf3a5f98d915d5db4f39d711fba640a3178b959919aae1f7cfd8aabcfef5826ed8aa8a2aa14cc85b2d7d18ff638ddf4ae3df39573eaf
+  languageName: node
+  linkType: hard
+
+"fluent-ffmpeg@npm:^2.1.3":
+  version: 2.1.3
+  resolution: "fluent-ffmpeg@npm:2.1.3"
+  dependencies:
+    async: "npm:^0.2.9"
+    which: "npm:^1.1.1"
+  checksum: 10c0/0397379ec3237c10b2389edeef26fdaf93f36d1b20b0f28f8945fe6d9121dcee9b0c615bf7d44edb7abd37233e0d24f0db39389668d3c86a1a2a0d59e3f4457b
   languageName: node
   linkType: hard
 
@@ -3102,7 +3154,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"get-stream@npm:^9.0.0":
+"get-stream@npm:^9.0.0, get-stream@npm:^9.0.1":
   version: 9.0.1
   resolution: "get-stream@npm:9.0.1"
   dependencies:
@@ -5411,6 +5463,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"peek-readable@npm:^5.3.1":
+  version: 5.3.1
+  resolution: "peek-readable@npm:5.3.1"
+  checksum: 10c0/49f628e4728887230c158699e422ebb10747f5e02aee930ec10634fa7142e74e67d3fb3a780e7a9b9f092c61bf185f07d167c099b2359b22a58cee3dbfe0e43b
+  languageName: node
+  linkType: hard
+
 "picocolors@npm:^1.0.0, picocolors@npm:^1.0.1":
   version: 1.1.0
   resolution: "picocolors@npm:1.1.0"
@@ -6154,8 +6213,10 @@ __metadata:
     "@grammyjs/fluent": "npm:^1.0.3"
     "@moebius/fluent": "npm:^1.1.0"
     "@semantic-release/git": "npm:^10.0.1"
+    "@types/fluent-ffmpeg": "npm:^2"
     "@types/node": "npm:^22.8.1"
     "@types/parse-torrent": "npm:^5.8.7"
+    "@types/tmp": "npm:^0"
     "@types/uuid": "npm:^10.0.0"
     cheerio: "npm:^1.0.0"
     dayjs: "npm:^1.11.13"
@@ -6164,6 +6225,8 @@ __metadata:
     eslint-config-prettier: "npm:^9.1.0"
     eslint-plugin-simple-import-sort: "npm:^12.1.1"
     eslint-plugin-unicorn: "npm:^56.0.0"
+    file-type: "npm:^19.6.0"
+    fluent-ffmpeg: "npm:^2.1.3"
     grammy: "npm:^1.30.0"
     husky: "npm:^9.1.6"
     lint-staged: "npm:^15.2.10"
@@ -6172,6 +6235,7 @@ __metadata:
     pino-pretty: "npm:^11.3.0"
     prettier: "npm:^3.3.3"
     semantic-release: "npm:^24.2.0"
+    tmp: "npm:^0.2.3"
     tough-cookie: "npm:^5.0.0"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.6.3"
@@ -6446,6 +6510,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"strtok3@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "strtok3@npm:9.0.1"
+  dependencies:
+    "@tokenizer/token": "npm:^0.3.0"
+    peek-readable: "npm:^5.3.1"
+  checksum: 10c0/ab96030c3d30899fc885ed87b305086b6421d64c1a2b9f5240c6ecffde7b819e174d67bd3b1ecc14a10f539c7a818a0ac47386b4bbb2fa913f673b6ed1c0eb78
+  languageName: node
+  linkType: hard
+
 "super-regex@npm:^1.0.0":
   version: 1.0.0
   resolution: "super-regex@npm:1.0.0"
@@ -6644,12 +6718,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tmp@npm:^0.2.3":
+  version: 0.2.3
+  resolution: "tmp@npm:0.2.3"
+  checksum: 10c0/3e809d9c2f46817475b452725c2aaa5d11985cf18d32a7a970ff25b568438e2c076c2e8609224feef3b7923fa9749b74428e3e634f6b8e520c534eef2fd24125
+  languageName: node
+  linkType: hard
+
 "to-regex-range@npm:^5.0.1":
   version: 5.0.1
   resolution: "to-regex-range@npm:5.0.1"
   dependencies:
     is-number: "npm:^7.0.0"
   checksum: 10c0/487988b0a19c654ff3e1961b87f471702e708fa8a8dd02a298ef16da7206692e8552a0250e8b3e8759270f62e9d8314616f6da274734d3b558b1fc7b7724e892
+  languageName: node
+  linkType: hard
+
+"token-types@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "token-types@npm:6.0.0"
+  dependencies:
+    "@tokenizer/token": "npm:^0.3.0"
+    ieee754: "npm:^1.2.1"
+  checksum: 10c0/5bf5eba51d63f71f301659ff70ce10ca43e7038364883437d8b4541cc98377e3e56109b11720e25fe51047014efaccdff90eaf6de9a78270483578814b838ab9
   languageName: node
   linkType: hard
 
@@ -6834,6 +6925,13 @@ __metadata:
   dependencies:
     base64-arraybuffer: "npm:^1.0.2"
   checksum: 10c0/9e4c263a461ae587f8ae670fb3b27cfb875ef2159da0987ef1a4fb0a6a85de3fadc9fdb988f824040c94cf9da8a38ca4bdf46266f45fa1729034ec3f68cb3308
+  languageName: node
+  linkType: hard
+
+"uint8array-extras@npm:^1.3.0":
+  version: 1.4.0
+  resolution: "uint8array-extras@npm:1.4.0"
+  checksum: 10c0/eaffd3388634b7e5e1496073b878dd19136043137d3e7e0d2a453e37f566a5a551e640819e1a6596c6df9b9d1f7b70884cc29db6a357bdd424811f3598d504dd
   languageName: node
   linkType: hard
 
@@ -7045,6 +7143,17 @@ __metadata:
     tr46: "npm:~0.0.3"
     webidl-conversions: "npm:^3.0.0"
   checksum: 10c0/1588bed84d10b72d5eec1d0faa0722ba1962f1821e7539c535558fb5398d223b0c50d8acab950b8c488b4ba69043fd833cc2697056b167d8ad46fac3995a55d5
+  languageName: node
+  linkType: hard
+
+"which@npm:^1.1.1":
+  version: 1.3.1
+  resolution: "which@npm:1.3.1"
+  dependencies:
+    isexe: "npm:^2.0.0"
+  bin:
+    which: ./bin/which
+  checksum: 10c0/e945a8b6bbf6821aaaef7f6e0c309d4b615ef35699576d5489b4261da9539f70393c6b2ce700ee4321c18f914ebe5644bc4631b15466ffbaad37d83151f6af59
   languageName: node
   linkType: hard
 

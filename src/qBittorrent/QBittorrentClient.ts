@@ -3,7 +3,7 @@ import { URLSearchParams } from 'node:url';
 import parseTorrent from 'parse-torrent';
 import { CookieJar } from 'tough-cookie';
 
-import { type QBTorrent } from './models.js';
+import { type QBFile, type QBTorrent } from './models.js';
 import {
   type QBClientAddTorrentsOptions,
   type QBClientGetTorrentsOptions,
@@ -289,5 +289,25 @@ export class QBittorrentClient {
       },
       body: data.toString(),
     });
+  }
+
+  async getTorrentFiles(hash: string, indexes?: number[]) {
+    const data = new URLSearchParams();
+
+    data.append('hash', hash);
+
+    if (indexes) {
+      data.append('indexes', indexes.join('|'));
+    }
+
+    const response = await this.request(`${this.apiBase}/torrents/files`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: data.toString(),
+    });
+
+    return response.json() as Promise<QBFile[]>;
   }
 }

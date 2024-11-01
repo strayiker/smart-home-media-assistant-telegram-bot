@@ -24,3 +24,15 @@ torrent-message-completed =
 torrent-unsupported-tracker-error = 不支持的跟踪器
 torrent-download-error = 添加种子时发生错误
 torrent-remove-error = 删除种子时发生错误
+torrent-file-message =
+    <b>{$name}</b>
+    ---
+    大小: {$size}
+    下载: {$download}
+torrent-files-empty = 没有文件
+torrent-files-error = 检索文件时出错
+torrent-file-uploading = 正在上传，请稍候...
+torrent-file-encoding = 正在编码视频，请稍候... {$progress}%
+torrent-file-too-large = 文件太大
+torrent-file-error = 发送文件时出错
+torrent-file-empty = 未找到文件

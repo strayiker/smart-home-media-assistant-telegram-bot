@@ -24,3 +24,15 @@ torrent-message-completed =
 torrent-unsupported-tracker-error = Rastreador no soportado
 torrent-download-error = Ocurrió un error al agregar el torrent
 torrent-remove-error = Ocurrió un error al eliminar el torrent
+torrent-file-message =
+    <b>{$name}</b>
+    ---
+    Tamaño: {$size}
+    Descargar: {$download}
+torrent-files-empty = No hay archivos
+torrent-files-error = Se produjo un error al recuperar los archivos
+torrent-file-uploading = Subiendo, por favor espera...
+torrent-file-encoding = Codificando video, por favor espera... {$progress}%
+torrent-file-too-large = El archivo es demasiado grande
+torrent-file-error = Se produjo un error al enviar el archivo
+torrent-file-empty = Archivo no encontrado
