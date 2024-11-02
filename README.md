@@ -6,7 +6,7 @@
 
 ## About
 
-This is the sources of a Telegram bot is designed to help you search for torrents and remotely download them to your PC using the qBittorrent client. It's written in TypeScript and runs in a Docker container on your PC.
+This is the sources of a Telegram bot is designed to help you search for torrents and remotely download them to your PC using the qBittorrent client. Once the torrent is downloaded, you can ask the bot to send you any file from the torrent and download it from any other device.
 
 ## Disclaimer
 
