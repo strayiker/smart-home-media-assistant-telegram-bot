@@ -6,43 +6,24 @@ import { useFluent } from '@grammyjs/fluent';
 import { Bot, GrammyError, HttpError } from 'grammy';
 
 import { TorrentsComposer } from './composers/TorrentsComposer.js';
-import { config } from './config.js';
+import {
+  botApiAddress,
+  botDataPath,
+  botDataTorrentsPath,
+  botToken,
+  qbtSavePath,
+  qbtWebuiAddress,
+  qbtWebuiPassword,
+  qbtWebuiUsername,
+  rutrackerPassword,
+  rutrackerUsername,
+} from './config.js';
 import { type MyContext } from './Context.js';
 import { fluent } from './fluent.js';
 import { logger } from './logger.js';
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
 import { RutrackerSearchEngine } from './searchEngines/RutrackerSearchEngine.js';
 import { CookieStorage } from './utils/CookieStorage.js';
-
-const botToken = config.get('BOT_TOKEN', {
-  required: true,
-});
-
-const botApiAddress = config.get('BOT_API_ADDRESS', {
-  required: true,
-});
-const botDataPath = config.get('BOT_DATA_PATH', {
-  default: '/data/bot',
-});
-const botDataTorrentsPath = config.get('BOT_DATA_TORRENTS_PATH', {
-  default: '/data/torrents',
-});
-const rutrackerUsername = config.get('RUTRACKER_USERNAME', {
-  required: true,
-});
-const rutrackerPassword = config.get('RUTRACKER_PASSWORD', {
-  required: true,
-});
-const qbtWebuiAddress = config.get('QBT_WEB_UI_ADDRESS', {
-  required: true,
-});
-const qbtWebuiUsername = config.get('QBT_WEB_UI_USERNAME', {
-  required: true,
-});
-const qbtWebuiPassword = config.get('QBT_WEB_UI_PASSWORD', {
-  required: true,
-});
-const qbtSavePath = config.get('QBT_SAVE_PATH');
 
 const bot = new Bot<MyContext>(botToken, {
   client: {
