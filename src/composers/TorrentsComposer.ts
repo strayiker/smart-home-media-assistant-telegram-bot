@@ -345,7 +345,7 @@ export class TorrentsComposer<
           const tmpFile = tmpNameSync({ postfix: '.mp4' });
 
           ffmpeg(filePath)
-            .outputOptions('-c:a', 'aac')
+            .outputOptions('-c:a', 'libfdk_aac')
             .outputOptions('-c:v', 'libx264')
             .outputOptions('-b:a', `${aBitrate}k`)
             .outputOptions('-b:v', `${vBitrate}k`)

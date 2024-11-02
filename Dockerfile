@@ -1,6 +1,10 @@
-FROM node:lts-alpine
+FROM linuxserver/ffmpeg:latest
 
-RUN apk add ffmpeg
+RUN apt-get -y update  && \
+    apt-get -y --no-install-recommends install nodejs npm && \
+    rm -rf /var/lib/apt/lists/* && \
+    npm install -g corepack && \
+    corepack enable
 
 WORKDIR /app
 
