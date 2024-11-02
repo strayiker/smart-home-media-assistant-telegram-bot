@@ -53,7 +53,7 @@ tmpfile=$(mktemp) && curl -sSL https://raw.githubusercontent.com/strayiker/smart
 
 It will ask you for the necessary information to configure all the necessary software.
 
-## Update
+## Updating
 
 Run the following command in the folder where your bot is installed:
 
