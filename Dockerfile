@@ -17,4 +17,5 @@ RUN --mount=type=cache,target=/app/.yarn/cache yarn workspaces focus --productio
 COPY ./dist ./dist
 COPY ./locales ./locales
 
+ENTRYPOINT []
 CMD ["node", "dist/index.js"]
