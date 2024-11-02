@@ -323,6 +323,7 @@ export class TorrentsComposer<
         if (qbFile.size <= MAX_FILE_SIZE) {
           await ctx.reply(ctx.t('torrent-file-uploading'));
           await ctx.replyWithVideo(file, {
+            caption: path.basename(qbFile.name),
             duration,
             height: videoStreamHeight,
             width: videoStreamWidth,
@@ -343,62 +344,66 @@ export class TorrentsComposer<
 
           const tmpFile = tmpNameSync({ postfix: '.mp4' });
 
-          try {
-            ffmpeg(filePath)
-              .outputOptions('-c:a', 'aac')
-              .outputOptions('-c:v', 'libx264')
-              .outputOptions('-b:a', `${aBitrate}k`)
-              .outputOptions('-b:v', `${vBitrate}k`)
-              .outputOptions('-pix_fmt', 'yuv420p')
-              .outputOptions('-map', '0:v:0')
-              .outputOptions('-map', '0:a:0')
-              .outputOptions('-preset', 'fast')
-              .outputFormat('mp4')
-              .on('start', (cmd) => {
-                this.logger.debug(cmd);
-              })
-              .on('progress', async (progress) => {
-                const text = ctx.t('torrent-file-encoding', {
-                  progress: Math.round(progress.percent || 0),
-                });
-                if (text !== progressMessage.text) {
-                  try {
-                    await this.bot.api.editMessageText(
-                      progressMessage.chat.id,
-                      progressMessage.message_id,
-                      text,
-                    );
-                    progressMessage.text = text;
-                  } catch {
-                    /* empty */
-                  }
-                }
-              })
-              .on('end', async () => {
+          ffmpeg(filePath)
+            .outputOptions('-c:a', 'aac')
+            .outputOptions('-c:v', 'libx264')
+            .outputOptions('-b:a', `${aBitrate}k`)
+            .outputOptions('-b:v', `${vBitrate}k`)
+            .outputOptions('-pix_fmt', 'yuv420p')
+            .outputOptions('-movflags', 'faststart')
+            .outputOptions('-tag:v', 'avc1')
+            .outputOptions('-map', '0:v:0')
+            .outputOptions('-map', '0:a:0')
+            .outputOptions('-preset', 'superfast')
+            .outputFormat('mp4')
+            .on('start', (cmd) => {
+              this.logger.debug(cmd);
+            })
+            .on('progress', async (progress) => {
+              const text = ctx.t('torrent-file-encoding', {
+                progress: Math.round(progress.percent || 0),
+              });
+              if (text !== progressMessage.text) {
                 try {
-                  await ctx.reply(ctx.t('torrent-file-uploading'));
-                  await ctx.replyWithVideo(new InputFile(tmpFile), {
-                    duration,
-                    height: videoStreamHeight,
-                    width: videoStreamWidth,
-                  });
-                } catch (error) {
-                  this.logger.error(
-                    error,
-                    'An error occured while sending file',
+                  await this.bot.api.editMessageText(
+                    progressMessage.chat.id,
+                    progressMessage.message_id,
+                    text,
                   );
+                  progressMessage.text = text;
+                } catch {
+                  /* empty */
                 }
-              })
-              .saveToFile(tmpFile);
+              }
+            })
+            .on('end', async () => {
+              try {
+                await ctx.reply(ctx.t('torrent-file-uploading'));
+                await ctx.replyWithVideo(new InputFile(tmpFile), {
+                  caption: path.basename(qbFile.name),
+                  duration,
+                  height: videoStreamHeight,
+                  width: videoStreamWidth,
+                });
+              } catch (error) {
+                this.logger.error(error, 'An error occured while sending file');
+              } finally {
+                fs.rmSync(tmpFile, {
+                  force: true,
+                });
+              }
+            })
+            .on('error', (error) => {
+              this.logger.error(error, 'An error occured while sending file');
+              fs.rmSync(tmpFile, {
+                force: true,
+              });
+            })
+            .saveToFile(tmpFile);
 
-            const progressMessage = await ctx.reply(
-              ctx.t('torrent-file-encoding', { progress: 0 }),
-            );
-          } finally {
-            fs.rmSync(tmpFile, {
-              force: true,
-            });
-          }
+          const progressMessage = await ctx.reply(
+            ctx.t('torrent-file-encoding', { progress: 0 }),
+          );
         }
       } else {
         if (qbFile.size <= MAX_FILE_SIZE) {
