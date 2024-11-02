@@ -416,6 +416,11 @@ curl -s "$REPO_RAW_URL/scripts/update.tmpl" -o update.sh
 print_green "Downloading complete!"
 echo ""
 
+echo "Logging out of the hosted bot api server..."
+curl -s https://api.telegram.org/bot$BOT_TOKEN/logOut
+print_green "Done!"
+echo ""
+
 if $LINUX || $MACOS; then
     chmod +x start.sh
     chmod +x stop.sh
