@@ -44,14 +44,14 @@ tmpfile=$(mktemp) && curl -sSL https://raw.githubusercontent.com/strayiker/smart
 
 **This script will perform the following tasks:**
 
-1.  Check for a container tools. If none is found, it installs `Podman` (fast and light open source container tool).
+1.  Check for a container tools, if none is found install `Podman` (fast and light open source container tool).
 2.  Install `qBittorrent` if it's not already installed.
 3.  Configure qBittorrent `WebUI`.
-4.  Configure environment and the bot.
+4.  Configure bot and bot API server.
 5.  Create scripts to **start**, **stop**, and **update** the bot.
-6.  Run the `qBittorrent` and the bot for you.
+6.  Run the `qBittorrent`, local bot API server and bot itself.
 
-It will ask you for the necessary information to configure the software and the bot itself.
+It will ask you for the necessary information to configure all the necessary software.
 
 ## Update
 
