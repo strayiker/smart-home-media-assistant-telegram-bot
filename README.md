@@ -30,7 +30,7 @@ If you find this bot helpful, a star would be greatly appreciated!
    - Go to the Rutracker website and create an account if you don't already have one.
    - Note down your Rutracker `username` and `password`. These credentials will be used by the bot to login and perform searches.
 
-## Semi-Automatic Installation
+## Installation
 
 Open your terminal and run the following command:
 
@@ -49,105 +49,10 @@ tmpfile=$(mktemp) && curl -sSL https://raw.githubusercontent.com/strayiker/smart
 
 It will ask you for the necessary information to configure the software and the bot itself.
 
-## Manual Installation
+## Update
 
-### Requirements
-
-**The following software is required to be installed on your PC:**
-
-1. Git.
-1. Docker (or Podman, or any other container tool you prefer).
-1. qBittorrent.
-
-**For Windows Users:**
-
-On Windows you also need to install `Make` for Windows. You can download it from [GnuWin](https://gnuwin32.sourceforge.net/packages/make.htm), or install it using `winget:`
+Run the following command:
 
 ```bash
-winget install -e --id GnuWin32.Make
+./update.sh
 ```
-
-### Step-by-Step
-
-1. **Configure qBittorrent Web-UI:**
-
-   - Open the qBittorrent client on your PC.
-   - Go to `Options` > `Web UI`.
-   - Enable the Web UI and set a username (default is `admin`) and password.
-   - Set the port (default is `8080`).
-   - Make sure the Web UI is accessible from your local network (open [http://localhost:8080](http://localhost:8080) in your web browser).
-
-2. **Clone the Repository:**
-
-   - Open your terminal and run the following commands:
-
-     ```bash
-     git clone https://github.com/strayiker/smart-home-media-assistant-telegram-bot.git
-     cd smart-home-media-assistant-telegram-bot
-     ```
-
-3. **Set Up Environment Variables:**
-
-   - In the cloned repository, you'll find a file named `.env.template`.
-   - Rename this file to `.env` and open it in a text editor.
-   - Replace the placeholders with your values.
-
-4. **Build the Docker Image:**
-
-   - Run the following command to build the Docker container:
-
-     ```bash
-     make build
-     ```
-
-   - If you prefer some other tool instead of Docker, you can use the `use` option, for example:
-
-     ```bash
-     make build use=podman
-     ```
-
-5. **Start the Docker Container:**
-
-   - To start the bot, run:
-
-     ```bash
-     make run
-     ```
-
-6. **Inspect the logs of Docker Container:**
-
-   - To start the bot, run:
-
-     ```bash
-     make logs
-     ```
-
-7. **Stop and Clean Up:**
-
-   - When you're done, you can stop the Docker container by running:
-
-     ```bash
-     make stop
-     ```
-
-8. **Updating the Bot**
-
-   - Pull the updates from the repository
-
-     ```bash
-     git pull
-     ```
-
-   - Stop, rebuild, and start the bot
-
-     ```bash
-     make stop build run logs
-     ```
-
-## How to use
-
-1. Open Telegram and start a chat with your bot.
-2. Send a message to the bot to search for torrents. For example, you can type `Wall-E 1080p`.
-3. The bot will respond with search results, each containing a link to download the torrent.
-4. Click on the link, and the bot will add the torrent to the qBittorrent client running on your PC.
-5. The bot will provide you with the download stats and periodically update them.
