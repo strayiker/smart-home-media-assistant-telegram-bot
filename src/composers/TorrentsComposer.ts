@@ -319,8 +319,9 @@ export class TorrentsComposer<
           });
         } else {
           const aBitrate = 192;
-          const vBitrate = Math.floor(
-            (MAX_FILE_SIZE_KB * 8) / duration - aBitrate,
+          const vBitrate = Math.max(
+            Math.floor((MAX_FILE_SIZE_KB * 8) / duration - aBitrate),
+            3500,
           );
 
           this.logger.debug('Duration: %s', duration);
