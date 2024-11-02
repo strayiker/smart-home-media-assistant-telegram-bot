@@ -28,6 +28,7 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     Tamanho: {$size}
+    ---
     Baixar: {$download}
 torrent-files-empty = Nenhum arquivo
 torrent-files-error = Ocorreu um erro ao recuperar os arquivos

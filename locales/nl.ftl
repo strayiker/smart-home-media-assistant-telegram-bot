@@ -28,6 +28,7 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     Grootte: {$size}
+    ---
     Downloaden: {$download}
 torrent-files-empty = Geen bestanden
 torrent-files-error = Er is een fout opgetreden bij het ophalen van bestanden

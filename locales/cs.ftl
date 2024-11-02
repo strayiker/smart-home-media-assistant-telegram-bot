@@ -28,6 +28,7 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     Velikost: {$size}
+    ---
     Stáhnout: {$download}
 torrent-files-empty = Žádné soubory
 torrent-files-error = Při načítání souborů došlo k chybě

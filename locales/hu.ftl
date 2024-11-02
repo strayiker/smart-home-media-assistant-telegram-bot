@@ -28,6 +28,7 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     Méret: {$size}
+    ---
     Letöltés: {$download}
 torrent-files-empty = Nincsenek fájlok
 torrent-files-error = Hiba történt a fájlok lekérése közben

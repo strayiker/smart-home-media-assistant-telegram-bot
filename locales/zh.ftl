@@ -28,6 +28,7 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     大小: {$size}
+    ---
     下载: {$download}
 torrent-files-empty = 没有文件
 torrent-files-error = 检索文件时出错

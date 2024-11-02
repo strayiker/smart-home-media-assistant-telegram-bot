@@ -28,6 +28,7 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     Storlek: {$size}
+    ---
     Ladda ner: {$download}
 torrent-files-empty = Inga filer
 torrent-files-error = Ett fel uppstod vid hämtning av filer

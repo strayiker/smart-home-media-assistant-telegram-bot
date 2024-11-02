@@ -694,9 +694,9 @@ export class TorrentsComposer<
 
     if (file.size > MAX_FILE_SIZE) {
       if (isVideo(fileType)) {
-        size += ` will be compressed to ~${formatBytes(MAX_FILE_SIZE)}`;
+        size += ` (will be compressed)`;
       } else {
-        download = 'file is too big';
+        download = 'File is too big!';
       }
     }
 

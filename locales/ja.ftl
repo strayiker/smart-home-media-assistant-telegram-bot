@@ -28,6 +28,7 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     サイズ: {$size}
+    ---
     ダウンロード: {$download}
 torrent-files-empty = ファイルがありません
 torrent-files-error = ファイルの取得中にエラーが発生しました

@@ -28,6 +28,7 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     Kích thước: {$size}
+    ---
     Tải về: {$download}
 torrent-files-empty = Không có tệp nào
 torrent-files-error = Đã xảy ra lỗi khi truy xuất tệp

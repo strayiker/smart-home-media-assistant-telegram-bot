@@ -28,7 +28,8 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     גודל: {$size}
-    הורדה: {$download}
+    ---
+    הורד: {$download}
 torrent-files-empty = אין קבצים
 torrent-files-error = אירעה שגיאה בעת אחזור הקבצים
 torrent-file-uploading = מעלה, אנא המתן...

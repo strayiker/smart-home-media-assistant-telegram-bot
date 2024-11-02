@@ -28,6 +28,7 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     आकार: {$size}
+    ---
     डाउनलोड: {$download}
 torrent-files-empty = कोई फाइल नहीं
 torrent-files-error = फाइलें पुनः प्राप्त करते समय त्रुटि हुई

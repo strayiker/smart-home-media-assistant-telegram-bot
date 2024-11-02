@@ -28,6 +28,7 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     ขนาด: {$size}
+    ---
     ดาวน์โหลด: {$download}
 torrent-files-empty = ไม่มีไฟล์
 torrent-files-error = เกิดข้อผิดพลาดขณะดึงไฟล์

@@ -28,6 +28,7 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     আকার: {$size}
+    ---
     ডাউনলোড: {$download}
 torrent-files-empty = কোন ফাইল নেই
 torrent-files-error = ফাইলগুলি পুনরুদ্ধার করার সময় একটি ত্রুটি ঘটেছে

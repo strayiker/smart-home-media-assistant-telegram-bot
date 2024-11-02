@@ -28,6 +28,7 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     Boyut: {$size}
+    ---
     İndir: {$download}
 torrent-files-empty = Dosya yok
 torrent-files-error = Dosyalar alınırken bir hata oluştu

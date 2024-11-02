@@ -28,6 +28,7 @@ torrent-file-message =
     <b>{$name}</b>
     ---
     Ukuran: {$size}
+    ---
     Unduh: {$download}
 torrent-files-empty = Tidak ada file
 torrent-files-error = Terjadi kesalahan saat mengambil file
