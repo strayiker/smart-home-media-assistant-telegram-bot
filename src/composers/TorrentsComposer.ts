@@ -27,6 +27,14 @@ import { type Logger } from '../utils/Logger.js';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // Telegram limit
 const MAX_FILE_SIZE_KB = 2 * 1000 * 1000;
+const MAX_VIDEO_BITRATE = [
+  [360, 1000],
+  [480, 2500],
+  [720, 3500],
+  [1080, 5000],
+  [1440, 10_000],
+  [2160, 20_000],
+] as const;
 
 function isVideo(type?: FileTypeResult) {
   if (!type) {
@@ -309,9 +317,6 @@ export class TorrentsComposer<
         const videoStream = metadata.streams.find((stream) => {
           return stream.codec_type === 'video';
         });
-        const videoStreamBitRate = videoStream?.bit_rate
-          ? Number(videoStream.bit_rate)
-          : undefined;
         const videoStreamHeight = videoStream?.height;
         const videoStreamWidth = videoStream?.width;
 
@@ -324,9 +329,12 @@ export class TorrentsComposer<
           });
         } else {
           const aBitrate = 192;
+          const vMaxBitrate = MAX_VIDEO_BITRATE.find(
+            ([height]) => height > (videoStreamHeight ?? Infinity),
+          )?.[1];
           const vBitrate = Math.min(
             Math.floor((MAX_FILE_SIZE_KB * 8) / duration - aBitrate),
-            videoStreamBitRate ?? Infinity,
+            vMaxBitrate ?? Infinity,
           );
 
           this.logger.debug('Duration: %s', duration);
