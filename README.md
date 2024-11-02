@@ -10,9 +10,7 @@ This is the sources of a Telegram bot is designed to help you search for torrent
 
 ## Disclaimer
 
-This bot is created for a personal usage, so it might have some bugs or not work perfectly. However, I hope you find it useful. If you have any improvements or want to add support for other torrent trackers, feel free to submit a pull request.
-
-If you find this bot helpful, a star would be greatly appreciated!
+This bot is created for a personal usage, so it might have some bugs or not work perfectly. If you have any questions, issues or improvements, feel free to open an issue ticket or submit a pull request.
 
 ---
 
