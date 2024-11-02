@@ -378,7 +378,11 @@ export class TorrentsComposer<
             })
             .on('end', async () => {
               try {
-                await ctx.reply(ctx.t('torrent-file-uploading'));
+                await this.bot.api.editMessageText(
+                  progressMessage.chat.id,
+                  progressMessage.message_id,
+                  ctx.t('torrent-file-uploading'),
+                );
                 await ctx.replyWithVideo(new InputFile(tmpFile), {
                   caption: path.basename(qbFile.name),
                   duration,
