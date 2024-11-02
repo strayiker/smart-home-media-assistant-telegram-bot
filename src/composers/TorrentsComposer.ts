@@ -309,19 +309,24 @@ export class TorrentsComposer<
         const videoStream = metadata.streams.find((stream) => {
           return stream.codec_type === 'video';
         });
+        const videoStreamBitRate = videoStream?.bit_rate
+          ? Number(videoStream.bit_rate)
+          : undefined;
+        const videoStreamHeight = videoStream?.height;
+        const videoStreamWidth = videoStream?.width;
 
         if (qbFile.size <= MAX_FILE_SIZE) {
           await ctx.reply(ctx.t('torrent-file-uploading'));
           await ctx.replyWithVideo(file, {
             duration,
-            height: videoStream?.height,
-            width: videoStream?.width,
+            height: videoStreamHeight,
+            width: videoStreamWidth,
           });
         } else {
           const aBitrate = 192;
-          const vBitrate = Math.max(
+          const vBitrate = Math.min(
             Math.floor((MAX_FILE_SIZE_KB * 8) / duration - aBitrate),
-            3500,
+            videoStreamBitRate ?? Infinity,
           );
 
           this.logger.debug('Duration: %s', duration);
@@ -366,8 +371,8 @@ export class TorrentsComposer<
                   await ctx.reply(ctx.t('torrent-file-uploading'));
                   await ctx.replyWithVideo(new InputFile(tmpFile), {
                     duration,
-                    height: videoStream?.height,
-                    width: videoStream?.width,
+                    height: videoStreamHeight,
+                    width: videoStreamWidth,
                   });
                 } catch (error) {
                   this.logger.error(
