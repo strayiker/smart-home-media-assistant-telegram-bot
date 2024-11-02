@@ -51,7 +51,7 @@ It will ask you for the necessary information to configure the software and the 
 
 ## Update
 
-Run the following command:
+Run the following command in the folder where your bot is installed:
 
 ```bash
 ./update.sh
