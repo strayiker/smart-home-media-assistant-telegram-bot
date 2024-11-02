@@ -1,7 +1,7 @@
 <h1 align="center">Media Assistant Bot</h1>
 
 <p align="center">
-<img alt="example" src="./static/image.webp" width="768" />
+<img alt="example" src="./static/logo.webp" width="768" />
 </p>
 
 ## About
