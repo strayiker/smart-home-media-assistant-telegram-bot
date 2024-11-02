@@ -25,7 +25,11 @@ If you find this bot helpful, a star would be greatly appreciated!
    - Follow the prompts to name your bot and create a unique username for it.
    - Once done, BotFather will provide you with a `token`. Keep this token safe as you'll need it later.
 
-2. **Register on Rutracker:**
+2. **Obtain `API_ID` and `API_HASH`**
+
+   - Obtain `API_ID` and `API_HASH` as described in https://core.telegram.org/api/obtaining_api_id. It will be used to run a local API server to allow the bot to send large files.
+
+3. **Register on Rutracker:**
 
    - Go to the Rutracker website and create an account if you don't already have one.
    - Note down your Rutracker `username` and `password`. These credentials will be used by the bot to login and perform searches.
