@@ -376,6 +376,10 @@ if [ "$RUTRACKER_PASSWORD" == "" ]; then
     echo ""
 fi
 
+if [ "$QBT_SAVE_PATH" == "" ]; then
+    read -p "Enter the folder where torrents will be saved: " QBT_SAVE_PATH
+fi
+
 BOT_API_ADDRESS=${BOT_API_ADDRESS:-$BOT_API_DEFAULT_ADDRESS}
 QBT_WEB_UI_USERNAME=${QBT_WEB_UI_USERNAME:-$QBT_WEB_UI_DEFAULT_USERNAME}
 QBT_WEB_UI_PASSWORD=${QBT_WEB_UI_PASSWORD:-$QBT_WEB_UI_DEFAULT_PASSWORD}
@@ -392,11 +396,8 @@ RUTRACKER_PASSWORD=$RUTRACKER_PASSWORD
 QBT_WEB_UI_USERNAME=$QBT_WEB_UI_USERNAME
 QBT_WEB_UI_PASSWORD=$QBT_WEB_UI_PASSWORD
 QBT_WEB_UI_ADDRESS=$QBT_WEB_UI_ADDRESS
+QBT_SAVE_PATH=$QBT_SAVE_PATH
 EOF
-
-if [ "$QBT_SAVE_PATH" != "" ]; then
-echo "QBT_SAVE_PATH=$QBT_SAVE_PATH" >> .env
-fi
 
 # Create .env.api file
 cat <<EOF > .env.api
@@ -421,8 +422,15 @@ if $LINUX || $MACOS; then
     chmod +x update.sh
 fi
 
-sed -i '' -e "s/{{VERSION}}/$VERSION/g" -e "s/{{CONTAINER_TOOL}}/$CONTAINER_TOOL/g" start.sh
-sed -i '' -e "s/{{CONTAINER_TOOL}}/$CONTAINER_TOOL/g" stop.sh
+sed -i '' \
+    -e "s|{{VERSION}}|$VERSION|g" \
+    -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
+    -e "s|{{SAVE_PATH}}|$QBT_SAVE_PATH|g" \
+    start.sh
+
+sed -i '' \
+    -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
+    stop.sh
 
 if [ ${#SKIPPED_INSTALLATIONS[@]} -gt 0 ]; then
     echo "To finish, follow these steps:"

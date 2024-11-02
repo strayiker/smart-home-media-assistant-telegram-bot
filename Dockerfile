@@ -1,5 +1,7 @@
 FROM node:lts-alpine
 
+RUN apk add ffmpeg
+
 WORKDIR /app
 
 COPY ./package.json ./yarn.lock ./.yarnrc.yml ./

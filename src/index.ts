@@ -1,5 +1,7 @@
 import './dayjs.js';
 
+import path from 'node:path';
+
 import { useFluent } from '@grammyjs/fluent';
 import { Bot, GrammyError, HttpError } from 'grammy';
 
@@ -19,8 +21,11 @@ const botToken = config.get('BOT_TOKEN', {
 const botApiAddress = config.get('BOT_API_ADDRESS', {
   required: true,
 });
-const cookiesFilePath = config.get('COOKIES_FILE_PATH', {
-  default: '/data/cookies.json',
+const botDataPath = config.get('BOT_DATA_PATH', {
+  default: '/data/bot',
+});
+const botDataTorrentsPath = config.get('BOT_DATA_TORRENTS_PATH', {
+  default: '/data/torrents',
 });
 const rutrackerUsername = config.get('RUTRACKER_USERNAME', {
   required: true,
@@ -45,7 +50,7 @@ const bot = new Bot<MyContext>(botToken, {
   },
 });
 const cookieStorage = new CookieStorage({
-  filePath: cookiesFilePath,
+  filePath: path.join(botDataPath, 'cookies.json'),
   logger,
 });
 const qBittorrent = new QBittorrentClient({
@@ -56,6 +61,7 @@ const qBittorrent = new QBittorrentClient({
 });
 const torrents = new TorrentsComposer({
   bot,
+  dataPath: botDataTorrentsPath,
   searchEngines: [
     new RutrackerSearchEngine({
       username: rutrackerUsername,

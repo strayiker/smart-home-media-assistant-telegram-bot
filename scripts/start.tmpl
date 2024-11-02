@@ -5,25 +5,26 @@ VERSION={{VERSION}}
 DIR=$(dirname "$(realpath "$0")")
 BOT_DATA_DIR=$DIR/data
 BOT_ENV_FILE=$DIR/.env
-API_ENV_FILE=$DIR/.env.api
+BOT_API_ENV_FILE=$DIR/.env.api
 
 OS=$(uname)
 
 if [[ "$OS" =~ ^(CYGWIN|MINGW|MSYS) ]]; then
     BOT_DATA_DIR=$(cygpath -w "$BOT_DATA_DIR")
     BOT_ENV_FILE=$(cygpath -w "$BOT_ENV_FILE")
-    API_ENV_FILE=$(cygpath -w "$API_ENV_FILE")
+    BOT_API_ENV_FILE=$(cygpath -w "$BOT_API_ENV_FILE")
 fi
 
 {{CONTAINER_TOOL}} run -d \
     -p 8081:8081 \
-    --env-file $API_ENV_FILE \
+    --env-file $BOT_API_ENV_FILE \
     --restart unless-stopped \
     --name smart-home-media-assistant-telegram-bot-api \
     aiogram/telegram-bot-api:latest
 
 {{CONTAINER_TOOL}} run -d \
-    -v $BOT_DATA_DIR:/data \
+    -v $BOT_DATA_DIR:/data/bot \
+    -v {{SAVE_PATH}}:/data/torrents \
     --env-file $BOT_ENV_FILE \
     --network host \
     --restart unless-stopped \

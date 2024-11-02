@@ -1,7 +1,8 @@
+import fs from 'node:fs';
 import path from 'node:path';
 
 import { type FluentContextFlavor } from '@grammyjs/fluent';
-import { fileTypeFromFile } from 'file-type';
+import { fileTypeFromFile, type FileTypeResult } from 'file-type';
 import ffmpeg, { type FfprobeData } from 'fluent-ffmpeg';
 import {
   type Bot,
@@ -24,10 +25,19 @@ import { formatBytes } from '../utils/formatBytes.js';
 import { formatDuration } from '../utils/formatDuration.js';
 import { type Logger } from '../utils/Logger.js';
 
-const MAX_FILE_SIZE = 2_000_000; // 2 GB telegram limit
+const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // Telegram limit
+const MAX_FILE_SIZE_KB = 2 * 1000 * 1000;
+
+function isVideo(type?: FileTypeResult) {
+  if (!type) {
+    return false;
+  }
+  return ['mp4', 'mkv', 'avi'].includes(type.ext);
+}
 
 export interface TorrentComposerOptions<C extends Context> {
   bot: Bot<C>;
+  dataPath: string;
   searchEngines: SearchEngine[];
   qBittorrent: QBittorrentClient;
   logger: Logger;
@@ -37,6 +47,7 @@ export class TorrentsComposer<
   C extends Context & FluentContextFlavor,
 > extends Composer<C> {
   private bot: Bot<C>;
+  private dataPath: string;
   private searchEngines: SearchEngine[];
   private qBittorrent: QBittorrentClient;
   private chatMessages = new Map<number, Message>();
@@ -48,6 +59,7 @@ export class TorrentsComposer<
     super();
 
     this.bot = options.bot;
+    this.dataPath = options.dataPath;
     this.searchEngines = options.searchEngines;
     this.qBittorrent = options.qBittorrent;
     this.logger = options.logger;
@@ -215,9 +227,10 @@ export class TorrentsComposer<
       return ctx.reply(ctx.t('torrent-files-empty'));
     }
 
-    const text = files
-      .map((file) => this.formatTorrentFile(ctx, uid, file))
-      .join('\n\n');
+    const texts = await Promise.all(
+      files.map((file) => this.formatTorrentFile(ctx, uid, file)),
+    );
+    const text = texts.join('\n\n');
 
     try {
       await ctx.reply(text, {
@@ -241,10 +254,9 @@ export class TorrentsComposer<
     const uid = `${trackerName}_${id}`;
 
     let hash: string;
-    let save_path: string;
 
     try {
-      ({ hash, save_path } = await this.getTorrentByUid(uid));
+      ({ hash } = await this.getTorrentByUid(uid));
     } catch (error) {
       console.log(error);
       return ctx.reply(ctx.t('torrent-file-error'));
@@ -263,7 +275,10 @@ export class TorrentsComposer<
       return ctx.reply(ctx.t('torrent-file-empty'));
     }
 
-    const filePath = path.resolve(path.join(save_path, qbFile.name));
+    const filePath = path.resolve(path.join(this.dataPath, qbFile.name));
+
+    this.logger.debug(filePath);
+
     const fileType = await fileTypeFromFile(filePath);
 
     this.logger.debug(fileType);
@@ -275,7 +290,7 @@ export class TorrentsComposer<
     try {
       const file = new InputFile(filePath);
 
-      if (['mp4', 'mkv', 'avi'].includes(fileType.ext)) {
+      if (isVideo(fileType)) {
         const metadata = await new Promise<FfprobeData>((resolve) => {
           ffmpeg.ffprobe(filePath, function (err, metadata) {
             if (err) {
@@ -303,10 +318,10 @@ export class TorrentsComposer<
             width: videoStream?.width,
           });
         } else {
-          const size = MAX_FILE_SIZE;
-
           const aBitrate = 192;
-          const vBitrate = Math.floor((size * 8) / duration - aBitrate);
+          const vBitrate = Math.floor(
+            (MAX_FILE_SIZE_KB * 8) / duration - aBitrate,
+          );
 
           this.logger.debug('Duration: %s', duration);
           this.logger.debug('Video bitrate: %s', vBitrate);
@@ -314,53 +329,62 @@ export class TorrentsComposer<
 
           const tmpFile = tmpNameSync({ postfix: '.mp4' });
 
-          ffmpeg(filePath)
-            .videoBitrate(vBitrate)
-            .audioBitrate(aBitrate)
-            .videoCodec('libx264')
-            .audioCodec('aac')
-            .outputOptions('-map', '0:a:0')
-            .outputOptions('-map', '0:v:0')
-            .outputOptions('-pix_fmt', 'yuv420p')
-            .outputOptions('-preset', 'fast')
-            .outputFormat('mp4')
-            .on('start', (cmd) => {
-              this.logger.debug(cmd);
-            })
-            .on('progress', async (progress) => {
-              const text = ctx.t('torrent-file-encoding', {
-                progress: Math.round(progress.percent || 0),
-              });
-              if (text !== progressMessage.text) {
-                try {
-                  await this.bot.api.editMessageText(
-                    progressMessage.chat.id,
-                    progressMessage.message_id,
-                    text,
-                  );
-                  progressMessage.text = text;
-                } catch {
-                  /* empty */
-                }
-              }
-            })
-            .on('end', async () => {
-              try {
-                await ctx.reply(ctx.t('torrent-file-uploading'));
-                await ctx.replyWithVideo(new InputFile(tmpFile), {
-                  duration,
-                  height: videoStream?.height,
-                  width: videoStream?.width,
+          try {
+            ffmpeg(filePath)
+              .outputOptions('-c:a', 'aac')
+              .outputOptions('-c:v', 'libx264')
+              .outputOptions('-b:a', `${aBitrate}k`)
+              .outputOptions('-b:v', `${vBitrate}k`)
+              .outputOptions('-pix_fmt', 'yuv420p')
+              .outputOptions('-map', '0:v:0')
+              .outputOptions('-map', '0:a:0')
+              .outputOptions('-preset', 'fast')
+              .outputFormat('mp4')
+              .on('start', (cmd) => {
+                this.logger.debug(cmd);
+              })
+              .on('progress', async (progress) => {
+                const text = ctx.t('torrent-file-encoding', {
+                  progress: Math.round(progress.percent || 0),
                 });
-              } catch (error) {
-                this.logger.error(error, 'An error occured while sending file');
-              }
-            })
-            .saveToFile(tmpFile);
+                if (text !== progressMessage.text) {
+                  try {
+                    await this.bot.api.editMessageText(
+                      progressMessage.chat.id,
+                      progressMessage.message_id,
+                      text,
+                    );
+                    progressMessage.text = text;
+                  } catch {
+                    /* empty */
+                  }
+                }
+              })
+              .on('end', async () => {
+                try {
+                  await ctx.reply(ctx.t('torrent-file-uploading'));
+                  await ctx.replyWithVideo(new InputFile(tmpFile), {
+                    duration,
+                    height: videoStream?.height,
+                    width: videoStream?.width,
+                  });
+                } catch (error) {
+                  this.logger.error(
+                    error,
+                    'An error occured while sending file',
+                  );
+                }
+              })
+              .saveToFile(tmpFile);
 
-          const progressMessage = await ctx.reply(
-            ctx.t('torrent-file-encoding', { progress: 0 }),
-          );
+            const progressMessage = await ctx.reply(
+              ctx.t('torrent-file-encoding', { progress: 0 }),
+            );
+          } finally {
+            fs.rmSync(tmpFile, {
+              force: true,
+            });
+          }
         }
       } else {
         if (qbFile.size <= MAX_FILE_SIZE) {
@@ -642,9 +666,20 @@ export class TorrentsComposer<
         });
   }
 
-  private formatTorrentFile(ctx: C, torrentUid: string, file: QBFile) {
-    const download = `/dl_file_${torrentUid}_${file.index}`;
-    const size = formatBytes(file.size ?? 0);
+  private async formatTorrentFile(ctx: C, torrentUid: string, file: QBFile) {
+    const filePath = path.resolve(path.join(this.dataPath, file.name));
+    const fileType = await fileTypeFromFile(filePath);
+
+    let size = formatBytes(file.size ?? 0);
+    let download = `/dl_file_${torrentUid}_${file.index}`;
+
+    if (file.size > MAX_FILE_SIZE) {
+      if (isVideo(fileType)) {
+        size += ` will be compressed to ~${formatBytes(MAX_FILE_SIZE)}`;
+      } else {
+        download = 'file is too big';
+      }
+    }
 
     return ctx.t('torrent-file-message', {
       name: file.name,
