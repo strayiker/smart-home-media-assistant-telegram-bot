@@ -354,7 +354,7 @@ export class TorrentsComposer<
             .outputOptions('-tag:v', 'avc1')
             .outputOptions('-map', '0:v:0')
             .outputOptions('-map', '0:a:0')
-            .outputOptions('-preset', 'superfast')
+            .outputOptions('-preset', 'fast')
             .outputFormat('mp4')
             .on('start', (cmd) => {
               this.logger.debug(cmd);
