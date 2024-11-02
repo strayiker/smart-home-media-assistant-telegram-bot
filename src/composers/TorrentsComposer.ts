@@ -332,7 +332,7 @@ export class TorrentsComposer<
 
           try {
             ffmpeg(filePath)
-              .outputOptions('-c:a', 'libfdk_aac')
+              .outputOptions('-c:a', 'aac')
               .outputOptions('-c:v', 'libx264')
               .outputOptions('-b:a', `${aBitrate}k`)
               .outputOptions('-b:v', `${vBitrate}k`)
