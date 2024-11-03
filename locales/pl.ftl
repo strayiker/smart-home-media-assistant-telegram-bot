@@ -9,8 +9,8 @@ search-unknown-error = Wystąpił błąd podczas wyszukiwania
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    Seedy: {$seeds} ({$maxSeeds}),  Peery: {$peers} ({$maxPeers})
-    Prędkość: {$speed}
+    Ziarna: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
+    Szybkość: {$speed}
     ETA: {$eta}
     Postęp: {$progress}
     ---
@@ -20,6 +20,7 @@ torrent-message-completed =
     ---
     Postęp: {$progress}
     ---
+    Pliki: {$files}
     Usuń: {$remove}
 torrent-unsupported-tracker-error = Tracker nie jest obsługiwany
 torrent-download-error = Wystąpił błąd podczas dodawania torrenta
@@ -33,7 +34,8 @@ torrent-file-message =
 torrent-files-empty = Brak plików
 torrent-files-error = Wystąpił błąd podczas pobierania plików
 torrent-file-uploading = Przesyłanie, proszę czekać...
-torrent-file-encoding = Kodowanie wideo, proszę czekać... {$progress}%
-torrent-file-too-large = Plik jest za duży
+torrent-file-compressing = Kompresja wideo, proszę czekać... {$progress}%
+torrent-file-will-be-compressed = zostanie skompresowany
+torrent-file-too-big = Plik jest za duży!
 torrent-file-error = Wystąpił błąd podczas wysyłania pliku
-torrent-file-empty = Plik nie znaleziony
+torrent-file-empty = Plik nie został znaleziony

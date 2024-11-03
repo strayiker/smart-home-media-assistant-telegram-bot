@@ -3,9 +3,9 @@ search-message =
     ---
     {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
     ---
-    Herunterladen: {$download}
+    Download: {$download}
 search-empty-results = Keine Ergebnisse
-search-unknown-error = Bei der Suche ist ein Fehler aufgetreten
+search-unknown-error = Fehler bei der Suche aufgetreten
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
@@ -20,20 +20,22 @@ torrent-message-completed =
     ---
     Fortschritt: {$progress}
     ---
+    Dateien: {$files}
     Entfernen: {$remove}
-torrent-unsupported-tracker-error = Tracker nicht unterstützt
-torrent-download-error = Fehler beim Hinzufügen des Torrents
-torrent-remove-error = Fehler beim Entfernen des Torrents
+torrent-unsupported-tracker-error = Tracker wird nicht unterstützt
+torrent-download-error = Fehler beim Hinzufügen des Torrents aufgetreten
+torrent-remove-error = Fehler beim Entfernen des Torrents aufgetreten
 torrent-file-message =
     <b>{$name}</b>
     ---
     Größe: {$size}
     ---
-    Herunterladen: {$download}
+    Download: {$download}
 torrent-files-empty = Keine Dateien
-torrent-files-error = Beim Abrufen der Dateien ist ein Fehler aufgetreten
+torrent-files-error = Fehler beim Abrufen der Dateien aufgetreten
 torrent-file-uploading = Hochladen, bitte warten...
-torrent-file-encoding = Video wird kodiert, bitte warten... {$progress}%
-torrent-file-too-large = Datei ist zu groß
-torrent-file-error = Beim Senden der Datei ist ein Fehler aufgetreten
+torrent-file-compressing = Video wird komprimiert, bitte warten... {$progress}%
+torrent-file-will-be-compressed = wird komprimiert
+torrent-file-too-big = Datei ist zu groß!
+torrent-file-error = Fehler beim Senden der Datei aufgetreten
 torrent-file-empty = Datei nicht gefunden

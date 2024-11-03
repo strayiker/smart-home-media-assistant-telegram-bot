@@ -3,37 +3,39 @@ search-message =
     ---
     {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
     ---
-    下载: {$download}
-search-empty-results = 没有结果
-search-unknown-error = 搜索过程中发生错误
+    下載: {$download}
+search-empty-results = 沒有結果
+search-unknown-error = 搜尋時發生錯誤
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    做种数: {$seeds} ({$maxSeeds}),  用户: {$peers} ({$maxPeers})
+    種子: {$seeds} ({$maxSeeds}),  同伴: {$peers} ({$maxPeers})
     速度: {$speed}
-    预计时间: {$eta}
-    进度: {$progress}
+    預計完成時間: {$eta}
+    進度: {$progress}
     ---
-    删除: {$remove}
+    移除: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    进度: {$progress}
+    進度: {$progress}
     ---
-    删除: {$remove}
-torrent-unsupported-tracker-error = 不支持的跟踪器
-torrent-download-error = 添加种子时发生错误
-torrent-remove-error = 删除种子时发生错误
+    檔案: {$files}
+    移除: {$remove}
+torrent-unsupported-tracker-error = 不支援的追蹤器
+torrent-download-error = 添加種子時發生錯誤
+torrent-remove-error = 移除種子時發生錯誤
 torrent-file-message =
     <b>{$name}</b>
     ---
     大小: {$size}
     ---
-    下载: {$download}
-torrent-files-empty = 没有文件
-torrent-files-error = 检索文件时出错
-torrent-file-uploading = 正在上传，请稍候...
-torrent-file-encoding = 正在编码视频，请稍候... {$progress}%
-torrent-file-too-large = 文件太大
-torrent-file-error = 发送文件时出错
-torrent-file-empty = 未找到文件
+    下載: {$download}
+torrent-files-empty = 沒有檔案
+torrent-files-error = 檔案檢索時發生錯誤
+torrent-file-uploading = 上傳中，請稍候...
+torrent-file-compressing = 視頻壓縮中，請稍候... {$progress}%
+torrent-file-will-be-compressed = 將被壓縮
+torrent-file-too-big = 檔案太大！
+torrent-file-error = 傳送檔案時發生錯誤
+torrent-file-empty = 未找到檔案

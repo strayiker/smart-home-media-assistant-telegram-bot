@@ -9,9 +9,9 @@ search-unknown-error = เกิดข้อผิดพลาดระหว่
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    ผู้ส่ง: {$seeds} ({$maxSeeds}),  เพียร์: {$peers} ({$maxPeers})
+    เมล็ด: {$seeds} ({$maxSeeds}),  เพื่อน: {$peers} ({$maxPeers})
     ความเร็ว: {$speed}
-    ETA: {$eta}
+    เวลาโดยประมาณ: {$eta}
     ความคืบหน้า: {$progress}
     ---
     ลบ: {$remove}
@@ -20,8 +20,9 @@ torrent-message-completed =
     ---
     ความคืบหน้า: {$progress}
     ---
+    ไฟล์: {$files}
     ลบ: {$remove}
-torrent-unsupported-tracker-error = ไม่รองรับตัวติดตาม
+torrent-unsupported-tracker-error = ตัวติดตามไม่รองรับ
 torrent-download-error = เกิดข้อผิดพลาดขณะเพิ่มทอร์เรนต์
 torrent-remove-error = เกิดข้อผิดพลาดขณะลบทอร์เรนต์
 torrent-file-message =
@@ -32,8 +33,9 @@ torrent-file-message =
     ดาวน์โหลด: {$download}
 torrent-files-empty = ไม่มีไฟล์
 torrent-files-error = เกิดข้อผิดพลาดขณะดึงไฟล์
-torrent-file-uploading = กำลังอัปโหลด โปรดรอสักครู่...
-torrent-file-encoding = กำลังเข้ารหัสวิดีโอ โปรดรอสักครู่... {$progress}%
-torrent-file-too-large = ไฟล์ใหญ่เกินไป
+torrent-file-uploading = กำลังอัปโหลด โปรดรอ...
+torrent-file-compressing = กำลังบีบอัดวิดีโอ โปรดรอ... {$progress}%
+torrent-file-will-be-compressed = จะถูกบีบอัด
+torrent-file-too-big = ไฟล์มีขนาดใหญ่เกินไป!
 torrent-file-error = เกิดข้อผิดพลาดขณะส่งไฟล์
 torrent-file-empty = ไม่พบไฟล์

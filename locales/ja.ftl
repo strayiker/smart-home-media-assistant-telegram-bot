@@ -11,7 +11,7 @@ torrent-message-in-progress =
     ---
     シード: {$seeds} ({$maxSeeds}),  ピア: {$peers} ({$maxPeers})
     速度: {$speed}
-    ETA: {$eta}
+    残り時間: {$eta}
     進行状況: {$progress}
     ---
     削除: {$remove}
@@ -20,8 +20,9 @@ torrent-message-completed =
     ---
     進行状況: {$progress}
     ---
+    ファイル: {$files}
     削除: {$remove}
-torrent-unsupported-tracker-error = トラッカーがサポートされていません
+torrent-unsupported-tracker-error = トラッカーはサポートされていません
 torrent-download-error = トレントの追加中にエラーが発生しました
 torrent-remove-error = トレントの削除中にエラーが発生しました
 torrent-file-message =
@@ -32,8 +33,9 @@ torrent-file-message =
     ダウンロード: {$download}
 torrent-files-empty = ファイルがありません
 torrent-files-error = ファイルの取得中にエラーが発生しました
-torrent-file-uploading = アップロード中です、お待ちください...
-torrent-file-encoding = ビデオをエンコード中です、お待ちください... {$progress}%
-torrent-file-too-large = ファイルが大きすぎます
+torrent-file-uploading = アップロード中、お待ちください...
+torrent-file-compressing = ビデオを圧縮中、お待ちください... {$progress}%
+torrent-file-will-be-compressed = 圧縮されます
+torrent-file-too-big = ファイルが大きすぎます！
 torrent-file-error = ファイルの送信中にエラーが発生しました
 torrent-file-empty = ファイルが見つかりません

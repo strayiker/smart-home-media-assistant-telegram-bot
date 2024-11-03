@@ -9,7 +9,7 @@ search-unknown-error = Ett fel inträffade under sökningen
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    Frön: {$seeds} ({$maxSeeds}),  Jämlikar: {$peers} ({$maxPeers})
+    Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
     Hastighet: {$speed}
     ETA: {$eta}
     Framsteg: {$progress}
@@ -20,6 +20,7 @@ torrent-message-completed =
     ---
     Framsteg: {$progress}
     ---
+    Filer: {$files}
     Ta bort: {$remove}
 torrent-unsupported-tracker-error = Tracker stöds inte
 torrent-download-error = Ett fel inträffade vid tillägg av torrent
@@ -31,9 +32,10 @@ torrent-file-message =
     ---
     Ladda ner: {$download}
 torrent-files-empty = Inga filer
-torrent-files-error = Ett fel uppstod vid hämtning av filer
+torrent-files-error = Ett fel inträffade vid hämtning av filer
 torrent-file-uploading = Uppladdning pågår, vänligen vänta...
-torrent-file-encoding = Kodar video, vänligen vänta... {$progress}%
-torrent-file-too-large = Filen är för stor
-torrent-file-error = Ett fel uppstod vid sändning av filen
+torrent-file-compressing = Komprimerar video, vänligen vänta... {$progress}%
+torrent-file-will-be-compressed = kommer att komprimeras
+torrent-file-too-big = Filen är för stor!
+torrent-file-error = Ett fel inträffade vid filöverföring
 torrent-file-empty = Filen hittades inte

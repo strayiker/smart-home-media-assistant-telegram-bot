@@ -4,14 +4,14 @@ search-message =
     {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
     ---
     İndir: {$download}
-search-empty-results = Sonuç yok
-search-unknown-error = Arama sırasında bir hata oluştu
+search-empty-results = Sonuç bulunamadı
+search-unknown-error = Arama sırasında hata oluştu
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    Gönderim: {$seeds} ({$maxSeeds}),  Kişi: {$peers} ({$maxPeers})
+    Seedler: {$seeds} ({$maxSeeds}),  Eşler: {$peers} ({$maxPeers})
     Hız: {$speed}
-    ETA: {$eta}
+    Tahmini Süre: {$eta}
     İlerleme: {$progress}
     ---
     Kaldır: {$remove}
@@ -20,10 +20,11 @@ torrent-message-completed =
     ---
     İlerleme: {$progress}
     ---
+    Dosyalar: {$files}
     Kaldır: {$remove}
 torrent-unsupported-tracker-error = İzleyici desteklenmiyor
-torrent-download-error = Torrent eklenirken bir hata oluştu
-torrent-remove-error = Torrent kaldırılırken bir hata oluştu
+torrent-download-error = Torrent eklenirken hata oluştu
+torrent-remove-error = Torrent kaldırılırken hata oluştu
 torrent-file-message =
     <b>{$name}</b>
     ---
@@ -31,9 +32,10 @@ torrent-file-message =
     ---
     İndir: {$download}
 torrent-files-empty = Dosya yok
-torrent-files-error = Dosyalar alınırken bir hata oluştu
+torrent-files-error = Dosyalar getirilirken hata oluştu
 torrent-file-uploading = Yükleniyor, lütfen bekleyin...
-torrent-file-encoding = Video kodlanıyor, lütfen bekleyin... {$progress}%
-torrent-file-too-large = Dosya çok büyük
-torrent-file-error = Dosya gönderilirken bir hata oluştu
+torrent-file-compressing = Video sıkıştırılıyor, lütfen bekleyin... {$progress}%
+torrent-file-will-be-compressed = sıkıştırılacak
+torrent-file-too-big = Dosya çok büyük!
+torrent-file-error = Dosya gönderilirken hata oluştu
 torrent-file-empty = Dosya bulunamadı

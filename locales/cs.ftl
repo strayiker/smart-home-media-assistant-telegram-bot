@@ -5,11 +5,11 @@ search-message =
     ---
     Stáhnout: {$download}
 search-empty-results = Žádné výsledky
-search-unknown-error = Během hledání došlo k chybě
+search-unknown-error = Při hledání došlo k chybě
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    Zdroje: {$seeds} ({$maxSeeds}),  Peery: {$peers} ({$maxPeers})
+    Seedů: {$seeds} ({$maxSeeds}),  Peerů: {$peers} ({$maxPeers})
     Rychlost: {$speed}
     ETA: {$eta}
     Pokrok: {$progress}
@@ -20,10 +20,11 @@ torrent-message-completed =
     ---
     Pokrok: {$progress}
     ---
+    Soubory: {$files}
     Odstranit: {$remove}
 torrent-unsupported-tracker-error = Tracker není podporován
 torrent-download-error = Při přidávání torrentu došlo k chybě
-torrent-remove-error = Při odstraňování torrentu došlo k chybě
+torrent-remove-error = Při odebírání torrentu došlo k chybě
 torrent-file-message =
     <b>{$name}</b>
     ---
@@ -32,8 +33,9 @@ torrent-file-message =
     Stáhnout: {$download}
 torrent-files-empty = Žádné soubory
 torrent-files-error = Při načítání souborů došlo k chybě
-torrent-file-uploading = Nahrávání, prosím čekejte...
-torrent-file-encoding = Kódování videa, prosím čekejte... {$progress}%
-torrent-file-too-large = Soubor je příliš velký
+torrent-file-uploading = Nahrávání, prosím, čekejte...
+torrent-file-compressing = Komprimace videa, prosím, čekejte... {$progress}%
+torrent-file-will-be-compressed = bude komprimováno
+torrent-file-too-big = Soubor je příliš velký!
 torrent-file-error = Při odesílání souboru došlo k chybě
 torrent-file-empty = Soubor nebyl nalezen

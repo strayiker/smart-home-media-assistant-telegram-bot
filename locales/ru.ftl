@@ -11,7 +11,7 @@ torrent-message-in-progress =
     ---
     Сиды: {$seeds} ({$maxSeeds}),  Пиры: {$peers} ({$maxPeers})
     Скорость: {$speed}
-    Ожидаемое время: {$eta}
+    Оставшееся время: {$eta}
     Прогресс: {$progress}
     ---
     Удалить: {$remove}
@@ -20,6 +20,7 @@ torrent-message-completed =
     ---
     Прогресс: {$progress}
     ---
+    Файлы: {$files}
     Удалить: {$remove}
 torrent-unsupported-tracker-error = Трекер не поддерживается
 torrent-download-error = Произошла ошибка при добавлении торрента
@@ -32,8 +33,9 @@ torrent-file-message =
     Скачать: {$download}
 torrent-files-empty = Нет файлов
 torrent-files-error = Произошла ошибка при получении файлов
-torrent-file-uploading = Загрузка, пожалуйста подождите...
-torrent-file-encoding = Кодирование видео, пожалуйста подождите... {$progress}%
-torrent-file-too-large = Файл слишком большой
+torrent-file-uploading = Отправка, подождите...
+torrent-file-compressing = Сжатие видео, подождите... {$progress}%
+torrent-file-will-be-compressed = будет сжат
+torrent-file-too-big = Файл слишком большой!
 torrent-file-error = Произошла ошибка при отправке файла
 torrent-file-empty = Файл не найден

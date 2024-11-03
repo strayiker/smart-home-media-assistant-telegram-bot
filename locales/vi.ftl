@@ -9,19 +9,20 @@ search-unknown-error = Đã xảy ra lỗi trong quá trình tìm kiếm
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    Chia sẻ: {$seeds} ({$maxSeeds}),  Ngang hàng: {$peers} ({$maxPeers})
+    Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
     Tốc độ: {$speed}
     ETA: {$eta}
-    Tiến độ: {$progress}
+    Tiến trình: {$progress}
     ---
     Xóa: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    Tiến độ: {$progress}
+    Tiến trình: {$progress}
     ---
+    Tệp: {$files}
     Xóa: {$remove}
-torrent-unsupported-tracker-error = Trình theo dõi không được hỗ trợ
+torrent-unsupported-tracker-error = Tracker không được hỗ trợ
 torrent-download-error = Đã xảy ra lỗi khi thêm torrent
 torrent-remove-error = Đã xảy ra lỗi khi xóa torrent
 torrent-file-message =
@@ -30,10 +31,11 @@ torrent-file-message =
     Kích thước: {$size}
     ---
     Tải về: {$download}
-torrent-files-empty = Không có tệp nào
+torrent-files-empty = Không có tệp
 torrent-files-error = Đã xảy ra lỗi khi truy xuất tệp
-torrent-file-uploading = Đang tải lên, vui lòng đợi...
-torrent-file-encoding = Đang mã hóa video, vui lòng đợi... {$progress}%
-torrent-file-too-large = Tệp quá lớn
+torrent-file-uploading = Đang tải lên, vui lòng chờ...
+torrent-file-compressing = Đang nén video, vui lòng chờ... {$progress}%
+torrent-file-will-be-compressed = sẽ được nén
+torrent-file-too-big = Tệp quá lớn!
 torrent-file-error = Đã xảy ra lỗi khi gửi tệp
 torrent-file-empty = Không tìm thấy tệp

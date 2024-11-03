@@ -9,9 +9,9 @@ search-unknown-error = حدث خطأ أثناء البحث
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    البذور: {$seeds} ({$maxSeeds}),  القرناء: {$peers} ({$maxPeers})
+    البذور: {$seeds} ({$maxSeeds}),  النظراء: {$peers} ({$maxPeers})
     السرعة: {$speed}
-    الوقت المتوقع: {$eta}
+    الوقت المتبقي: {$eta}
     التقدم: {$progress}
     ---
     إزالة: {$remove}
@@ -20,6 +20,7 @@ torrent-message-completed =
     ---
     التقدم: {$progress}
     ---
+    الملفات: {$files}
     إزالة: {$remove}
 torrent-unsupported-tracker-error = المتتبع غير مدعوم
 torrent-download-error = حدث خطأ أثناء إضافة التورنت
@@ -29,11 +30,12 @@ torrent-file-message =
     ---
     الحجم: {$size}
     ---
-    التحميل: {$download}
+    تحميل: {$download}
 torrent-files-empty = لا توجد ملفات
-torrent-files-error = حدث خطأ أثناء استرجاع الملفات
+torrent-files-error = حدث خطأ أثناء استرداد الملفات
 torrent-file-uploading = جارٍ التحميل، يرجى الانتظار...
-torrent-file-encoding = جارٍ ترميز الفيديو، يرجى الانتظار... {$progress}%
-torrent-file-too-large = الملف كبير جدًا
+torrent-file-compressing = جارٍ ضغط الفيديو، يرجى الانتظار... {$progress}%
+torrent-file-will-be-compressed = سيتم ضغطه
+torrent-file-too-big = الملف كبير جدًا!
 torrent-file-error = حدث خطأ أثناء إرسال الملف
 torrent-file-empty = لم يتم العثور على الملف

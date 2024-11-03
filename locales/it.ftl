@@ -5,11 +5,11 @@ search-message =
     ---
     Scarica: {$download}
 search-empty-results = Nessun risultato
-search-unknown-error = Si è verificato un errore durante la ricerca
+search-unknown-error = Errore durante la ricerca
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    Seed: {$seeds} ({$maxSeeds}),  Nodi: {$peers} ({$maxPeers})
+    Seed: {$seeds} ({$maxSeeds}),  Peer: {$peers} ({$maxPeers})
     Velocità: {$speed}
     ETA: {$eta}
     Progresso: {$progress}
@@ -20,10 +20,11 @@ torrent-message-completed =
     ---
     Progresso: {$progress}
     ---
+    File: {$files}
     Rimuovi: {$remove}
 torrent-unsupported-tracker-error = Tracker non supportato
-torrent-download-error = Si è verificato un errore durante l'aggiunta del torrent
-torrent-remove-error = Si è verificato un errore durante la rimozione del torrent
+torrent-download-error = Errore durante l'aggiunta del torrent
+torrent-remove-error = Errore durante la rimozione del torrent
 torrent-file-message =
     <b>{$name}</b>
     ---
@@ -31,9 +32,10 @@ torrent-file-message =
     ---
     Scarica: {$download}
 torrent-files-empty = Nessun file
-torrent-files-error = Si è verificato un errore durante il recupero dei file
+torrent-files-error = Errore durante il recupero dei file
 torrent-file-uploading = Caricamento in corso, attendere prego...
-torrent-file-encoding = Codifica video in corso, attendere prego... {$progress}%
-torrent-file-too-large = Il file è troppo grande
-torrent-file-error = Si è verificato un errore durante l'invio del file
+torrent-file-compressing = Compressione del video in corso, attendere prego... {$progress}%
+torrent-file-will-be-compressed = sarà compresso
+torrent-file-too-big = File troppo grande!
+torrent-file-error = Errore durante l'invio del file
 torrent-file-empty = File non trovato

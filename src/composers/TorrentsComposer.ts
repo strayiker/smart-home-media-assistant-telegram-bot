@@ -360,7 +360,7 @@ export class TorrentsComposer<
               this.logger.debug(cmd);
             })
             .on('progress', async (progress) => {
-              const text = ctx.t('torrent-file-encoding', {
+              const text = ctx.t('torrent-file-compressing', {
                 progress: Math.round(progress.percent || 0),
               });
               if (text !== progressMessage.text) {
@@ -406,14 +406,14 @@ export class TorrentsComposer<
             .saveToFile(tmpFile);
 
           const progressMessage = await ctx.reply(
-            ctx.t('torrent-file-encoding', { progress: 0 }),
+            ctx.t('torrent-file-compressing', { progress: 0 }),
           );
         }
       } else {
         if (qbFile.size <= MAX_FILE_SIZE) {
           ctx.replyWithDocument(file);
         } else {
-          await ctx.reply(ctx.t('torrent-file-too-large'));
+          await ctx.reply(ctx.t('torrent-file-too-big'));
         }
       }
     } catch (error) {
@@ -698,9 +698,9 @@ export class TorrentsComposer<
 
     if (file.size > MAX_FILE_SIZE) {
       if (isVideo(fileType)) {
-        size += ` (will be compressed)`;
+        size += ` (${ctx.t('torrent-file-will-be-compressed')})`;
       } else {
-        download = 'File is too big!';
+        download = ctx.t('torrent-file-too-big');
       }
     }
 

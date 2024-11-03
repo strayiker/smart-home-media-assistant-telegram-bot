@@ -3,37 +3,39 @@ search-message =
     ---
     {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
     ---
-    הורד: {$download}
+    הורדה: {$download}
 search-empty-results = אין תוצאות
 search-unknown-error = אירעה שגיאה במהלך החיפוש
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    זורעים: {$seeds} ({$maxSeeds}),  עמיתים: {$peers} ({$maxPeers})
+    זרעים: {$seeds} ({$maxSeeds}),  משתפים: {$peers} ({$maxPeers})
     מהירות: {$speed}
-    ETA: {$eta}
+    זמן לסיום: {$eta}
     התקדמות: {$progress}
     ---
-    הסר: {$remove}
+    הסרה: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
     התקדמות: {$progress}
     ---
-    הסר: {$remove}
-torrent-unsupported-tracker-error = המעקב אינו נתמך
-torrent-download-error = אירעה שגיאה בעת הוספת הטורנט
-torrent-remove-error = אירעה שגיאה בעת הסרת הטורנט
+    קבצים: {$files}
+    הסרה: {$remove}
+torrent-unsupported-tracker-error = עוקב לא נתמך
+torrent-download-error = אירעה שגיאה במהלך הוספת הtorrent
+torrent-remove-error = אירעה שגיאה במהלך הסרת הtorrent
 torrent-file-message =
     <b>{$name}</b>
     ---
     גודל: {$size}
     ---
-    הורד: {$download}
+    הורדה: {$download}
 torrent-files-empty = אין קבצים
-torrent-files-error = אירעה שגיאה בעת אחזור הקבצים
+torrent-files-error = אירעה שגיאה במהלך אחזור הקבצים
 torrent-file-uploading = מעלה, אנא המתן...
-torrent-file-encoding = מקודד וידאו, אנא המתן... {$progress}%
-torrent-file-too-large = הקובץ גדול מדי
-torrent-file-error = אירעה שגיאה בעת שליחת הקובץ
+torrent-file-compressing = דוחס וידאו, אנא המתן... {$progress}%
+torrent-file-will-be-compressed = ידחס
+torrent-file-too-big = הקובץ גדול מדי!
+torrent-file-error = אירעה שגיאה במהלך שליחת הקובץ
 torrent-file-empty = הקובץ לא נמצא

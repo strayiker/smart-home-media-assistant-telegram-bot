@@ -5,11 +5,11 @@ search-message =
     ---
     Descărcare: {$download}
 search-empty-results = Niciun rezultat
-search-unknown-error = A apărut o eroare în timpul căutării
+search-unknown-error = Eroare apărută în timpul căutării
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    Semințe: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
+    Semințe: {$seeds} ({$maxSeeds}),  Perechi: {$peers} ({$maxPeers})
     Viteză: {$speed}
     ETA: {$eta}
     Progres: {$progress}
@@ -20,20 +20,22 @@ torrent-message-completed =
     ---
     Progres: {$progress}
     ---
+    Fișiere: {$files}
     Eliminare: {$remove}
 torrent-unsupported-tracker-error = Trackerul nu este suportat
-torrent-download-error = A apărut o eroare la adăugarea torrentului
-torrent-remove-error = A apărut o eroare la eliminarea torrentului
+torrent-download-error = Eroare la adăugarea torrentului
+torrent-remove-error = Eroare la eliminarea torrentului
 torrent-file-message =
     <b>{$name}</b>
     ---
-    Dimensiune: {$size}
+    Mărime: {$size}
     ---
     Descărcare: {$download}
 torrent-files-empty = Niciun fișier
-torrent-files-error = A apărut o eroare la preluarea fișierelor
-torrent-file-uploading = Încărcare, vă rugăm așteptați...
-torrent-file-encoding = Codificare video, vă rugăm așteptați... {$progress}%
-torrent-file-too-large = Fișierul este prea mare
-torrent-file-error = A apărut o eroare la trimiterea fișierului
-torrent-file-empty = Fișierul nu a fost găsit
+torrent-files-error = Eroare la recuperarea fișierelor
+torrent-file-uploading = Se încarcă, vă rugăm așteptați...
+torrent-file-compressing = Se comprimă video, vă rugăm așteptați... {$progress}%
+torrent-file-will-be-compressed = va fi comprimat
+torrent-file-too-big = Fișier prea mare!
+torrent-file-error = Eroare la trimiterea fișierului
+torrent-file-empty = Fișier negăsit

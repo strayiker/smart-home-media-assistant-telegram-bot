@@ -11,7 +11,7 @@ torrent-message-in-progress =
     ---
     Semillas: {$seeds} ({$maxSeeds}),  Pares: {$peers} ({$maxPeers})
     Velocidad: {$speed}
-    ETA: {$eta}
+    Tiempo estimado: {$eta}
     Progreso: {$progress}
     ---
     Eliminar: {$remove}
@@ -20,10 +20,11 @@ torrent-message-completed =
     ---
     Progreso: {$progress}
     ---
+    Archivos: {$files}
     Eliminar: {$remove}
-torrent-unsupported-tracker-error = Rastreador no soportado
-torrent-download-error = Ocurrió un error al agregar el torrent
-torrent-remove-error = Ocurrió un error al eliminar el torrent
+torrent-unsupported-tracker-error = Tracker no soportado
+torrent-download-error = Error al añadir el torrent
+torrent-remove-error = Error al eliminar el torrent
 torrent-file-message =
     <b>{$name}</b>
     ---
@@ -31,9 +32,10 @@ torrent-file-message =
     ---
     Descargar: {$download}
 torrent-files-empty = No hay archivos
-torrent-files-error = Se produjo un error al recuperar los archivos
+torrent-files-error = Error al recuperar archivos
 torrent-file-uploading = Subiendo, por favor espera...
-torrent-file-encoding = Codificando video, por favor espera... {$progress}%
-torrent-file-too-large = El archivo es demasiado grande
-torrent-file-error = Se produjo un error al enviar el archivo
+torrent-file-compressing = Comprimiendo vídeo, por favor espera... {$progress}%
+torrent-file-will-be-compressed = será comprimido
+torrent-file-too-big = ¡El archivo es demasiado grande!
+torrent-file-error = Error al enviar el archivo
 torrent-file-empty = Archivo no encontrado

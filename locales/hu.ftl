@@ -11,29 +11,31 @@ torrent-message-in-progress =
     ---
     Seedek: {$seeds} ({$maxSeeds}),  Peerek: {$peers} ({$maxPeers})
     Sebesség: {$speed}
-    ETA: {$eta}
-    Haladás: {$progress}
+    Várható idő: {$eta}
+    Folyamat: {$progress}
     ---
     Eltávolítás: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    Haladás: {$progress}
+    Folyamat: {$progress}
     ---
+    Fájlok: {$files}
     Eltávolítás: {$remove}
-torrent-unsupported-tracker-error = A tracker nem támogatott
-torrent-download-error = Hiba történt a torrent hozzáadása során
-torrent-remove-error = Hiba történt a torrent eltávolítása során
+torrent-unsupported-tracker-error = Tracker nem támogatott
+torrent-download-error = Hiba történt a torrent hozzáadásakor
+torrent-remove-error = Hiba történt a torrent eltávolításakor
 torrent-file-message =
     <b>{$name}</b>
     ---
     Méret: {$size}
     ---
     Letöltés: {$download}
-torrent-files-empty = Nincsenek fájlok
-torrent-files-error = Hiba történt a fájlok lekérése közben
+torrent-files-empty = Nincs fájl
+torrent-files-error = Hiba történt a fájlok lekérésekor
 torrent-file-uploading = Feltöltés, kérjük várjon...
-torrent-file-encoding = Videó kódolása, kérjük várjon... {$progress}%
-torrent-file-too-large = A fájl túl nagy
-torrent-file-error = Hiba történt a fájl küldése közben
+torrent-file-compressing = Videó tömörítése, kérjük várjon... {$progress}%
+torrent-file-will-be-compressed = tömörítve lesz
+torrent-file-too-big = A fájl túl nagy!
+torrent-file-error = Hiba történt a fájl küldésekor
 torrent-file-empty = A fájl nem található

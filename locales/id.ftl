@@ -5,21 +5,22 @@ search-message =
     ---
     Unduh: {$download}
 search-empty-results = Tidak ada hasil
-search-unknown-error = Terjadi kesalahan selama pencarian
+search-unknown-error = Terjadi kesalahan saat mencari
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    Benih: {$seeds} ({$maxSeeds}),  Rekanan: {$peers} ({$maxPeers})
+    Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
     Kecepatan: {$speed}
     ETA: {$eta}
-    Kemajuan: {$progress}
+    Progres: {$progress}
     ---
     Hapus: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    Kemajuan: {$progress}
+    Progres: {$progress}
     ---
+    File: {$files}
     Hapus: {$remove}
 torrent-unsupported-tracker-error = Pelacak tidak didukung
 torrent-download-error = Terjadi kesalahan saat menambahkan torrent
@@ -33,7 +34,8 @@ torrent-file-message =
 torrent-files-empty = Tidak ada file
 torrent-files-error = Terjadi kesalahan saat mengambil file
 torrent-file-uploading = Mengunggah, harap tunggu...
-torrent-file-encoding = Mengkodekan video, harap tunggu... {$progress}%
-torrent-file-too-large = File terlalu besar
+torrent-file-compressing = Mengompresi video, harap tunggu... {$progress}%
+torrent-file-will-be-compressed = akan dikompresi
+torrent-file-too-big = File terlalu besar!
 torrent-file-error = Terjadi kesalahan saat mengirim file
 torrent-file-empty = File tidak ditemukan
