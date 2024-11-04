@@ -84,7 +84,7 @@ install_container_engine() {
 
     CONTAINER_TOOL=podman
 
-    print_green "Podman installed successfully."
+    print_green "Podman installed successfully!"
     echo ""
 }
 
@@ -126,7 +126,7 @@ install_qbittorrent() {
         winget install -e --id qBittorrent.qBittorrent
     fi
 
-    print_green "qBittorrent installed successfully."
+    print_green "qBittorrent installed successfully!"
     echo ""
 }
 
@@ -137,14 +137,14 @@ install_winget() {
 
     echo "Installing WinGet..."
 
-    curl -L -o Microsoft.VCLibs.x64.14.00.Desktop.appx https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx
-    curl -L -o Microsoft.UI.Xaml.2.8.x64.appx https://github.com/microsoft/microsoft-ui-xaml/releases/download/v2.8.6/Microsoft.UI.Xaml.2.8.x64.appx
-    curl -L -o Microsoft.WinGet.msixbundle https://aka.ms/getwinget
+    curl -sL -o Microsoft.VCLibs.x64.14.00.Desktop.appx https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx
+    curl -sL -o Microsoft.UI.Xaml.2.8.x64.appx https://github.com/microsoft/microsoft-ui-xaml/releases/download/v2.8.6/Microsoft.UI.Xaml.2.8.x64.appx
+    curl -sL -o Microsoft.WinGet.msixbundle https://aka.ms/getwinget
     Add-AppxPackage Microsoft.VCLibs.x64.14.00.Desktop.appx
     Add-AppxPackage Microsoft.UI.Xaml.2.8.x64.appx
     Add-AppxPackage Microsoft.WinGet.msixbundle
 
-    print_green "WinGet installed successfully."
+    print_green "WinGet installed successfully!"
     echo ""
 }
 
@@ -259,7 +259,7 @@ $1=$2\\
     QBT_WEB_UI_ENABLED=true
     QBT_CONFIGURED=true
 
-    print_green "qBittorrent configured successfully."
+    print_green "qBittorrent configured successfully!"
     echo ""
 }
 
@@ -413,12 +413,12 @@ echo "Downloading scripts..."
 curl -s "$REPO_RAW_URL/scripts/start.tmpl" -o start.sh
 curl -s "$REPO_RAW_URL/scripts/stop.tmpl" -o stop.sh
 curl -s "$REPO_RAW_URL/scripts/update.tmpl" -o update.sh
-print_green "Downloading complete!"
+print_green "Downloading completed!"
 echo ""
 
 echo "Logging out of the hosted bot api server..."
-curl -s https://api.telegram.org/bot$BOT_TOKEN/logOut
-print_green "Done!"
+curl -s https://api.telegram.org/bot$BOT_TOKEN/logOut > /dev/null
+print_green "Logged out successfully!"
 echo ""
 
 if $LINUX || $MACOS; then
@@ -470,7 +470,7 @@ echo -e " - To stop the bot, execute the \033[1;32mstop.sh\033[0m script"
 echo -e " - To update the bot, execute the \033[1;32mupdate.sh\033[0m script"
 echo ""
 
-print_green "Setup complete!"
+print_green "Setup completed!"
 echo ""
 
 if [ ${#SKIPPED_INSTALLATIONS[@]} -eq 0 ]; then
