@@ -6,11 +6,11 @@
 
 ## About
 
-This is the sources of a Telegram bot is designed to help you search for torrents and remotely download them to your PC using the qBittorrent client. Once the torrent is downloaded, you can ask the bot to send you any file from the torrent and download it from any other device.
+This is the sources of a Telegram `Bot` is designed to help you search for torrents and remotely download them to your PC using the qBittorrent client. Once the torrent is downloaded, you can ask the `Bot` to send you any file from the torrent and download it from any other device.
 
 ## Disclaimer
 
-This bot is created for a personal usage, so it might have some bugs or not work perfectly. If you have any questions, issues or improvements, feel free to open an issue ticket or submit a pull request.
+This `Bot` is created for a personal usage, so it might have some bugs or not work perfectly. If you have any questions, issues or improvements, feel free to open an issue ticket or submit a pull request.
 
 ---
 
@@ -25,7 +25,7 @@ This bot is created for a personal usage, so it might have some bugs or not work
 
 2. **Obtain `API_ID` and `API_HASH`**
 
-   - Obtain `API_ID` and `API_HASH` as described in https://core.telegram.org/api/obtaining_api_id. It will be used to run a local API server to allow the bot to send large files.
+   - Obtain `API_ID` and `API_HASH` as described in https://core.telegram.org/api/obtaining_api_id. It will be used to run a local `API Server` to allow the `Bot` to send large files.
 
 3. **Register on Rutracker:**
 
@@ -40,20 +40,20 @@ Open your terminal and run the following command:
 tmpfile=$(mktemp) && curl -sSL https://raw.githubusercontent.com/strayiker/smart-home-media-assistant-telegram-bot/refs/heads/main/scripts/setup.sh -o $tmpfile && chmod +x $tmpfile && bash -i $tmpfile && rm $tmpfile
 ```
 
-**This script will perform the following tasks:**
+**This script will perform the following:**
 
-1.  Check for a container tools, if none is found install `Podman` (fast and light open source container tool).
+1.  Check for a container tools and install `Podman` if none is found (fast and light open source container tool).
 2.  Install `qBittorrent` if it's not already installed.
 3.  Configure qBittorrent `WebUI`.
-4.  Configure bot and bot API server.
-5.  Create scripts to **start**, **stop**, and **update** the bot.
-6.  Run the `qBittorrent`, local bot API server and bot itself.
+4.  Configure `Bot` and `API Server`.
+5.  Create scripts to **start**, **stop**, and **update** the `Bot`.
+6.  Run `qBittorrent`, `API Server` and `Bot`.
 
-It will ask you for the necessary information to configure all the necessary software.
+It will ask you for some necessary information, so don't go too far.
 
 ## Updating
 
-Run the following command in the folder where your bot is installed:
+To update `Bot` to the latest version, run the following command in the folder where your `Bot` is installed:
 
 ```bash
 ./update.sh
