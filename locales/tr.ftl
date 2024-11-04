@@ -1,24 +1,25 @@
 search-message =
-    <b>{$title}</b> {$detailsLink}
+    <blockquote>{$title}
+    {$tags}
     ---
-    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
     ---
-    İndir: {$download}
+    İndir: {$download}</blockquote>
 search-empty-results = Sonuç bulunamadı
 search-unknown-error = Arama sırasında hata oluştu
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    Seedler: {$seeds} ({$maxSeeds}),  Eşler: {$peers} ({$maxPeers})
-    Hız: {$speed}
-    Tahmini Süre: {$eta}
-    İlerleme: {$progress}
+    <i>Seedler: {$seeds} ({$maxSeeds}),  Eşler: {$peers} ({$maxPeers})</i>
+    <i>Hız: {$speed}</i>
+    <i>Tahmini Süre: {$eta}</i>
+    <i>İlerleme: {$progress}</i>
     ---
     Kaldır: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    İlerleme: {$progress}
+    <i>İlerleme: {$progress}</i>
     ---
     Dosyalar: {$files}
     Kaldır: {$remove}
@@ -28,7 +29,7 @@ torrent-remove-error = Torrent kaldırılırken hata oluştu
 torrent-file-message =
     <b>{$name}</b>
     ---
-    Boyut: {$size}
+    <i>Boyut: {$size}</i>
     ---
     İndir: {$download}
 torrent-files-empty = Dosya yok

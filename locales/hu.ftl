@@ -1,24 +1,25 @@
 search-message =
-    <b>{$title}</b> {$detailsLink}
+    <blockquote>{$title}
+    {$tags}
     ---
-    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
     ---
-    Letöltés: {$download}
+    Letöltés: {$download}</blockquote>
 search-empty-results = Nincs találat
 search-unknown-error = Hiba történt a keresés során
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    Seedek: {$seeds} ({$maxSeeds}),  Peerek: {$peers} ({$maxPeers})
-    Sebesség: {$speed}
-    Várható idő: {$eta}
-    Folyamat: {$progress}
+    <i>Seedek: {$seeds} ({$maxSeeds}),  Peerek: {$peers} ({$maxPeers})</i>
+    <i>Sebesség: {$speed}</i>
+    <i>Várható idő: {$eta}</i>
+    <i>Folyamat: {$progress}</i>
     ---
     Eltávolítás: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    Folyamat: {$progress}
+    <i>Folyamat: {$progress}</i>
     ---
     Fájlok: {$files}
     Eltávolítás: {$remove}
@@ -28,7 +29,7 @@ torrent-remove-error = Hiba történt a torrent eltávolításakor
 torrent-file-message =
     <b>{$name}</b>
     ---
-    Méret: {$size}
+    <i>Méret: {$size}</i>
     ---
     Letöltés: {$download}
 torrent-files-empty = Nincs fájl

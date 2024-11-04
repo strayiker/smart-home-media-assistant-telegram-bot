@@ -1,24 +1,25 @@
 search-message =
-    <b>{$title}</b> {$detailsLink}
+    <blockquote>{$title}
+    {$tags}
     ---
-    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
     ---
-    다운로드: {$download}
+    다운로드: {$download}</blockquote>
 search-empty-results = 결과 없음
 search-unknown-error = 검색 중 오류 발생
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    시드: {$seeds} ({$maxSeeds}),  피어: {$peers} ({$maxPeers})
-    속도: {$speed}
-    예상 시간: {$eta}
-    진행 상황: {$progress}
+    <i>시드: {$seeds} ({$maxSeeds}),  피어: {$peers} ({$maxPeers})</i>
+    <i>속도: {$speed}</i>
+    <i>예상 시간: {$eta}</i>
+    <i>진행 상황: {$progress}</i>
     ---
     제거: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    진행 상황: {$progress}
+    <i>진행 상황: {$progress}</i>
     ---
     파일: {$files}
     제거: {$remove}
@@ -28,7 +29,7 @@ torrent-remove-error = 토렌트 제거 중 오류 발생
 torrent-file-message =
     <b>{$name}</b>
     ---
-    크기: {$size}
+    <i>크기: {$size}</i>
     ---
     다운로드: {$download}
 torrent-files-empty = 파일 없음

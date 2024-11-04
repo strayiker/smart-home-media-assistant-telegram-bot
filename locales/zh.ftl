@@ -1,24 +1,25 @@
 search-message =
-    <b>{$title}</b> {$detailsLink}
+    <blockquote>{$title}
+    {$tags}
     ---
-    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
     ---
-    下載: {$download}
+    下載: {$download}</blockquote>
 search-empty-results = 沒有結果
 search-unknown-error = 搜尋時發生錯誤
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    種子: {$seeds} ({$maxSeeds}),  同伴: {$peers} ({$maxPeers})
-    速度: {$speed}
-    預計完成時間: {$eta}
-    進度: {$progress}
+    <i>種子: {$seeds} ({$maxSeeds}),  同伴: {$peers} ({$maxPeers})</i>
+    <i>速度: {$speed}</i>
+    <i>預計完成時間: {$eta}</i>
+    <i>進度: {$progress}</i>
     ---
     移除: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    進度: {$progress}
+    <i>進度: {$progress}</i>
     ---
     檔案: {$files}
     移除: {$remove}
@@ -28,7 +29,7 @@ torrent-remove-error = 移除種子時發生錯誤
 torrent-file-message =
     <b>{$name}</b>
     ---
-    大小: {$size}
+    <i>大小: {$size}</i>
     ---
     下載: {$download}
 torrent-files-empty = 沒有檔案

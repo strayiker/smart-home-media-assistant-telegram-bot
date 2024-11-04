@@ -1,24 +1,25 @@
 search-message =
-    <b>{$title}</b> {$detailsLink}
+    <blockquote>{$title}
+    {$tags}
     ---
-    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
     ---
-    הורדה: {$download}
+    הורדה: {$download}</blockquote>
 search-empty-results = אין תוצאות
 search-unknown-error = אירעה שגיאה במהלך החיפוש
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    זרעים: {$seeds} ({$maxSeeds}),  משתפים: {$peers} ({$maxPeers})
-    מהירות: {$speed}
-    זמן לסיום: {$eta}
-    התקדמות: {$progress}
+    <i>זרעים: {$seeds} ({$maxSeeds}),  משתפים: {$peers} ({$maxPeers})</i>
+    <i>מהירות: {$speed}</i>
+    <i>זמן לסיום: {$eta}</i>
+    <i>התקדמות: {$progress}</i>
     ---
     הסרה: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    התקדמות: {$progress}
+    <i>התקדמות: {$progress}</i>
     ---
     קבצים: {$files}
     הסרה: {$remove}
@@ -28,7 +29,7 @@ torrent-remove-error = אירעה שגיאה במהלך הסרת הtorrent
 torrent-file-message =
     <b>{$name}</b>
     ---
-    גודל: {$size}
+    <i>גודל: {$size}</i>
     ---
     הורדה: {$download}
 torrent-files-empty = אין קבצים

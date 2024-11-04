@@ -1,24 +1,25 @@
 search-message =
-    <b>{$title}</b> {$detailsLink}
+    <blockquote>{$title}
+    {$tags}
     ---
-    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
     ---
-    Descărcare: {$download}
+    Descărcare: {$download}</blockquote>
 search-empty-results = Niciun rezultat
 search-unknown-error = Eroare apărută în timpul căutării
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    Semințe: {$seeds} ({$maxSeeds}),  Perechi: {$peers} ({$maxPeers})
-    Viteză: {$speed}
-    ETA: {$eta}
-    Progres: {$progress}
+    <i>Semințe: {$seeds} ({$maxSeeds}),  Perechi: {$peers} ({$maxPeers})</i>
+    <i>Viteză: {$speed}</i>
+    <i>ETA: {$eta}</i>
+    <i>Progres: {$progress}</i>
     ---
     Eliminare: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    Progres: {$progress}
+    <i>Progres: {$progress}</i>
     ---
     Fișiere: {$files}
     Eliminare: {$remove}
@@ -28,7 +29,7 @@ torrent-remove-error = Eroare la eliminarea torrentului
 torrent-file-message =
     <b>{$name}</b>
     ---
-    Mărime: {$size}
+    <i>Mărime: {$size}</i>
     ---
     Descărcare: {$download}
 torrent-files-empty = Niciun fișier

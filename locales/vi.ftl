@@ -1,24 +1,25 @@
 search-message =
-    <b>{$title}</b> {$detailsLink}
+    <blockquote>{$title}
+    {$tags}
     ---
-    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
     ---
-    Tải về: {$download}
+    Tải về: {$download}</blockquote>
 search-empty-results = Không có kết quả
 search-unknown-error = Đã xảy ra lỗi trong quá trình tìm kiếm
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
-    Tốc độ: {$speed}
-    ETA: {$eta}
-    Tiến trình: {$progress}
+    <i>Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})</i>
+    <i>Tốc độ: {$speed}</i>
+    <i>ETA: {$eta}</i>
+    <i>Tiến trình: {$progress}</i>
     ---
     Xóa: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    Tiến trình: {$progress}
+    <i>Tiến trình: {$progress}</i>
     ---
     Tệp: {$files}
     Xóa: {$remove}
@@ -28,7 +29,7 @@ torrent-remove-error = Đã xảy ra lỗi khi xóa torrent
 torrent-file-message =
     <b>{$name}</b>
     ---
-    Kích thước: {$size}
+    <i>Kích thước: {$size}</i>
     ---
     Tải về: {$download}
 torrent-files-empty = Không có tệp

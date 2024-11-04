@@ -114,11 +114,11 @@ export class TorrentsComposer<
       return ctx.reply(ctx.t('search-empty-results'));
     }
 
-    // TODO: Add buttons to navigate between pages
+    // TODO: Add button to load more results
     const text = results
       .slice(0, 5)
       .map(([se, result]) => this.formatSearchResult(ctx, se, result))
-      .join('\n\n');
+      .join('');
 
     try {
       await ctx.reply(text, {
@@ -638,17 +638,15 @@ export class TorrentsComposer<
     const uid = `${se.name}_${result.id}`;
     const size = formatBytes(result.size ?? 0);
     const download = `/dl_${uid}`;
-    const detailsLink = result.detailsUrl
-      ? `<a href="${result.detailsUrl}">[⇲]</a>`
-      : '';
+    const tags = [`<a href="${result.detailsUrl}">[${se.name}]</a>`].join(' ');
 
     return ctx.t('search-message', {
       title: result.title,
+      tags,
       size,
       seeds: result.seeds ?? 0,
       peers: result.peers ?? 0,
       publishDate: result.publishDate ?? '---',
-      detailsLink,
       download,
     });
   }

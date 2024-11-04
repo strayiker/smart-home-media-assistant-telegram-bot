@@ -1,24 +1,25 @@
 search-message =
-    <b>{$title}</b> {$detailsLink}
+    <blockquote>{$title}
+    {$tags}
     ---
-    {$size}  |  {$seeds}/{$peers}  |  {DATETIME($publishDate)}
+    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
     ---
-    Stáhnout: {$download}
+    Stáhnout: {$download}</blockquote>
 search-empty-results = Žádné výsledky
 search-unknown-error = Při hledání došlo k chybě
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    Seedů: {$seeds} ({$maxSeeds}),  Peerů: {$peers} ({$maxPeers})
-    Rychlost: {$speed}
-    ETA: {$eta}
-    Pokrok: {$progress}
+    <i>Seedů: {$seeds} ({$maxSeeds}),  Peerů: {$peers} ({$maxPeers})</i>
+    <i>Rychlost: {$speed}</i>
+    <i>ETA: {$eta}</i>
+    <i>Pokrok: {$progress}</i>
     ---
     Odstranit: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    Pokrok: {$progress}
+    <i>Pokrok: {$progress}</i>
     ---
     Soubory: {$files}
     Odstranit: {$remove}
@@ -28,7 +29,7 @@ torrent-remove-error = Při odebírání torrentu došlo k chybě
 torrent-file-message =
     <b>{$name}</b>
     ---
-    Velikost: {$size}
+    <i>Velikost: {$size}</i>
     ---
     Stáhnout: {$download}
 torrent-files-empty = Žádné soubory
