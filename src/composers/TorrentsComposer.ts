@@ -25,15 +25,15 @@ import { formatBytes } from '../utils/formatBytes.js';
 import { formatDuration } from '../utils/formatDuration.js';
 import { type Logger } from '../utils/Logger.js';
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // Telegram limit
+const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024;
 const MAX_FILE_SIZE_KB = 2 * 1000 * 1000;
 const MAX_VIDEO_BITRATE = [
-  [360, 1000],
-  [480, 2500],
-  [720, 3500],
-  [1080, 5000],
-  [1440, 10_000],
-  [2160, 20_000],
+  [360, 1200],
+  [480, 1800],
+  [720, 2400],
+  [1080, 4800],
+  [1440, 7000],
+  [2160, 9600],
 ] as const;
 
 function isVideo(type?: FileTypeResult) {
