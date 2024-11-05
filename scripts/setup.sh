@@ -197,7 +197,9 @@ configure_qbittorrent() {
         return
     fi
 
-    if $LINUX || $MACOS; then
+    if $LINUX; then
+        CONFIG_FILE="$HOME/.config/qBittorrent/qBittorrent.conf"
+    elif $MACOS; then
         CONFIG_FILE="$HOME/.config/qBittorrent/qBittorrent.ini"
     elif $WINDOWS; then
         CONFIG_FILE="$APPDATA/qBittorrent/qBittorrent.ini"
