@@ -1,8 +1,8 @@
 search-message =
-    <blockquote>{$title}
+    <blockquote><b>{$title}</b>
     {$tags}
     ---
-    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
+    {$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}
     ---
     Ladda ner: {$download}</blockquote>
 search-empty-results = Inga resultat
@@ -10,16 +10,16 @@ search-unknown-error = Ett fel inträffade under sökningen
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    <i>Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})</i>
-    <i>Hastighet: {$speed}</i>
-    <i>ETA: {$eta}</i>
-    <i>Framsteg: {$progress}</i>
+    Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
+    Hastighet: {$speed}
+    ETA: {$eta}
+    Framsteg: {$progress}
     ---
     Ta bort: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    <i>Framsteg: {$progress}</i>
+    Framsteg: {$progress}
     ---
     Filer: {$files}
     Ta bort: {$remove}
@@ -29,7 +29,7 @@ torrent-remove-error = Ett fel inträffade vid borttagning av torrent
 torrent-file-message =
     <b>{$name}</b>
     ---
-    <i>Storlek: {$size}</i>
+    Storlek: {$size}
     ---
     Ladda ner: {$download}
 torrent-files-empty = Inga filer

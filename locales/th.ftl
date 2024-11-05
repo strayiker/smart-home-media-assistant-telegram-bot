@@ -1,8 +1,8 @@
 search-message =
-    <blockquote>{$title}
+    <blockquote><b>{$title}</b>
     {$tags}
     ---
-    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
+    {$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}
     ---
     ดาวน์โหลด: {$download}</blockquote>
 search-empty-results = ไม่มีผลลัพธ์
@@ -10,16 +10,16 @@ search-unknown-error = เกิดข้อผิดพลาดระหว่
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    <i>เมล็ด: {$seeds} ({$maxSeeds}),  เพื่อน: {$peers} ({$maxPeers})</i>
-    <i>ความเร็ว: {$speed}</i>
-    <i>เวลาโดยประมาณ: {$eta}</i>
-    <i>ความคืบหน้า: {$progress}</i>
+    เมล็ด: {$seeds} ({$maxSeeds}),  เพื่อน: {$peers} ({$maxPeers})
+    ความเร็ว: {$speed}
+    เวลาโดยประมาณ: {$eta}
+    ความคืบหน้า: {$progress}
     ---
     ลบ: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    <i>ความคืบหน้า: {$progress}</i>
+    ความคืบหน้า: {$progress}
     ---
     ไฟล์: {$files}
     ลบ: {$remove}
@@ -29,7 +29,7 @@ torrent-remove-error = เกิดข้อผิดพลาดขณะลบ
 torrent-file-message =
     <b>{$name}</b>
     ---
-    <i>ขนาด: {$size}</i>
+    ขนาด: {$size}
     ---
     ดาวน์โหลด: {$download}
 torrent-files-empty = ไม่มีไฟล์

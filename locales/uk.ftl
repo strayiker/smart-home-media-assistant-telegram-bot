@@ -1,8 +1,8 @@
 search-message =
-    <blockquote>{$title}
+    <blockquote><b>{$title}</b>
     {$tags}
     ---
-    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
+    {$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}
     ---
     Завантажити: {$download}</blockquote>
 search-empty-results = Результатів немає
@@ -10,16 +10,16 @@ search-unknown-error = Під час пошуку сталася помилка
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    <i>Сіди: {$seeds} ({$maxSeeds}),  Піри: {$peers} ({$maxPeers})</i>
-    <i>Швидкість: {$speed}</i>
-    <i>Залишилося часу: {$eta}</i>
-    <i>Прогрес: {$progress}</i>
+    Сіди: {$seeds} ({$maxSeeds}),  Піри: {$peers} ({$maxPeers})
+    Швидкість: {$speed}
+    Залишилося часу: {$eta}
+    Прогрес: {$progress}
     ---
     Видалити: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    <i>Прогрес: {$progress}</i>
+    Прогрес: {$progress}
     ---
     Файли: {$files}
     Видалити: {$remove}
@@ -29,7 +29,7 @@ torrent-remove-error = Під час видалення торента стал�
 torrent-file-message =
     <b>{$name}</b>
     ---
-    <i>Розмір: {$size}</i>
+    Розмір: {$size}
     ---
     Завантажити: {$download}
 torrent-files-empty = Файлів немає

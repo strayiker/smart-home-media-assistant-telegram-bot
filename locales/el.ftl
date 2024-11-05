@@ -1,8 +1,8 @@
 search-message =
-    <blockquote>{$title}
+    <blockquote><b>{$title}</b>
     {$tags}
     ---
-    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
+    {$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}
     ---
     Λήψη: {$download}</blockquote>
 search-empty-results = Δεν βρέθηκαν αποτελέσματα
@@ -10,16 +10,16 @@ search-unknown-error = Παρουσιάστηκε σφάλμα κατά την �
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    <i>Σπόροι: {$seeds} ({$maxSeeds}),  Συμμετέχοντες: {$peers} ({$maxPeers})</i>
-    <i>Ταχύτητα: {$speed}</i>
-    <i>Υπολειπόμενος Χρόνος: {$eta}</i>
-    <i>Πρόοδος: {$progress}</i>
+    Σπόροι: {$seeds} ({$maxSeeds}),  Συμμετέχοντες: {$peers} ({$maxPeers})
+    Ταχύτητα: {$speed}
+    Υπολειπόμενος Χρόνος: {$eta}
+    Πρόοδος: {$progress}
     ---
     Αφαίρεση: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    <i>Πρόοδος: {$progress}</i>
+    Πρόοδος: {$progress}
     ---
     Αρχεία: {$files}
     Αφαίρεση: {$remove}
@@ -29,7 +29,7 @@ torrent-remove-error = Παρουσιάστηκε σφάλμα κατά την �
 torrent-file-message =
     <b>{$name}</b>
     ---
-    <i>Μέγεθος: {$size}</i>
+    Μέγεθος: {$size}
     ---
     Λήψη: {$download}
 torrent-files-empty = Δεν υπάρχουν αρχεία

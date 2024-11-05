@@ -1,8 +1,8 @@
 search-message =
-    <blockquote>{$title}
+    <blockquote><b>{$title}</b>
     {$tags}
     ---
-    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
+    {$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}
     ---
     डाउनलोड: {$download}</blockquote>
 search-empty-results = कोई परिणाम नहीं
@@ -10,16 +10,16 @@ search-unknown-error = खोज के दौरान त्रुटि ह�
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    <i>बीज: {$seeds} ({$maxSeeds}),  सहकर्मी: {$peers} ({$maxPeers})</i>
-    <i>गति: {$speed}</i>
-    <i>अनुमानित समय: {$eta}</i>
-    <i>प्रगति: {$progress}</i>
+    बीज: {$seeds} ({$maxSeeds}),  सहकर्मी: {$peers} ({$maxPeers})
+    गति: {$speed}
+    अनुमानित समय: {$eta}
+    प्रगति: {$progress}
     ---
     निकालें: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    <i>प्रगति: {$progress}</i>
+    प्रगति: {$progress}
     ---
     फाइलें: {$files}
     निकालें: {$remove}
@@ -29,7 +29,7 @@ torrent-remove-error = टोरेंट हटाते समय त्रु
 torrent-file-message =
     <b>{$name}</b>
     ---
-    <i>आकार: {$size}</i>
+    आकार: {$size}
     ---
     डाउनलोड: {$download}
 torrent-files-empty = कोई फाइलें नहीं

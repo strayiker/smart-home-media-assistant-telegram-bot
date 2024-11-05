@@ -1,8 +1,8 @@
 search-message =
-    <blockquote>{$title}
+    <blockquote><b>{$title}</b>
     {$tags}
     ---
-    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
+    {$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}
     ---
     Download: {$download}</blockquote>
 search-empty-results = Keine Ergebnisse
@@ -10,16 +10,16 @@ search-unknown-error = Fehler bei der Suche aufgetreten
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    <i>Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})</i>
-    <i>Geschwindigkeit: {$speed}</i>
-    <i>ETA: {$eta}</i>
-    <i>Fortschritt: {$progress}</i>
+    Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
+    Geschwindigkeit: {$speed}
+    ETA: {$eta}
+    Fortschritt: {$progress}
     ---
     Entfernen: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    <i>Fortschritt: {$progress}</i>
+    Fortschritt: {$progress}
     ---
     Dateien: {$files}
     Entfernen: {$remove}
@@ -29,7 +29,7 @@ torrent-remove-error = Fehler beim Entfernen des Torrents aufgetreten
 torrent-file-message =
     <b>{$name}</b>
     ---
-    <i>Größe: {$size}</i>
+    Größe: {$size}
     ---
     Download: {$download}
 torrent-files-empty = Keine Dateien

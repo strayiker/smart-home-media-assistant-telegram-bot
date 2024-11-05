@@ -1,8 +1,8 @@
 search-message =
-    <blockquote>{$title}
+    <blockquote><b>{$title}</b>
     {$tags}
     ---
-    <i>{$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}</i>
+    {$size}  |  {$seeds}S · {$peers}L  |  {DATETIME($publishDate)}
     ---
     Unduh: {$download}</blockquote>
 search-empty-results = Tidak ada hasil
@@ -10,16 +10,16 @@ search-unknown-error = Terjadi kesalahan saat mencari
 torrent-message-in-progress =
     <b>{$title}</b>
     ---
-    <i>Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})</i>
-    <i>Kecepatan: {$speed}</i>
-    <i>ETA: {$eta}</i>
-    <i>Progres: {$progress}</i>
+    Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
+    Kecepatan: {$speed}
+    ETA: {$eta}
+    Progres: {$progress}
     ---
     Hapus: {$remove}
 torrent-message-completed =
     <b>{$title}</b>
     ---
-    <i>Progres: {$progress}</i>
+    Progres: {$progress}
     ---
     File: {$files}
     Hapus: {$remove}
@@ -29,7 +29,7 @@ torrent-remove-error = Terjadi kesalahan saat menghapus torrent
 torrent-file-message =
     <b>{$name}</b>
     ---
-    <i>Ukuran: {$size}</i>
+    Ukuran: {$size}
     ---
     Unduh: {$download}
 torrent-files-empty = Tidak ada file
