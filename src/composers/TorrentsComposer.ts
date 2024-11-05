@@ -118,7 +118,7 @@ export class TorrentsComposer<
     const text = results
       .slice(0, 5)
       .map(([se, result]) => this.formatSearchResult(ctx, se, result))
-      .join('');
+      .join('\n');
 
     try {
       await ctx.reply(text, {
