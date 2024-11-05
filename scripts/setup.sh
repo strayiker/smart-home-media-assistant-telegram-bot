@@ -251,10 +251,10 @@ configure_qbittorrent() {
             fi
         elif $MACOS; then
             sed -i '' "/^\[Preferences\]/a\\
-$1=$2\\" $CONFIG_FILE
+$1=$2" $CONFIG_FILE
         else
             sed -i "/^\[Preferences\]/a\\
-$1=$2\\" $CONFIG_FILE
+$1=$2" $CONFIG_FILE
         fi
     }
 
@@ -433,9 +433,9 @@ print_green "Logged out successfully!"
 echo ""
 
 if $LINUX || $MACOS; then
-    chmod +x start.sh
-    chmod +x stop.sh
-    chmod +x update.sh
+    chmod +x ./start.sh
+    chmod +x ./stop.sh
+    chmod +x ./update.sh
 fi
 
 if $MACOS; then
@@ -443,19 +443,19 @@ if $MACOS; then
         -e "s|{{VERSION}}|$VERSION|g" \
         -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
         -e "s|{{SAVE_PATH}}|$QBT_SAVE_PATH|g" \
-        start.sh
+        ./start.sh
     sed -i '' \
         -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
-        stop.sh
+        ./stop.sh
 else
     sed -i \
         -e "s|{{VERSION}}|$VERSION|g" \
         -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
         -e "s|{{SAVE_PATH}}|$QBT_SAVE_PATH|g" \
-        start.sh
+        ./start.sh
     sed -i \
         -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
-        stop.sh
+        ./stop.sh
 fi
 
 if [ ${#SKIPPED_INSTALLATIONS[@]} -gt 0 ]; then
