@@ -12,16 +12,16 @@ This is the sources of a Telegram `Bot` is designed to help you search for torre
 
 This `Bot` is created for a personal usage, so it might have some bugs or not work perfectly. If you have any questions, issues or improvements, feel free to open an issue ticket or submit a pull request.
 
----
+This `Bot` will not help you overcome the restrictions associated with blocking torrent trackers, since it runs locally on your PC. You need to configure the bypass of blocking yourself.
 
 ## Before You Get Started
 
 1. **Create a New Bot on Telegram:**
 
-   - Open the Telegram and search for the "BotFather" bot.
-   - Start a chat with BotFather and send the command `/newbot`.
+   - Open the Telegram and search for the `BotFather` bot.
+   - Start a chat with `BotFather` and send the command `/newbot`.
    - Follow the prompts to name your bot and create a unique username for it.
-   - Once done, BotFather will provide you with a `token`. Keep this token safe as you'll need it later.
+   - Once done, `BotFather` will provide you with a `TOKEN`. Keep this token safe as you'll need it later.
 
 2. **Obtain `API_ID` and `API_HASH`**
 
@@ -30,9 +30,9 @@ This `Bot` is created for a personal usage, so it might have some bugs or not wo
 3. **Register on Rutracker:**
 
    - Go to the Rutracker website and create an account if you don't already have one.
-   - Note down your Rutracker `username` and `password`. These credentials will be used by the bot to login and perform searches.
+   - Note down your Rutracker `USERNAME` and `PASSWORD`. These credentials will be used by the bot to login and perform searches.
 
-## Installation
+## Setup
 
 Open your terminal and run the following command:
 
@@ -51,9 +51,9 @@ tmpfile=$(mktemp) && curl -sSL https://raw.githubusercontent.com/strayiker/smart
 
 It will ask you for some necessary information, so don't go too far.
 
-## Updating
+## Update
 
-To update `Bot` to the latest version, run the following command in the folder where your `Bot` is installed:
+To update the `Bot` to the latest version, run the following command in the folder where your `Bot` is installed:
 
 ```bash
 ./update.sh
