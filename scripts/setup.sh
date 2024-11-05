@@ -247,14 +247,14 @@ configure_qbittorrent() {
             if $MACOS; then
                 sed -i '' "s|$1=.*|$1=$2|" $CONFIG_FILE
             else
-                sed "s|$1=.*|$1=$2|" $CONFIG_FILE
+                sed -i "s|$1=.*|$1=$2|" $CONFIG_FILE
             fi
         elif $MACOS; then
             sed -i '' "/^\[Preferences\]/a\\
 $1=$2\\
 " $CONFIG_FILE
         else
-            sed "/^\[Preferences\]/a\\
+            sed -i "/^\[Preferences\]/a\\
 $1=$2\\
 " $CONFIG_FILE
         fi
@@ -450,12 +450,12 @@ if $MACOS; then
         -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
         stop.sh
 else
-    sed \
+    sed -i \
         -e "s|{{VERSION}}|$VERSION|g" \
         -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
         -e "s|{{SAVE_PATH}}|$QBT_SAVE_PATH|g" \
         start.sh
-    sed \
+    sed -i \
         -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
         stop.sh
 fi
