@@ -106,18 +106,21 @@ export class RutrackerSearchEngine extends SearchEngine {
         continue;
       }
 
-      const title = tds.eq(3).find('a').text();
+      const title = tds.eq(3).find('a').text().trim();
       const size = Number.parseInt(tds.eq(5).attr('data-ts_text') ?? '0');
-      const seeds = Number.parseInt(tds.eq(6).text()) ?? 0;
-      const peers = Number.parseInt(tds.eq(7).text()) ?? 0;
+      const seeds = Number.parseInt(tds.eq(6).text().trim()) ?? 0;
+      const peers = Number.parseInt(tds.eq(7).text().trim()) ?? 0;
       const publishDate = this.parseDate(tds.eq(9).attr('data-ts_text'));
       const detailsUrl = tds.eq(3).find('a').attr('href');
       const downloadUrl = tds.eq(5).find('a').attr('href');
+      const category = tds.eq(2).text().trim();
+      const tags = [category];
 
       if (title && downloadUrl) {
         results.push({
           id,
           title,
+          tags,
           size,
           seeds,
           peers,

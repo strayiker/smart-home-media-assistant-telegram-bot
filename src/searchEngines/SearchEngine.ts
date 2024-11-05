@@ -1,6 +1,7 @@
 export interface SearchResult {
   id: string;
   title: string;
+  tags: string[];
   size: number;
   seeds: number;
   peers: number;

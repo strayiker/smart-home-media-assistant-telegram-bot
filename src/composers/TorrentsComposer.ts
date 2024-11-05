@@ -638,7 +638,10 @@ export class TorrentsComposer<
     const uid = `${se.name}_${result.id}`;
     const size = formatBytes(result.size ?? 0);
     const download = `/dl_${uid}`;
-    const tags = [`<a href="${result.detailsUrl}">[${se.name}]</a>`].join(' ');
+    const tags = [
+      ...result.tags.map((tag) => `[${tag}]`),
+      `<a href="${result.detailsUrl}">[${se.name}]</a>`,
+    ].join(' ');
 
     return ctx.t('search-message', {
       title: result.title,
