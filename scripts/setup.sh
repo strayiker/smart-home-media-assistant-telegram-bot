@@ -37,7 +37,10 @@ BOT_API_DEFAULT_ADDRESS=http://localhost:8081
 QBT_WEB_UI_DEFAULT_USERNAME=admin
 QBT_WEB_UI_DEFAULT_PASSWORD=adminadmin
 QBT_WEB_UI_DEFAULT_PASSWORD_PBKDF2="\"@ByteArray(RJtnunecy+/FjxRHFhqo3w==:TYkjECu4PhU/47hJyZkx6AajoyDbAgiw40f8tE3ygkMpuM0coG+KcRnt/6oE4ZepzpzYnd4ltWNB5ytnVqUBHA==)\""
-QBT_WEB_UI_DEFAULT_HOST=host.docker.internal
+if $WINDOWS; then
+    QBT_WEB_UI_DEFAULT_HOST=$(ipconfig | grep -A 5 "vEthernet (WSL)" | grep "IPv4 Address" | awk -F: '{gsub(/\s/, "", $2); print $2}')
+fi
+QBT_WEB_UI_DEFAULT_HOST=${QBT_WEB_UI_DEFAULT_HOST:-"host.docker.internal"}
 QBT_WEB_UI_DEFAULT_PORT=8080
 
 QBT_WEB_UI_ENABLED=false
