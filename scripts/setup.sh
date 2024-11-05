@@ -120,9 +120,11 @@ install_qbittorrent() {
     if $LINUX; then
         export DEBIAN_FRONTEND=noninteractive
         export TZ=Etc/UTC
+        apt-get update -y -qq
+        apt-get install -y -qq software-properties-common
         apt-add-repository ppa:qbittorrent-team/qbittorrent-unstable
-        apt-get -y -qq update
-        apt-get -y -qq install qbittorrent-nox
+        apt-get update -y -qq
+        apt-get install -y -qq qbittorrent-nox
     elif $MACOS; then
         brew install --cask -q qbittorrent
     elif $WINDOWS; then
@@ -242,9 +244,17 @@ configure_qbittorrent() {
 
     set_setting() {
         if grep -q "$1=" $CONFIG_FILE; then
-            sed -i '' "s|$1=.*|$1=$2|" $CONFIG_FILE
-        else
+            if $MACOS; then
+                sed -i '' "s|$1=.*|$1=$2|" $CONFIG_FILE
+            else
+                sed "s|$1=.*|$1=$2|" $CONFIG_FILE
+            fi
+        elif $MACOS; then
             sed -i '' "/^\[Preferences\]/a\\
+$1=$2\\
+" $CONFIG_FILE
+        else
+            sed "/^\[Preferences\]/a\\
 $1=$2\\
 " $CONFIG_FILE
         fi
@@ -430,15 +440,25 @@ if $LINUX || $MACOS; then
     chmod +x update.sh
 fi
 
-sed -i '' \
-    -e "s|{{VERSION}}|$VERSION|g" \
-    -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
-    -e "s|{{SAVE_PATH}}|$QBT_SAVE_PATH|g" \
-    start.sh
-
-sed -i '' \
-    -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
-    stop.sh
+if $MACOS; then
+    sed -i '' \
+        -e "s|{{VERSION}}|$VERSION|g" \
+        -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
+        -e "s|{{SAVE_PATH}}|$QBT_SAVE_PATH|g" \
+        start.sh
+    sed -i '' \
+        -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
+        stop.sh
+else
+    sed \
+        -e "s|{{VERSION}}|$VERSION|g" \
+        -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
+        -e "s|{{SAVE_PATH}}|$QBT_SAVE_PATH|g" \
+        start.sh
+    sed \
+        -e "s|{{CONTAINER_TOOL}}|$CONTAINER_TOOL|g" \
+        stop.sh
+fi
 
 if [ ${#SKIPPED_INSTALLATIONS[@]} -gt 0 ]; then
     echo "To finish, follow these steps:"
