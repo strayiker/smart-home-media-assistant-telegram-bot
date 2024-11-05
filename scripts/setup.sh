@@ -251,12 +251,10 @@ configure_qbittorrent() {
             fi
         elif $MACOS; then
             sed -i '' "/^\[Preferences\]/a\\
-$1=$2\\
-" $CONFIG_FILE
+$1=$2\\" $CONFIG_FILE
         else
             sed -i "/^\[Preferences\]/a\\
-$1=$2\\
-" $CONFIG_FILE
+$1=$2\\" $CONFIG_FILE
         fi
     }
 
