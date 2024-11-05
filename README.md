@@ -40,15 +40,6 @@ Open your terminal and run the following command:
 tmpfile=$(mktemp) && curl -sSL https://raw.githubusercontent.com/strayiker/smart-home-media-assistant-telegram-bot/refs/heads/main/scripts/setup.sh -o $tmpfile && chmod +x $tmpfile && bash -i $tmpfile && rm $tmpfile
 ```
 
-**This script will perform the following:**
-
-1.  Check for a container tools and install `Podman` if none is found (fast and light open source container tool).
-2.  Install `qBittorrent` if it's not already installed.
-3.  Configure qBittorrent `WebUI`.
-4.  Configure `Bot` and `API Server`.
-5.  Create scripts to **start**, **stop**, and **update** the `Bot`.
-6.  Run `qBittorrent`, `API Server` and `Bot`.
-
 It will ask you for some necessary information, so don't go too far.
 
 ## Update
