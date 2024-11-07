@@ -8,30 +8,30 @@ search-message =
 search-empty-results = Результатів немає
 search-unknown-error = Під час пошуку сталася помилка
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Сіди: {$seeds} ({$maxSeeds}),  Піри: {$peers} ({$maxPeers})
     Швидкість: {$speed}
     Залишилося часу: {$eta}
     Прогрес: {$progress}
     ---
-    Видалити: {$remove}
+    Видалити: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Прогрес: {$progress}
     ---
     Файли: {$files}
-    Видалити: {$remove}
+    Видалити: {$remove}</blockquote>
 torrent-unsupported-tracker-error = Трекер не підтримується
 torrent-download-error = Під час додавання торента сталася помилка
 torrent-remove-error = Під час видалення торента сталася помилка
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     Розмір: {$size}
     ---
-    Завантажити: {$download}
+    Завантажити: {$download}</blockquote>
 torrent-files-empty = Файлів немає
 torrent-files-error = Під час отримання файлів сталася помилка
 torrent-file-uploading = Завантаження, будь ласка, зачекайте...

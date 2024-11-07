@@ -8,30 +8,30 @@ search-message =
 search-empty-results = Sonuç bulunamadı
 search-unknown-error = Arama sırasında hata oluştu
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Seedler: {$seeds} ({$maxSeeds}),  Eşler: {$peers} ({$maxPeers})
     Hız: {$speed}
     Tahmini Süre: {$eta}
     İlerleme: {$progress}
     ---
-    Kaldır: {$remove}
+    Kaldır: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     İlerleme: {$progress}
     ---
     Dosyalar: {$files}
-    Kaldır: {$remove}
+    Kaldır: {$remove}</blockquote>
 torrent-unsupported-tracker-error = İzleyici desteklenmiyor
 torrent-download-error = Torrent eklenirken hata oluştu
 torrent-remove-error = Torrent kaldırılırken hata oluştu
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     Boyut: {$size}
     ---
-    İndir: {$download}
+    İndir: {$download}</blockquote>
 torrent-files-empty = Dosya yok
 torrent-files-error = Dosyalar getirilirken hata oluştu
 torrent-file-uploading = Yükleniyor, lütfen bekleyin...

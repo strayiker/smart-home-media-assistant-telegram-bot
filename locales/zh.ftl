@@ -8,30 +8,30 @@ search-message =
 search-empty-results = 沒有結果
 search-unknown-error = 搜尋時發生錯誤
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     種子: {$seeds} ({$maxSeeds}),  同伴: {$peers} ({$maxPeers})
     速度: {$speed}
     預計完成時間: {$eta}
     進度: {$progress}
     ---
-    移除: {$remove}
+    移除: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     進度: {$progress}
     ---
     檔案: {$files}
-    移除: {$remove}
+    移除: {$remove}</blockquote>
 torrent-unsupported-tracker-error = 不支援的追蹤器
 torrent-download-error = 添加種子時發生錯誤
 torrent-remove-error = 移除種子時發生錯誤
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     大小: {$size}
     ---
-    下載: {$download}
+    下載: {$download}</blockquote>
 torrent-files-empty = 沒有檔案
 torrent-files-error = 檔案檢索時發生錯誤
 torrent-file-uploading = 上傳中，請稍候...

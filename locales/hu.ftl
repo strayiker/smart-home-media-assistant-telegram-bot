@@ -8,30 +8,30 @@ search-message =
 search-empty-results = Nincs találat
 search-unknown-error = Hiba történt a keresés során
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Seedek: {$seeds} ({$maxSeeds}),  Peerek: {$peers} ({$maxPeers})
     Sebesség: {$speed}
     Várható idő: {$eta}
     Folyamat: {$progress}
     ---
-    Eltávolítás: {$remove}
+    Eltávolítás: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Folyamat: {$progress}
     ---
     Fájlok: {$files}
-    Eltávolítás: {$remove}
+    Eltávolítás: {$remove}</blockquote>
 torrent-unsupported-tracker-error = Tracker nem támogatott
 torrent-download-error = Hiba történt a torrent hozzáadásakor
 torrent-remove-error = Hiba történt a torrent eltávolításakor
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     Méret: {$size}
     ---
-    Letöltés: {$download}
+    Letöltés: {$download}</blockquote>
 torrent-files-empty = Nincs fájl
 torrent-files-error = Hiba történt a fájlok lekérésekor
 torrent-file-uploading = Feltöltés, kérjük várjon...

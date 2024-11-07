@@ -8,30 +8,30 @@ search-message =
 search-empty-results = 結果がありません
 search-unknown-error = 検索中にエラーが発生しました
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     シード: {$seeds} ({$maxSeeds}),  ピア: {$peers} ({$maxPeers})
     速度: {$speed}
     残り時間: {$eta}
     進行状況: {$progress}
     ---
-    削除: {$remove}
+    削除: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     進行状況: {$progress}
     ---
     ファイル: {$files}
-    削除: {$remove}
+    削除: {$remove}</blockquote>
 torrent-unsupported-tracker-error = トラッカーはサポートされていません
 torrent-download-error = トレントの追加中にエラーが発生しました
 torrent-remove-error = トレントの削除中にエラーが発生しました
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     サイズ: {$size}
     ---
-    ダウンロード: {$download}
+    ダウンロード: {$download}</blockquote>
 torrent-files-empty = ファイルがありません
 torrent-files-error = ファイルの取得中にエラーが発生しました
 torrent-file-uploading = アップロード中、お待ちください...

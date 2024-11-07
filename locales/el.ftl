@@ -8,30 +8,30 @@ search-message =
 search-empty-results = Δεν βρέθηκαν αποτελέσματα
 search-unknown-error = Παρουσιάστηκε σφάλμα κατά την αναζήτηση
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Σπόροι: {$seeds} ({$maxSeeds}),  Συμμετέχοντες: {$peers} ({$maxPeers})
     Ταχύτητα: {$speed}
     Υπολειπόμενος Χρόνος: {$eta}
     Πρόοδος: {$progress}
     ---
-    Αφαίρεση: {$remove}
+    Αφαίρεση: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Πρόοδος: {$progress}
     ---
     Αρχεία: {$files}
-    Αφαίρεση: {$remove}
+    Αφαίρεση: {$remove}</blockquote>
 torrent-unsupported-tracker-error = Ο tracker δεν υποστηρίζεται
 torrent-download-error = Παρουσιάστηκε σφάλμα κατά την προσθήκη του torrent
 torrent-remove-error = Παρουσιάστηκε σφάλμα κατά την αφαίρεση του torrent
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     Μέγεθος: {$size}
     ---
-    Λήψη: {$download}
+    Λήψη: {$download}</blockquote>
 torrent-files-empty = Δεν υπάρχουν αρχεία
 torrent-files-error = Παρουσιάστηκε σφάλμα κατά την ανάκτηση των αρχείων
 torrent-file-uploading = Γίνεται μεταφόρτωση, παρακαλώ περιμένετε...

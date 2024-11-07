@@ -8,30 +8,30 @@ search-message =
 search-empty-results = Niciun rezultat
 search-unknown-error = Eroare apărută în timpul căutării
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Semințe: {$seeds} ({$maxSeeds}),  Perechi: {$peers} ({$maxPeers})
     Viteză: {$speed}
     ETA: {$eta}
     Progres: {$progress}
     ---
-    Eliminare: {$remove}
+    Eliminare: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Progres: {$progress}
     ---
     Fișiere: {$files}
-    Eliminare: {$remove}
+    Eliminare: {$remove}</blockquote>
 torrent-unsupported-tracker-error = Trackerul nu este suportat
 torrent-download-error = Eroare la adăugarea torrentului
 torrent-remove-error = Eroare la eliminarea torrentului
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     Mărime: {$size}
     ---
-    Descărcare: {$download}
+    Descărcare: {$download}</blockquote>
 torrent-files-empty = Niciun fișier
 torrent-files-error = Eroare la recuperarea fișierelor
 torrent-file-uploading = Se încarcă, vă rugăm așteptați...

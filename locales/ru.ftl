@@ -8,30 +8,30 @@ search-message =
 search-empty-results = Нет результатов
 search-unknown-error = Произошла ошибка во время поиска
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Сиды: {$seeds} ({$maxSeeds}),  Пиры: {$peers} ({$maxPeers})
     Скорость: {$speed}
     Оставшееся время: {$eta}
     Прогресс: {$progress}
     ---
-    Удалить: {$remove}
+    Удалить: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Прогресс: {$progress}
     ---
     Файлы: {$files}
-    Удалить: {$remove}
+    Удалить: {$remove}</blockquote>
 torrent-unsupported-tracker-error = Трекер не поддерживается
 torrent-download-error = Произошла ошибка при добавлении торрента
 torrent-remove-error = Произошла ошибка при удалении торрента
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     Размер: {$size}
     ---
-    Скачать: {$download}
+    Скачать: {$download}</blockquote>
 torrent-files-empty = Нет файлов
 torrent-files-error = Произошла ошибка при получении файлов
 torrent-file-uploading = Отправка, подождите...

@@ -8,30 +8,30 @@ search-message =
 search-empty-results = Không có kết quả
 search-unknown-error = Đã xảy ra lỗi trong quá trình tìm kiếm
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
     Tốc độ: {$speed}
     ETA: {$eta}
     Tiến trình: {$progress}
     ---
-    Xóa: {$remove}
+    Xóa: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Tiến trình: {$progress}
     ---
     Tệp: {$files}
-    Xóa: {$remove}
+    Xóa: {$remove}</blockquote>
 torrent-unsupported-tracker-error = Tracker không được hỗ trợ
 torrent-download-error = Đã xảy ra lỗi khi thêm torrent
 torrent-remove-error = Đã xảy ra lỗi khi xóa torrent
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     Kích thước: {$size}
     ---
-    Tải về: {$download}
+    Tải về: {$download}</blockquote>
 torrent-files-empty = Không có tệp
 torrent-files-error = Đã xảy ra lỗi khi truy xuất tệp
 torrent-file-uploading = Đang tải lên, vui lòng chờ...

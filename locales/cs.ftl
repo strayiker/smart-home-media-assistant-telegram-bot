@@ -8,30 +8,30 @@ search-message =
 search-empty-results = Žádné výsledky
 search-unknown-error = Při hledání došlo k chybě
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Seedů: {$seeds} ({$maxSeeds}),  Peerů: {$peers} ({$maxPeers})
     Rychlost: {$speed}
     ETA: {$eta}
     Pokrok: {$progress}
     ---
-    Odstranit: {$remove}
+    Odstranit: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Pokrok: {$progress}
     ---
     Soubory: {$files}
-    Odstranit: {$remove}
+    Odstranit: {$remove}</blockquote>
 torrent-unsupported-tracker-error = Tracker není podporován
 torrent-download-error = Při přidávání torrentu došlo k chybě
 torrent-remove-error = Při odebírání torrentu došlo k chybě
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     Velikost: {$size}
     ---
-    Stáhnout: {$download}
+    Stáhnout: {$download}</blockquote>
 torrent-files-empty = Žádné soubory
 torrent-files-error = Při načítání souborů došlo k chybě
 torrent-file-uploading = Nahrávání, prosím, čekejte...

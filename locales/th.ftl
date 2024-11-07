@@ -8,30 +8,30 @@ search-message =
 search-empty-results = ไม่มีผลลัพธ์
 search-unknown-error = เกิดข้อผิดพลาดระหว่างการค้นหา
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     เมล็ด: {$seeds} ({$maxSeeds}),  เพื่อน: {$peers} ({$maxPeers})
     ความเร็ว: {$speed}
     เวลาโดยประมาณ: {$eta}
     ความคืบหน้า: {$progress}
     ---
-    ลบ: {$remove}
+    ลบ: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     ความคืบหน้า: {$progress}
     ---
     ไฟล์: {$files}
-    ลบ: {$remove}
+    ลบ: {$remove}</blockquote>
 torrent-unsupported-tracker-error = ตัวติดตามไม่รองรับ
 torrent-download-error = เกิดข้อผิดพลาดขณะเพิ่มทอร์เรนต์
 torrent-remove-error = เกิดข้อผิดพลาดขณะลบทอร์เรนต์
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     ขนาด: {$size}
     ---
-    ดาวน์โหลด: {$download}
+    ดาวน์โหลด: {$download}</blockquote>
 torrent-files-empty = ไม่มีไฟล์
 torrent-files-error = เกิดข้อผิดพลาดขณะดึงไฟล์
 torrent-file-uploading = กำลังอัปโหลด โปรดรอ...

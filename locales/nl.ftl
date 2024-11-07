@@ -8,30 +8,30 @@ search-message =
 search-empty-results = Geen resultaten
 search-unknown-error = Fout opgetreden tijdens het zoeken
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
     Snelheid: {$speed}
     ETA: {$eta}
     Voortgang: {$progress}
     ---
-    Verwijderen: {$remove}
+    Verwijderen: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Voortgang: {$progress}
     ---
     Bestanden: {$files}
-    Verwijderen: {$remove}
+    Verwijderen: {$remove}</blockquote>
 torrent-unsupported-tracker-error = Tracker niet ondersteund
 torrent-download-error = Fout opgetreden bij het toevoegen van de torrent
 torrent-remove-error = Fout opgetreden bij het verwijderen van de torrent
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     Grootte: {$size}
     ---
-    Download: {$download}
+    Download: {$download}</blockquote>
 torrent-files-empty = Geen bestanden
 torrent-files-error = Fout opgetreden bij het ophalen van bestanden
 torrent-file-uploading = Uploaden, even geduld aub...

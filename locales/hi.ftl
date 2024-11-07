@@ -8,30 +8,30 @@ search-message =
 search-empty-results = कोई परिणाम नहीं
 search-unknown-error = खोज के दौरान त्रुटि हुई
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     बीज: {$seeds} ({$maxSeeds}),  सहकर्मी: {$peers} ({$maxPeers})
     गति: {$speed}
     अनुमानित समय: {$eta}
     प्रगति: {$progress}
     ---
-    निकालें: {$remove}
+    निकालें: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     प्रगति: {$progress}
     ---
     फाइलें: {$files}
-    निकालें: {$remove}
+    निकालें: {$remove}</blockquote>
 torrent-unsupported-tracker-error = ट्रैकर समर्थित नहीं है
 torrent-download-error = टोरेंट जोड़ते समय त्रुटि हुई
 torrent-remove-error = टोरेंट हटाते समय त्रुटि हुई
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     आकार: {$size}
     ---
-    डाउनलोड: {$download}
+    डाउनलोड: {$download}</blockquote>
 torrent-files-empty = कोई फाइलें नहीं
 torrent-files-error = फाइलें पुनः प्राप्त करते समय त्रुटि हुई
 torrent-file-uploading = अपलोड हो रहा है, कृपया प्रतीक्षा करें...

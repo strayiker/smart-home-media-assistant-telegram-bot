@@ -8,30 +8,30 @@ search-message =
 search-empty-results = لا توجد نتائج
 search-unknown-error = حدث خطأ أثناء البحث
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     البذور: {$seeds} ({$maxSeeds}),  النظراء: {$peers} ({$maxPeers})
     السرعة: {$speed}
     الوقت المتبقي: {$eta}
     التقدم: {$progress}
     ---
-    إزالة: {$remove}
+    إزالة: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     التقدم: {$progress}
     ---
     الملفات: {$files}
-    إزالة: {$remove}
+    إزالة: {$remove}</blockquote>
 torrent-unsupported-tracker-error = المتتبع غير مدعوم
 torrent-download-error = حدث خطأ أثناء إضافة التورنت
 torrent-remove-error = حدث خطأ أثناء إزالة التورنت
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     الحجم: {$size}
     ---
-    تحميل: {$download}
+    تحميل: {$download}</blockquote>
 torrent-files-empty = لا توجد ملفات
 torrent-files-error = حدث خطأ أثناء استرداد الملفات
 torrent-file-uploading = جارٍ التحميل، يرجى الانتظار...

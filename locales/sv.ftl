@@ -8,30 +8,30 @@ search-message =
 search-empty-results = Inga resultat
 search-unknown-error = Ett fel inträffade under sökningen
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
     Hastighet: {$speed}
     ETA: {$eta}
     Framsteg: {$progress}
     ---
-    Ta bort: {$remove}
+    Ta bort: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Framsteg: {$progress}
     ---
     Filer: {$files}
-    Ta bort: {$remove}
+    Ta bort: {$remove}</blockquote>
 torrent-unsupported-tracker-error = Tracker stöds inte
 torrent-download-error = Ett fel inträffade vid tillägg av torrent
 torrent-remove-error = Ett fel inträffade vid borttagning av torrent
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     Storlek: {$size}
     ---
-    Ladda ner: {$download}
+    Ladda ner: {$download}</blockquote>
 torrent-files-empty = Inga filer
 torrent-files-error = Ett fel inträffade vid hämtning av filer
 torrent-file-uploading = Uppladdning pågår, vänligen vänta...

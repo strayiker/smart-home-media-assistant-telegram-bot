@@ -8,30 +8,30 @@ search-message =
 search-empty-results = Nenhum resultado
 search-unknown-error = Ocorreu um erro durante a pesquisa
 torrent-message-in-progress =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Seeds: {$seeds} ({$maxSeeds}),  Peers: {$peers} ({$maxPeers})
     Velocidade: {$speed}
     ETA: {$eta}
     Progresso: {$progress}
     ---
-    Remover: {$remove}
+    Remover: {$remove}</blockquote>
 torrent-message-completed =
-    <b>{$title}</b>
+    <blockquote><b>{$title}</b>
     ---
     Progresso: {$progress}
     ---
     Arquivos: {$files}
-    Remover: {$remove}
+    Remover: {$remove}</blockquote>
 torrent-unsupported-tracker-error = Tracker não suportado
 torrent-download-error = Erro ao adicionar o torrent
 torrent-remove-error = Erro ao remover o torrent
 torrent-file-message =
-    <b>{$name}</b>
+    <blockquote><b>{$name}</b>
     ---
     Tamanho: {$size}
     ---
-    Download: {$download}
+    Download: {$download}</blockquote>
 torrent-files-empty = Nenhum arquivo
 torrent-files-error = Erro ao recuperar arquivos
 torrent-file-uploading = Carregando, por favor aguarde...
