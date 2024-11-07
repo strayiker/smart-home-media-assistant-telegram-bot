@@ -284,12 +284,7 @@ export class TorrentsComposer<
     }
 
     const filePath = path.resolve(path.join(this.dataPath, qbFile.name));
-
-    this.logger.debug(filePath);
-
     const fileType = await fileTypeFromFile(filePath);
-
-    this.logger.debug(fileType);
 
     if (!fileType) {
       return;
