@@ -12,7 +12,7 @@ This is the sources of a Telegram `Bot` is designed to help you search for torre
 
 This `Bot` is created for a personal usage, so it might have some bugs or not work perfectly. If you have any questions, issues or improvements, feel free to open an issue ticket or submit a pull request.
 
-This `Bot` will not help you overcome the restrictions associated with blocking torrent trackers, since it runs locally on your PC. You need to configure the bypass of blocking yourself.
+This `Bot` will not help you overcome the restrictions associated with blocking torrent trackers, since it runs locally on your PC.
 
 ## Before You Get Started
 
