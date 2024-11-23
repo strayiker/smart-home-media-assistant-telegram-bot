@@ -238,7 +238,7 @@ export class TorrentsComposer<
     const texts = await Promise.all(
       files.map((file) => this.formatTorrentFile(ctx, uid, file)),
     );
-    const text = texts.join('\n\n');
+    const text = texts.join('\n');
 
     try {
       await ctx.reply(text, {
@@ -593,7 +593,7 @@ export class TorrentsComposer<
     if (completedTorrents.length > 0) {
       const text = completedTorrents
         .map((torrent) => this.formatTorrent(chatId, torrent))
-        .join('\n\n\n');
+        .join('\n');
 
       try {
         await this.bot.api.sendMessage(chatId, text, {
@@ -613,7 +613,7 @@ export class TorrentsComposer<
 
       const text = pendingTorrents
         .map((torrent) => this.formatTorrent(chatId, torrent))
-        .join('\n\n\n');
+        .join('\n');
 
       await (message
         ? this.updateTorrentsMessage(message, text)
