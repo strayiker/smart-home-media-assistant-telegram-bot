@@ -1095,7 +1095,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@thaunknown/thirty-two@npm:^1.0.3":
+"@thaunknown/thirty-two@npm:^1.0.5":
   version: 1.0.5
   resolution: "@thaunknown/thirty-two@npm:1.0.5"
   dependencies:
@@ -4340,14 +4340,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"magnet-uri@npm:^7.0.5":
-  version: 7.0.5
-  resolution: "magnet-uri@npm:7.0.5"
+"magnet-uri@npm:^7.0.7":
+  version: 7.0.7
+  resolution: "magnet-uri@npm:7.0.7"
   dependencies:
-    "@thaunknown/thirty-two": "npm:^1.0.3"
+    "@thaunknown/thirty-two": "npm:^1.0.5"
     bep53-range: "npm:^2.0.0"
-    uint8-util: "npm:^2.1.9"
-  checksum: 10c0/9bb0050bc026427a51f4c6a28bee7d83183197d2906b375ad7d4b42d33648ff0816c37a65b0fc61ecaf2ecc59ef1f518c4f5719cd2de2297464266e1e285b0f1
+    uint8-util: "npm:^2.2.5"
+  checksum: 10c0/de0ed00ac71ce56b4d97b939956baf77a387b19842b58f3121b03a1aa41dd9af3bd6004720bc1b150d3d5d753a406fb5995aeec3d116db7e5f63f7abf3bcadd8
   languageName: node
   linkType: hard
 
@@ -5347,19 +5347,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"parse-torrent@npm:^11.0.17":
-  version: 11.0.17
-  resolution: "parse-torrent@npm:11.0.17"
+"parse-torrent@npm:^11.0.18":
+  version: 11.0.18
+  resolution: "parse-torrent@npm:11.0.18"
   dependencies:
     bencode: "npm:^4.0.0"
     cross-fetch-ponyfill: "npm:^1.0.3"
     get-stdin: "npm:^9.0.0"
-    magnet-uri: "npm:^7.0.5"
+    magnet-uri: "npm:^7.0.7"
     queue-microtask: "npm:^1.2.3"
     uint8-util: "npm:^2.2.5"
   bin:
     parse-torrent: bin/cmd.js
-  checksum: 10c0/74fd47e81b079dd3b7f39797d1a9f0651d626de9a7c5da03c2bb50239f84f40eb6bbbfe704a5cb851cbdb5a2296af60245c5b237efdc8d127ad5cbdbd0a47279
+  checksum: 10c0/676640cf257a937120f62293070a8e85b295340bafcfdb4673d74abdaf615129fead396bed60d8ed6ad621a68cdcaaa9052590268672ddf8c0e2b4d7b1802abc
   languageName: node
   linkType: hard
 
@@ -6219,7 +6219,7 @@ __metadata:
     grammy: "npm:^1.34.0"
     husky: "npm:^9.1.7"
     lint-staged: "npm:^15.3.0"
-    parse-torrent: "npm:^11.0.17"
+    parse-torrent: "npm:^11.0.18"
     pino: "npm:^9.6.0"
     pino-pretty: "npm:^13.0.0"
     prettier: "npm:^3.4.2"
@@ -6899,7 +6899,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uint8-util@npm:^2.1.9, uint8-util@npm:^2.2.2, uint8-util@npm:^2.2.5":
+"uint8-util@npm:^2.2.2, uint8-util@npm:^2.2.5":
   version: 2.2.5
   resolution: "uint8-util@npm:2.2.5"
   dependencies:
