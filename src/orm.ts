@@ -6,6 +6,10 @@ import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 const config = defineConfig({
   debug: process.env.NODE_ENV !== 'production',
   extensions: [Migrator],
+  migrations: {
+    path: 'dist/migrations',
+    pathTs: 'src/migrations',
+  },
   entities: ['dist/entities/**/*.js'],
   entitiesTs: ['src/entities/**/*.ts'],
   forceUndefined: true,
@@ -13,6 +17,10 @@ const config = defineConfig({
   metadataProvider: TsMorphMetadataProvider,
 });
 
-const mikroOrm = await MikroORM.init(config);
+const orm = await MikroORM.init(config);
 
-export { config, mikroOrm };
+const migrator = orm.getMigrator();
+await migrator.up();
+
+export { orm };
+export default config;

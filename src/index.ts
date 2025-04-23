@@ -29,7 +29,7 @@ import {
 import { type MyContext, type SessionData } from './Context.js';
 import { fluent } from './fluent.js';
 import { logger } from './logger.js';
-import { mikroOrm } from './mikroOrm.js';
+import { orm } from './orm.js';
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
 import { RutrackerSearchEngine } from './searchEngines/RutrackerSearchEngine.js';
 import { CookieStorage } from './utils/CookieStorage.js';
@@ -49,7 +49,7 @@ const qBittorrent = new QBittorrentClient({
   password: qbtWebuiPassword,
   savePath: qbtSavePath,
 });
-const authComposer = new AuthComposer(mikroOrm.em.fork(), secretKey);
+const authComposer = new AuthComposer(orm.em.fork(), secretKey);
 const torrentsComposer = new TorrentsComposer({
   bot,
   dataPath: botDataTorrentsPath,
