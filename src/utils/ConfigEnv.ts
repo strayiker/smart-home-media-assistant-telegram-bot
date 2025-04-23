@@ -14,6 +14,8 @@ export class ConfigEnv implements Config {
       return options?.default as ConfigGetResult<T, Required, Parse>;
     }
 
-    return options?.parse ? JSON.parse(value) : value;
+    return options?.parse
+      ? JSON.parse(value)
+      : (value as ConfigGetResult<T, Required, Parse>);
   }
 }
