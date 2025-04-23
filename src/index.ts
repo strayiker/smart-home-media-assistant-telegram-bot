@@ -92,8 +92,9 @@ bot.catch(({ error }) => {
 });
 
 const shutdown = async () => {
-  await torrentsComposer.dispose();
   await bot.stop();
+  await torrentsComposer.dispose();
+  await orm.close(true);
 };
 
 process.once('SIGINT', shutdown);

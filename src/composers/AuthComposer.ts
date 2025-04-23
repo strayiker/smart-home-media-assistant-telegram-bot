@@ -11,7 +11,7 @@ export class AuthComposer extends Composer<MyContext> {
   ) {
     super();
 
-    this.use(this.checkUser.bind(this));
+    this.use(this.checkAuth.bind(this));
 
     this.on('message:text', (ctx, next) => {
       if (ctx.session.awaitingSecret) {
@@ -21,7 +21,7 @@ export class AuthComposer extends Composer<MyContext> {
     });
   }
 
-  private async checkUser(ctx: MyContext, next: NextFunction) {
+  private async checkAuth(ctx: MyContext, next: NextFunction) {
     const telegramId = ctx.from?.id;
     if (!telegramId) return;
 
@@ -31,10 +31,12 @@ export class AuthComposer extends Composer<MyContext> {
       return next();
     }
 
-    if (!ctx.session.awaitingSecret) {
-      await ctx.reply(ctx.t('auth-enter-secret'));
-      ctx.session.awaitingSecret = true;
+    if (ctx.session.awaitingSecret) {
+      return next();
     }
+
+    await ctx.reply(ctx.t('auth-enter-secret'));
+    ctx.session.awaitingSecret = true;
   }
 
   private async handleSecret(ctx: Filter<MyContext, 'message:text'>) {
