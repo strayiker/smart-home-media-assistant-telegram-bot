@@ -1,7 +1,14 @@
 FROM linuxserver/ffmpeg:latest
 
-RUN apt-get -y update  && \
-    apt-get -y --no-install-recommends install nodejs npm && \
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+        python3 \
+        make \
+        g++ \
+        sqlite3 \
+        libsqlite3-dev \
+        nodejs \
+        npm && \
     rm -rf /var/lib/apt/lists/* && \
     npm install -g corepack && \
     corepack enable
