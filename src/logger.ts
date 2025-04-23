@@ -10,5 +10,5 @@ const prettyStream = pinoPretty({
 
 export const logger =
   process.env.NODE_ENV === 'production'
-    ? pino({ level: 'warn' })
+    ? pino({ level: 'info' }, prettyStream)
     : pino({ level: 'debug' }, prettyStream);

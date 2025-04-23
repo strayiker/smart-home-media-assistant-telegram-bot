@@ -101,6 +101,7 @@ process.once('SIGTERM', shutdown);
 
 const promise = bot.start();
 
-logger.debug('Bot is running!');
+logger.info('Bot is running!');
+logger.info('Your secret key is : %s', secretKey);
 
 await promise;
