@@ -3,8 +3,15 @@ import './dayjs.js';
 import path from 'node:path';
 
 import { useFluent } from '@grammyjs/fluent';
-import { Bot, GrammyError, HttpError } from 'grammy';
+import {
+  Bot,
+  GrammyError,
+  HttpError,
+  MemorySessionStorage,
+  session,
+} from 'grammy';
 
+import { AuthComposer } from './composers/AuthComposer.js';
 import { TorrentsComposer } from './composers/TorrentsComposer.js';
 import {
   botApiAddress,
@@ -17,10 +24,12 @@ import {
   qbtWebuiUsername,
   rutrackerPassword,
   rutrackerUsername,
+  secretKey,
 } from './config.js';
-import { type MyContext } from './Context.js';
+import { type MyContext, type SessionData } from './Context.js';
 import { fluent } from './fluent.js';
 import { logger } from './logger.js';
+import { mikroOrm } from './mikroOrm.js';
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
 import { RutrackerSearchEngine } from './searchEngines/RutrackerSearchEngine.js';
 import { CookieStorage } from './utils/CookieStorage.js';
@@ -40,7 +49,8 @@ const qBittorrent = new QBittorrentClient({
   password: qbtWebuiPassword,
   savePath: qbtSavePath,
 });
-const torrents = new TorrentsComposer({
+const authComposer = new AuthComposer(mikroOrm.em.fork(), secretKey);
+const torrentsComposer = new TorrentsComposer({
   bot,
   dataPath: botDataTorrentsPath,
   searchEngines: [
@@ -56,12 +66,19 @@ const torrents = new TorrentsComposer({
 });
 
 bot.use(
+  session({
+    initial: () => ({}),
+    storage: new MemorySessionStorage<SessionData>(),
+  }),
+);
+bot.use(
   useFluent({
     fluent,
     defaultLocale: 'en',
   }),
 );
-bot.use(torrents);
+bot.use(authComposer);
+bot.use(torrentsComposer);
 
 // eslint-disable-next-line unicorn/prefer-top-level-await
 bot.catch(({ error }) => {
@@ -75,7 +92,7 @@ bot.catch(({ error }) => {
 });
 
 const shutdown = async () => {
-  await torrents.dispose();
+  await torrentsComposer.dispose();
   await bot.stop();
 };
 

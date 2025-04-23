@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 Ange den hemliga nyckeln för att få tillgång till boten:
+auth-success = ✅ Autentisering lyckades! Välkommen.
+auth-fail = ❌ Fel nyckel. Försök igen:
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}

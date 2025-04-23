@@ -12,6 +12,8 @@ dotenv.config({
 
 export const config = new ConfigEnv();
 
+export const secretKey = config.get('SECRET_KEY', { required: true });
+
 export const botToken = config.get('BOT_TOKEN', {
   required: true,
 });

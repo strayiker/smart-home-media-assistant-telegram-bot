@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 Masukkan kunci rahasia untuk mengakses bot:
+auth-success = ✅ Otentikasi berhasil! Selamat datang.
+auth-fail = ❌ Kunci salah. Silakan coba lagi:
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}

@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 Introduceți cheia secretă pentru a accesa botul:
+auth-success = ✅ Autentificare reușită! Bine ai venit.
+auth-fail = ❌ Cheie incorectă. Vă rugăm să încercați din nou:
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}

@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 Zadejte tajný klíč pro přístup k botovi:
+auth-success = ✅ Ověření bylo úspěšné! Vítejte.
+auth-fail = ❌ Nesprávný klíč. Zkuste to prosím znovu:
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}

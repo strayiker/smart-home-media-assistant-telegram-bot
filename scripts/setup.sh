@@ -328,6 +328,7 @@ fi
 echo "Setup environment variables..."
 
 if [ -f ".env" ]; then
+    SECRET_KEY=$(grep 'SECRET_KEY' ".env" | cut -d'=' -f2-)
     BOT_TOKEN=$(grep 'BOT_TOKEN' ".env" | cut -d'=' -f2-)
     BOT_API_ADDRESS=$(grep 'BOT_API_ADDRESS' ".env" | cut -d'=' -f2-)
     RUTRACKER_USERNAME=$(grep 'RUTRACKER_USERNAME' ".env" | cut -d'=' -f2-)
@@ -393,6 +394,7 @@ if [ "$QBT_SAVE_PATH" == "" ]; then
     read -p "Enter the folder where torrents will be saved: " QBT_SAVE_PATH
 fi
 
+SECRET_KEY=${SECRET_KEY:-$(openssl rand -hex 32)}
 BOT_API_ADDRESS=${BOT_API_ADDRESS:-$BOT_API_DEFAULT_ADDRESS}
 QBT_WEB_UI_USERNAME=${QBT_WEB_UI_USERNAME:-$QBT_WEB_UI_DEFAULT_USERNAME}
 QBT_WEB_UI_PASSWORD=${QBT_WEB_UI_PASSWORD:-$QBT_WEB_UI_DEFAULT_PASSWORD}
@@ -402,6 +404,7 @@ QBT_WEB_UI_ADDRESS=${QBT_WEB_UI_ADDRESS:-"http://$QBT_WEB_UI_HOST:$QBT_WEB_UI_PO
 
 # Create .env file
 cat <<EOF > .env
+SECRET_KEY=$SECRET_KEY
 BOT_TOKEN=$BOT_TOKEN
 BOT_API_ADDRESS=$BOT_API_ADDRESS
 RUTRACKER_USERNAME=$RUTRACKER_USERNAME
@@ -410,6 +413,7 @@ QBT_WEB_UI_USERNAME=$QBT_WEB_UI_USERNAME
 QBT_WEB_UI_PASSWORD=$QBT_WEB_UI_PASSWORD
 QBT_WEB_UI_ADDRESS=$QBT_WEB_UI_ADDRESS
 QBT_SAVE_PATH=$QBT_SAVE_PATH
+MIKRO_ORM_DB_NAME=./app.db
 EOF
 
 # Create .env.api file

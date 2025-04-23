@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 Voer de geheime sleutel in om toegang te krijgen tot de bot:
+auth-success = ✅ Authenticatie geslaagd! Welkom.
+auth-fail = ❌ Verkeerde sleutel. Probeer het opnieuw:
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}

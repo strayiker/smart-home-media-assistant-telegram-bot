@@ -31,4 +31,7 @@ node_modules/
 dist/
 
 # Runtime
+temp/
 data/
+
+*.db

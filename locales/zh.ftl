@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 输入密钥以访问机器人：
+auth-success = ✅ 认证成功！欢迎。
+auth-fail = ❌ 密钥错误，请重试：
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}

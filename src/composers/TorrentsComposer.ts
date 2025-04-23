@@ -1,19 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { type FluentContextFlavor } from '@grammyjs/fluent';
 import { fileTypeFromFile, type FileTypeResult } from 'file-type';
 import ffmpeg, { type FfprobeData } from 'fluent-ffmpeg';
-import {
-  type Bot,
-  Composer,
-  type Context,
-  type Filter,
-  GrammyError,
-} from 'grammy';
+import { type Bot, Composer, type Filter, GrammyError } from 'grammy';
 import { InputFile, type Message } from 'grammy/types';
 import { tmpNameSync } from 'tmp';
 
+import { type MyContext } from '../Context.js';
 import { fluent } from '../fluent.js';
 import { type QBFile, type QBTorrent } from '../qBittorrent/models.js';
 import { type QBittorrentClient } from '../qBittorrent/QBittorrentClient.js';
@@ -43,18 +37,16 @@ function isVideo(type?: FileTypeResult) {
   return ['mp4', 'mkv', 'avi'].includes(type.ext);
 }
 
-export interface TorrentComposerOptions<C extends Context> {
-  bot: Bot<C>;
+export interface TorrentComposerOptions {
+  bot: Bot<MyContext>;
   dataPath: string;
   searchEngines: SearchEngine[];
   qBittorrent: QBittorrentClient;
   logger: Logger;
 }
 
-export class TorrentsComposer<
-  C extends Context & FluentContextFlavor,
-> extends Composer<C> {
-  private bot: Bot<C>;
+export class TorrentsComposer extends Composer<MyContext> {
+  private bot: Bot<MyContext>;
   private dataPath: string;
   private searchEngines: SearchEngine[];
   private qBittorrent: QBittorrentClient;
@@ -63,7 +55,7 @@ export class TorrentsComposer<
   private timeout: NodeJS.Timeout;
   private logger: Logger;
 
-  constructor(options: TorrentComposerOptions<C>) {
+  constructor(options: TorrentComposerOptions) {
     super();
 
     this.bot = options.bot;
@@ -99,7 +91,7 @@ export class TorrentsComposer<
     clearInterval(this.timeout);
   }
 
-  private async handleSearchQuery(ctx: Filter<C, 'message:text'>) {
+  private async handleSearchQuery(ctx: Filter<MyContext, 'message:text'>) {
     const query = ctx.message.text;
 
     let results: (readonly [SearchEngine, SearchResult])[];
@@ -132,7 +124,9 @@ export class TorrentsComposer<
     }
   }
 
-  private async handleDownloadCommand(ctx: Filter<C, 'message::bot_command'>) {
+  private async handleDownloadCommand(
+    ctx: Filter<MyContext, 'message::bot_command'>,
+  ) {
     if (!ctx.message.text) {
       return;
     }
@@ -180,7 +174,9 @@ export class TorrentsComposer<
     await this.createOrUpdateTorrentsMessage(ctx.chatId, true);
   }
 
-  private async handleRemoveCommand(ctx: Filter<C, 'message::bot_command'>) {
+  private async handleRemoveCommand(
+    ctx: Filter<MyContext, 'message::bot_command'>,
+  ) {
     if (!ctx.message.text) {
       return;
     }
@@ -206,7 +202,9 @@ export class TorrentsComposer<
     await this.createOrUpdateTorrentsMessage(ctx.chatId, true);
   }
 
-  private async handleListFilesCommand(ctx: Filter<C, 'message::bot_command'>) {
+  private async handleListFilesCommand(
+    ctx: Filter<MyContext, 'message::bot_command'>,
+  ) {
     if (!ctx.message.text) {
       return;
     }
@@ -250,7 +248,7 @@ export class TorrentsComposer<
   }
 
   private async handleDownloadFileCommand(
-    ctx: Filter<C, 'message::bot_command'>,
+    ctx: Filter<MyContext, 'message::bot_command'>,
   ) {
     if (!ctx.message.text) {
       return;
@@ -629,7 +627,11 @@ export class TorrentsComposer<
     }
   }
 
-  private formatSearchResult(ctx: C, se: SearchEngine, result: SearchResult) {
+  private formatSearchResult(
+    ctx: MyContext,
+    se: SearchEngine,
+    result: SearchResult,
+  ) {
     const uid = `${se.name}_${result.id}`;
     const size = formatBytes(result.size ?? 0);
     const download = `/dl_${uid}`;
@@ -685,7 +687,11 @@ export class TorrentsComposer<
         });
   }
 
-  private async formatTorrentFile(ctx: C, torrentUid: string, file: QBFile) {
+  private async formatTorrentFile(
+    ctx: MyContext,
+    torrentUid: string,
+    file: QBFile,
+  ) {
     const filePath = path.resolve(path.join(this.dataPath, file.name));
     const fileType = await fileTypeFromFile(filePath);
 

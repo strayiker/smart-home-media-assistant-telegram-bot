@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 Entrez la clé secrète pour accéder au bot:
+auth-success = ✅ Authentification réussie ! Bienvenue.
+auth-fail = ❌ Clé incorrecte. Veuillez réessayer :
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}

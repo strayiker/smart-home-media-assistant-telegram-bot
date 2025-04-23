@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 Bota erişmek için gizli anahtarı girin:
+auth-success = ✅ Kimlik doğrulama başarılı! Hoş geldiniz.
+auth-fail = ❌ Hatalı anahtar. Lütfen tekrar deneyin:
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}

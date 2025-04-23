@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 ボットにアクセスするためのシークレットキーを入力してください:
+auth-success = ✅ 認証に成功しました！ようこそ。
+auth-fail = ❌ 間違ったキーです。もう一度お試しください:
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}

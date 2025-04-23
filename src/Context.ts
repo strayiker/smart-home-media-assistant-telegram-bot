@@ -1,4 +1,10 @@
 import { type FluentContextFlavor } from '@grammyjs/fluent';
-import { type Context } from 'grammy';
+import { type Context, type SessionFlavor } from 'grammy';
 
-export type MyContext = Context & FluentContextFlavor;
+export interface SessionData {
+  awaitingSecret?: boolean;
+}
+
+export type MyContext = Context &
+  FluentContextFlavor &
+  SessionFlavor<SessionData>;

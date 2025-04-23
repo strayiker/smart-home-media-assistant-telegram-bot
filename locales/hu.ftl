@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 Írja be a titkos kulcsot a bot eléréséhez:
+auth-success = ✅ Sikeres hitelesítés! Üdvözöljük.
+auth-fail = ❌ Hibás kulcs. Kérjük, próbálja újra:
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}

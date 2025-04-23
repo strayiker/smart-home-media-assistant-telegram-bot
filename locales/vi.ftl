@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 Nhập khóa bí mật để truy cập bot:
+auth-success = ✅ Xác thực thành công! Chào mừng.
+auth-fail = ❌ Sai khóa. Vui lòng thử lại:
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}

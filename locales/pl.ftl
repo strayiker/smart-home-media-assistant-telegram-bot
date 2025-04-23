@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 Wprowadź tajny klucz, aby uzyskać dostęp do bota:
+auth-success = ✅ Uwierzytelnienie powiodło się! Witamy.
+auth-fail = ❌ Nieprawidłowy klucz. Spróbuj ponownie:
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}

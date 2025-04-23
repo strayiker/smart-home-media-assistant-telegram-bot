@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 Inserisci la chiave segreta per accedere al bot:
+auth-success = ✅ Autenticazione riuscita! Benvenuto.
+auth-fail = ❌ Chiave errata. Riprova:
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}

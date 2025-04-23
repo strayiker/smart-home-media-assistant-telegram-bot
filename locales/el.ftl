@@ -1,3 +1,6 @@
+auth-enter-secret = 🔒 Εισάγετε το μυστικό κλειδί για πρόσβαση στο bot:
+auth-success = ✅ Επιτυχής ταυτοποίηση! Καλώς ήρθατε.
+auth-fail = ❌ Λάθος κλειδί. Δοκιμάστε ξανά:
 search-message =
     <blockquote><b>{$title}</b>
     {$tags}
