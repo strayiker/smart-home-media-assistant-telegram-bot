@@ -515,17 +515,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mikro-orm/better-sqlite@npm:^6.4.13":
-  version: 6.4.13
-  resolution: "@mikro-orm/better-sqlite@npm:6.4.13"
+"@mikro-orm/better-sqlite@npm:^6.4.14":
+  version: 6.4.14
+  resolution: "@mikro-orm/better-sqlite@npm:6.4.14"
   dependencies:
-    "@mikro-orm/knex": "npm:6.4.13"
+    "@mikro-orm/knex": "npm:6.4.14"
     better-sqlite3: "npm:11.9.1"
     fs-extra: "npm:11.3.0"
     sqlstring-sqlite: "npm:0.1.1"
   peerDependencies:
     "@mikro-orm/core": ^6.0.0
-  checksum: 10c0/46a27651d21d3b5856ac74fa79f0c808e00fc24a88786188ba1254772dd9015fa7a96ac8d8204ce249f49d879301cc3741d3a74610bc2d306cdc02206dfc15f3
+  checksum: 10c0/b3df31fd612eef7c939c9ee593cb14cbe81f14ba883bffacff54a046d2fcf4a352f64f99e0337bc1521918a5bde2cb3d04f36e00f83ebcd9beac9edcd42360f6
   languageName: node
   linkType: hard
 
@@ -581,6 +581,29 @@ __metadata:
     mariadb:
       optional: true
   checksum: 10c0/5f0f14bf4a6a323fe021e4084b55f1371b9d51aa80971b7c30e4cf831e873eabf92b139162d8fb4dc45311a803836bdcbb483960ce84e25acd14b8831606f49f
+  languageName: node
+  linkType: hard
+
+"@mikro-orm/knex@npm:6.4.14":
+  version: 6.4.14
+  resolution: "@mikro-orm/knex@npm:6.4.14"
+  dependencies:
+    fs-extra: "npm:11.3.0"
+    knex: "npm:3.1.0"
+    sqlstring: "npm:2.3.3"
+  peerDependencies:
+    "@mikro-orm/core": ^6.0.0
+    better-sqlite3: "*"
+    libsql: "*"
+    mariadb: "*"
+  peerDependenciesMeta:
+    better-sqlite3:
+      optional: true
+    libsql:
+      optional: true
+    mariadb:
+      optional: true
+  checksum: 10c0/a4f1f0b73918e2dbbbfb61af57192148e55cfebea4cd5741b70884624a24ef4a893f34335eda4fd7a2caf9018196e21fb0805c8403b6f4dbe840cc3a894c4806
   languageName: node
   linkType: hard
 
@@ -6942,7 +6965,7 @@ __metadata:
     "@commitlint/cli": "npm:^19.8.0"
     "@commitlint/config-conventional": "npm:^19.8.0"
     "@grammyjs/fluent": "npm:^1.0.3"
-    "@mikro-orm/better-sqlite": "npm:^6.4.13"
+    "@mikro-orm/better-sqlite": "npm:^6.4.14"
     "@mikro-orm/cli": "npm:^6.4.13"
     "@mikro-orm/core": "npm:^6.4.13"
     "@mikro-orm/migrations": "npm:^6.4.13"
