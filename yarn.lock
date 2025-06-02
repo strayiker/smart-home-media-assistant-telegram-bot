@@ -526,17 +526,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mikro-orm/better-sqlite@npm:^6.4.15":
-  version: 6.4.15
-  resolution: "@mikro-orm/better-sqlite@npm:6.4.15"
+"@mikro-orm/better-sqlite@npm:^6.4.16":
+  version: 6.4.16
+  resolution: "@mikro-orm/better-sqlite@npm:6.4.16"
   dependencies:
-    "@mikro-orm/knex": "npm:6.4.15"
+    "@mikro-orm/knex": "npm:6.4.16"
     better-sqlite3: "npm:11.10.0"
     fs-extra: "npm:11.3.0"
     sqlstring-sqlite: "npm:0.1.1"
   peerDependencies:
     "@mikro-orm/core": ^6.0.0
-  checksum: 10c0/32b41c0c24e405f09824a98de0c8981c6d8afd51acf5e10e35a41878d1dafe0c51cc9dbdca50f8be87b2ff51a4d4d0aacc32a0f414dbc9f121d7685d3f9d5095
+  checksum: 10c0/acffb82b2032d18a37b454725e3139cd1c32b45d0379b6888360d6a07fa120671508313ff191c79616a6995dad238f3e49b3da0b62e5521e9cf56e449ad89b85
   languageName: node
   linkType: hard
 
@@ -595,9 +595,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mikro-orm/knex@npm:6.4.15":
-  version: 6.4.15
-  resolution: "@mikro-orm/knex@npm:6.4.15"
+"@mikro-orm/knex@npm:6.4.16":
+  version: 6.4.16
+  resolution: "@mikro-orm/knex@npm:6.4.16"
   dependencies:
     fs-extra: "npm:11.3.0"
     knex: "npm:3.1.0"
@@ -614,7 +614,7 @@ __metadata:
       optional: true
     mariadb:
       optional: true
-  checksum: 10c0/34cba3f6f69e80abe315abeca158abc8b5f3af637c1c262372b14a53386dae601f046392c94198011f577d074202823370789976ec51792750b4761706d2c18b
+  checksum: 10c0/b0584fe3bd79b131512712ec9e31a1b76e272dcff519d5607daebfd5b3dd856116d9aae836c86baa006abc58e0331926aa3bd4ef4bba1a7ced4781d8c6fd3d21
   languageName: node
   linkType: hard
 
@@ -6983,7 +6983,7 @@ __metadata:
     "@commitlint/cli": "npm:^19.8.0"
     "@commitlint/config-conventional": "npm:^19.8.0"
     "@grammyjs/fluent": "npm:^1.0.3"
-    "@mikro-orm/better-sqlite": "npm:^6.4.15"
+    "@mikro-orm/better-sqlite": "npm:^6.4.16"
     "@mikro-orm/cli": "npm:^6.4.13"
     "@mikro-orm/core": "npm:^6.4.13"
     "@mikro-orm/migrations": "npm:^6.4.13"
