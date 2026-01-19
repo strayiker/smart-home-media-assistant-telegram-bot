@@ -165,19 +165,17 @@ ensure_root_deps_debian() {
 
 ensure_docker() {
   if command -v docker >/dev/null 2>&1; then
-    sudo systemctl enable --now docker >/dev/null 2>&1 || true
+    echo "✔ Docker is already installed, skipping..."
+    return
+  fi
+
+  echo "✔ Docker is already installed, skipping..."
     return
   fi
 
   echo "Installing Docker (apt: docker.io + compose)..."
   sudo apt-get -qq install -y --no-install-recommends docker.io
   sudo systemctl enable --now docker
-
-  if ! command -v docker-compose >/dev/null 2>&1; then
-    # On some Debian/Ubuntu versions compose plugin package name differs; keep it simple.
-    sudo apt-get -qq install -y --no-install-recommends docker-compose || true
-  fi
-}
 
 ensure_user_in_docker_group() {
   if groups "$USER" | grep -q "\bdocker\b"; then
@@ -190,6 +188,7 @@ ensure_user_in_docker_group() {
 
 install_qbittorrent_nox() {
   if command -v qbittorrent-nox >/dev/null 2>&1; then
+    echo "✔ qbittorrent-nox is already installed, skipping..."
     return
   fi
 
@@ -200,13 +199,18 @@ install_qbittorrent_nox() {
 install_qbittorrent_service() {
   # Add host.docker.internal to /etc/hosts on Debian/Ubuntu
   if [[ -f /etc/debian_version ]]; then
-    echo "Adding host.docker.internal to /etc/hosts..."
-    sudo tee -a /etc/hosts <<< "127.0.0.1 host.docker.internal"
+    if grep -q "host.docker.internal" /etc/hosts 2>/dev/null; then
+      echo "✔ host.docker.internal already exists in /etc/hosts, skipping..."
+    else
+      echo "Adding host.docker.internal to /etc/hosts..."
+      sudo tee -a /etc/hosts <<< "127.0.0.1 host.docker.internal"
+    fi
   fi
   local unit_path=/etc/systemd/system/qbittorrent-nox.service
   local user="$USER"
 
   if [[ -f "$unit_path" ]]; then
+    echo "✔ qBittorrent systemd unit already exists, skipping..."
     return
   fi
 
