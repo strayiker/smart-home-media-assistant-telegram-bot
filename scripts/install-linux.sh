@@ -199,7 +199,7 @@ install_qbittorrent_nox() {
 
 install_qbittorrent_service() {
   # Add host.docker.internal to /etc/hosts on Debian/Ubuntu
-  if [[ "$OS" == "Linux" ]] && [[ -f /etc/debian_version ]]; then
+  if [[ -f /etc/debian_version ]]; then
     echo "Adding host.docker.internal to /etc/hosts..."
     sudo tee -a /etc/hosts <<< "127.0.0.1 host.docker.internal"
   fi
