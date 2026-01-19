@@ -154,10 +154,12 @@ ensure_root_deps_debian() {
   sudo apt-get -qq update
 
   # Install only required packages
+  sudo apt-get -qq install -y --no-install-recommends curl sqlite3 jq
+
   require_cmd curl
   require_cmd sqlite3
   require_cmd jq
-  require_cmd systemd
+  require_cmd systemctl
 }
 
 ensure_docker() {
@@ -166,13 +168,10 @@ ensure_docker() {
     return
   fi
 
-  echo "✔ Docker is already installed, skipping..."
-    return
-  fi
-
   echo "Installing Docker (apt: docker.io + compose)..."
   sudo apt-get -qq install -y --no-install-recommends docker.io
   sudo systemctl enable --now docker
+}
 
 ensure_user_in_docker_group() {
   if groups "$USER" | grep -q "\bdocker\b"; then
