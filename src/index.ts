@@ -32,6 +32,7 @@ import { logger } from './logger.js';
 import { orm } from './orm.js';
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
 import { RutrackerSearchEngine } from './searchEngines/RutrackerSearchEngine.js';
+import { ChatSettingsRepository } from './utils/ChatSettingsRepository.js';
 import { CookieStorage } from './utils/CookieStorage.js';
 
 const bot = new Bot<MyContext>(botToken, {
@@ -50,9 +51,11 @@ const qBittorrent = new QBittorrentClient({
   savePath: qbtSavePath,
 });
 const authComposer = new AuthComposer(orm.em.fork(), secretKey);
+const chatSettingsRepository = new ChatSettingsRepository(orm.em.fork());
 const torrentsComposer = new TorrentsComposer({
   bot,
   dataPath: botDataTorrentsPath,
+  em: orm.em.fork(),
   searchEngines: [
     new RutrackerSearchEngine({
       username: rutrackerUsername,
@@ -71,6 +74,17 @@ bot.use(
     storage: new MemorySessionStorage<SessionData>(),
   }),
 );
+bot.use(async (ctx, next) => {
+  const locale = ctx.from?.language_code;
+  if (locale && ctx.chatId !== undefined) {
+    try {
+      await chatSettingsRepository.upsertLocale(ctx.chatId, locale);
+    } catch (error) {
+      logger.warn(error, 'Failed to persist chat locale');
+    }
+  }
+  await next();
+});
 bot.use(
   useFluent({
     fluent,

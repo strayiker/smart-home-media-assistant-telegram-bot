@@ -43,3 +43,27 @@ torrent-file-will-be-compressed = will be compressed
 torrent-file-too-big = File is too big!
 torrent-file-error = Error occurred while sending file
 torrent-file-empty = File not found
+
+torrents-list-title = 📋 Your torrents (page {$page}/{$totalPages}):
+torrents-list-empty = You have no added torrents.
+torrents-list-empty-hint = Use search to add torrents.
+torrents-list-error = Error occurred while retrieving torrents list.
+
+torrents-item-completed =
+    <b>{$title}</b>
+    Progress: {$progress} ✅
+    Size: {$size}
+torrents-item-downloading =
+    <b>{$title}</b>
+    Progress: {$progress} ⏳
+    Speed: {$speed}
+    ETA: {$eta}
+
+torrents-btn-files = 📁 Files
+torrents-btn-remove = 🗑 Remove
+torrents-btn-refresh = 🔄
+torrents-btn-prev = ⬅️
+torrents-btn-next = ➡️
+
+torrents-removed-success = ✅ Torrent removed
+torrents-removed-error = ❌ Failed to remove torrent

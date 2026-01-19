@@ -1,0 +1,17 @@
+[Unit]
+Description=Smart Home Media Assistant Telegram Bot
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory={{INSTALL_DIR}}
+Environment=TAIL_LOGS=0
+ExecStart={{INSTALL_DIR}}/start.sh
+ExecStop={{INSTALL_DIR}}/stop.sh
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

@@ -1,3 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-tmpfile=$(mktemp) && curl -sSL https://raw.githubusercontent.com/strayiker/smart-home-media-assistant-telegram-bot/refs/heads/main/scripts/setup.sh -o $tmpfile && chmod +x $tmpfile && bash -i $tmpfile && rm $tmpfile
+REPO_RAW_URL_DEFAULT="https://raw.githubusercontent.com/strayiker/smart-home-media-assistant-telegram-bot/refs/heads/main"
+REPO_RAW_URL="${REPO_RAW_URL:-$REPO_RAW_URL_DEFAULT}"
+
+INSTALL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+tmpfile=$(mktemp)
+curl -fsSL "$REPO_RAW_URL/scripts/install-linux.sh" -o "$tmpfile"
+chmod +x "$tmpfile"
+
+INSTALL_DIR="$INSTALL_DIR" REPO_RAW_URL="$REPO_RAW_URL" bash "$tmpfile"
+
+rm -f "$tmpfile"

@@ -15,20 +15,49 @@ if [[ "$OS" =~ ^(CYGWIN|MINGW|MSYS) ]]; then
     BOT_API_ENV_FILE=$(cygpath -w "$BOT_API_ENV_FILE")
 fi
 
-{{CONTAINER_TOOL}} run -d \
+ensure_container_running() {
+    local name="$1"
+    shift
+
+    if docker container inspect "$name" >/dev/null 2>&1; then
+        docker start "$name" >/dev/null
+    else
+        docker run -d --name "$name" "$@"
+    fi
+}
+
+ensure_container_running smart-home-media-assistant-telegram-bot-api \
     -p 8081:8081 \
     --env-file $BOT_API_ENV_FILE \
     --restart unless-stopped \
-    --name smart-home-media-assistant-telegram-bot-api \
     aiogram/telegram-bot-api:latest
 
-{{CONTAINER_TOOL}} run -d \
-    -v $BOT_DATA_DIR:/data/bot \
-    -v {{SAVE_PATH}}:/data/torrents \
-    --env-file $BOT_ENV_FILE \
-    --network host \
-    --restart unless-stopped \
-    --name smart-home-media-assistant-telegram-bot \
-    ghcr.io/strayiker/smart-home-media-assistant-telegram-bot:$VERSION
+BOT_IMAGE_TAG=""
+if docker container inspect smart-home-media-assistant-telegram-bot >/dev/null 2>&1; then
+    BOT_IMAGE_TAG="(existing container)"
+else
+    VERSION=$(curl -fsSL https://raw.githubusercontent.com/strayiker/smart-home-media-assistant-telegram-bot/refs/heads/main/package.json \
+    | sed -nE 's/.*"version": "([^"]+)".*/\1/p' \
+    | head -n1 \
+    || true)
 
-{{CONTAINER_TOOL}} logs -f smart-home-media-assistant-telegram-bot
+  if [[ -z "$VERSION" ]]; then
+    VERSION="latest"
+    echo "WARN: Failed to detect bot version; falling back to :$VERSION" >&2
+  fi
+
+  BOT_IMAGE_TAG=":$VERSION"
+fi
+
+ensure_container_running smart-home-media-assistant-telegram-bot \
+    -v $BOT_DATA_DIR:/data/bot \
+    -v /srv/torrents:/data/torrents \
+    --env-file $BOT_ENV_FILE \
+    --add-host=host.docker.internal:host-gateway \
+    --restart unless-stopped \
+    ghcr.io/strayiker/smart-home-media-assistant-telegram-bot$BOT_IMAGE_TAG
+
+TAIL_LOGS=${TAIL_LOGS:-1}
+if [[ "$TAIL_LOGS" == "1" ]] && [[ -t 1 ]]; then
+    docker logs -f smart-home-media-assistant-telegram-bot
+fi

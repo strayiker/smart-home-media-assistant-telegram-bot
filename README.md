@@ -37,7 +37,7 @@ This `Bot` will not help you overcome the restrictions associated with blocking 
 Open your terminal and run the following command:
 
 ```bash
-tmpfile=$(mktemp) && curl -sSL https://raw.githubusercontent.com/strayiker/smart-home-media-assistant-telegram-bot/refs/heads/main/scripts/setup.sh -o $tmpfile && chmod +x $tmpfile && bash -i $tmpfile && rm $tmpfile
+tmpfile=$(mktemp) && curl -fsSL https://raw.githubusercontent.com/strayiker/smart-home-media-assistant-telegram-bot/refs/heads/main/scripts/install-linux.sh -o $tmpfile && chmod +x $tmpfile && bash $tmpfile && rm $tmpfile
 ```
 
 It will ask you for some necessary information, so don't go too far.

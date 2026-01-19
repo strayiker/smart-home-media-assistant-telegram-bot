@@ -1,26 +1,37 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import type { EntityManager } from '@mikro-orm/core';
 import { fileTypeFromFile, type FileTypeResult } from 'file-type';
 import ffmpeg, { type FfprobeData } from 'fluent-ffmpeg';
-import { type Bot, Composer, type Filter, GrammyError } from 'grammy';
+import {
+  type Bot,
+  Composer,
+  type Filter,
+  GrammyError,
+  InlineKeyboard,
+} from 'grammy';
 import { InputFile, type Message } from 'grammy/types';
 import { tmpNameSync } from 'tmp';
 
-import { type MyContext } from '../Context.js';
+import type { MyContext } from '../Context.js';
+import type { TorrentMeta } from '../entities/TorrentMeta.js';
 import { fluent } from '../fluent.js';
-import { type QBFile, type QBTorrent } from '../qBittorrent/models.js';
-import { type QBittorrentClient } from '../qBittorrent/QBittorrentClient.js';
-import {
-  type SearchEngine,
-  type SearchResult,
+import type { QBFile, QBTorrent } from '../qBittorrent/models.js';
+import type { QBittorrentClient } from '../qBittorrent/QBittorrentClient.js';
+import type {
+  SearchEngine,
+  SearchResult,
 } from '../searchEngines/SearchEngine.js';
+import { ChatSettingsRepository } from '../utils/ChatSettingsRepository.js';
 import { formatBytes } from '../utils/formatBytes.js';
 import { formatDuration } from '../utils/formatDuration.js';
-import { type Logger } from '../utils/Logger.js';
+import type { Logger } from '../utils/Logger.js';
+import { TorrentMetaRepository } from '../utils/TorrentMetaRepository.js';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024;
 const MAX_FILE_SIZE_KB = 2 * 1000 * 1000;
+const PER_PAGE = 5;
 const MAX_VIDEO_BITRATE = [
   [360, 1200],
   [480, 1800],
@@ -43,6 +54,7 @@ export interface TorrentComposerOptions {
   searchEngines: SearchEngine[];
   qBittorrent: QBittorrentClient;
   logger: Logger;
+  em: EntityManager;
 }
 
 export class TorrentsComposer extends Composer<MyContext> {
@@ -54,6 +66,8 @@ export class TorrentsComposer extends Composer<MyContext> {
   private chatTorrents = new Map<number, Set<string>>();
   private timeout: NodeJS.Timeout;
   private logger: Logger;
+  private torrentMetaRepository: TorrentMetaRepository;
+  private chatSettingsRepository: ChatSettingsRepository;
 
   constructor(options: TorrentComposerOptions) {
     super();
@@ -63,6 +77,8 @@ export class TorrentsComposer extends Composer<MyContext> {
     this.searchEngines = options.searchEngines;
     this.qBittorrent = options.qBittorrent;
     this.logger = options.logger;
+    this.torrentMetaRepository = new TorrentMetaRepository(options.em);
+    this.chatSettingsRepository = new ChatSettingsRepository(options.em);
 
     this.timeout = setInterval(() => {
       this.createOrUpdateTorrentsMessages();
@@ -73,12 +89,89 @@ export class TorrentsComposer extends Composer<MyContext> {
         await this.handleDownloadFileCommand(ctx);
       } else if (ctx.message.text?.startsWith('/dl_')) {
         await this.handleDownloadCommand(ctx);
+      } else if (ctx.message.text?.startsWith('/torrents')) {
+        await this.handleTorrentsListCommand(ctx);
       } else if (ctx.message.text?.startsWith('/rm_')) {
         await this.handleRemoveCommand(ctx);
       } else if (ctx.message.text?.startsWith('/ls_')) {
         await this.handleListFilesCommand(ctx);
       } else {
         return next();
+      }
+    });
+
+    this.on('callback_query:data', async (ctx, next) => {
+      const data = ctx.callbackQuery.data;
+      if (!data.startsWith('torrents:')) {
+        return next();
+      }
+
+      const parsed = this.parseTorrentsCallback(data);
+
+      if (!parsed || ctx.chatId === undefined) {
+        await ctx.answerCallbackQuery();
+        return;
+      }
+
+      const locale = await this.chatSettingsRepository.getLocale(ctx.chatId);
+      const t = fluent.withLocale(locale);
+
+      switch (parsed.action) {
+        case 'page':
+        case 'refresh': {
+          try {
+            const { text, keyboard } = await this.buildTorrentsList(
+              ctx.chatId,
+              parsed.page,
+            );
+            await ctx.editMessageText(text, {
+              parse_mode: 'HTML',
+              reply_markup: keyboard,
+            });
+          } catch (error) {
+            this.logger.error(error, 'Failed to refresh torrents list');
+            await ctx.editMessageText(t('torrents-list-error'));
+          }
+          await ctx.answerCallbackQuery();
+          return;
+        }
+        case 'files': {
+          await ctx.answerCallbackQuery();
+          await this.sendTorrentFilesByUid(ctx, parsed.uid);
+          return;
+        }
+        case 'remove': {
+          try {
+            await this.removeTorrentByUid(parsed.uid);
+            await ctx.answerCallbackQuery({
+              text: t('torrents-removed-success'),
+            });
+          } catch (error) {
+            this.logger.error(error, 'Failed to remove torrent');
+            await ctx.answerCallbackQuery({
+              text: t('torrents-removed-error'),
+              show_alert: false,
+            });
+          }
+
+          try {
+            const { text, keyboard } = await this.buildTorrentsList(
+              ctx.chatId,
+              parsed.page,
+            );
+            await ctx.editMessageText(text, {
+              parse_mode: 'HTML',
+              reply_markup: keyboard,
+            });
+          } catch (error) {
+            this.logger.error(error, 'Failed to update torrents list');
+          }
+          return;
+        }
+        default: {
+          await ctx.answerCallbackQuery();
+          return;
+        }
       }
     });
 
@@ -151,13 +244,26 @@ export class TorrentsComposer extends Composer<MyContext> {
     let hash: string;
 
     try {
-      const uidTag = `uid_${uid}`;
-      const i18nTag = `i18n_${ctx.chatId}_${ctx.from.language_code ?? 'en'}`;
-      hash = await this.addTorrent({
-        torrent,
-        tags: [uidTag, i18nTag],
-      });
+      hash = await this.addTorrent(torrent);
     } catch {
+      return ctx.reply(ctx.t('torrent-download-error'));
+    }
+
+    try {
+      await this.torrentMetaRepository.create({
+        hash,
+        uid,
+        chatId: ctx.chatId,
+        searchEngine: se.name,
+        trackerId: id,
+      });
+    } catch (error) {
+      this.logger.error(error, 'Failed to persist torrent metadata');
+      try {
+        await this.deleteTorrent(hash);
+      } catch (deleteError) {
+        this.logger.error(deleteError, 'Failed to rollback torrent creation');
+      }
       return ctx.reply(ctx.t('torrent-download-error'));
     }
 
@@ -186,13 +292,7 @@ export class TorrentsComposer extends Composer<MyContext> {
     let hash: string;
 
     try {
-      ({ hash } = await this.getTorrentByUid(uid));
-    } catch {
-      return ctx.reply(ctx.t('torrent-remove-error'));
-    }
-
-    try {
-      await this.deleteTorrent(hash);
+      hash = await this.removeTorrentByUid(uid);
     } catch {
       return ctx.reply(ctx.t('torrent-remove-error'));
     }
@@ -211,39 +311,25 @@ export class TorrentsComposer extends Composer<MyContext> {
 
     const uid = ctx.message.text.replace('/ls_', '');
 
-    let hash: string;
+    await this.sendTorrentFilesByUid(ctx, uid);
+  }
 
-    try {
-      ({ hash } = await this.getTorrentByUid(uid));
-    } catch (error) {
-      console.log(error);
-      return ctx.reply(ctx.t('torrent-files-error'));
+  private async handleTorrentsListCommand(
+    ctx: Filter<MyContext, 'message::bot_command'>,
+  ) {
+    if (ctx.chatId === undefined) {
+      return;
     }
 
-    let files: QBFile[];
-
     try {
-      files = await this.getTorrentFiles(hash);
-    } catch (error) {
-      console.log(error);
-      return ctx.reply(ctx.t('torrent-files-error'));
-    }
-
-    if (files.length === 0) {
-      return ctx.reply(ctx.t('torrent-files-empty'));
-    }
-
-    const texts = await Promise.all(
-      files.map((file) => this.formatTorrentFile(ctx, uid, file)),
-    );
-    const text = texts.join('\n');
-
-    try {
+      const { text, keyboard } = await this.buildTorrentsList(ctx.chatId, 1);
       await ctx.reply(text, {
         parse_mode: 'HTML',
+        reply_markup: keyboard,
       });
     } catch (error) {
-      this.logger.error(error, 'An error occured while sending torrent files');
+      this.logger.error(error, 'Failed to build torrents list');
+      await ctx.reply(ctx.t('torrents-list-error'));
     }
   }
 
@@ -414,6 +500,186 @@ export class TorrentsComposer extends Composer<MyContext> {
     }
   }
 
+  private async sendTorrentFilesByUid(ctx: MyContext, uid: string) {
+    let hash: string;
+
+    try {
+      ({ hash } = await this.getTorrentByUid(uid));
+    } catch (error) {
+      this.logger.error(error, 'Failed to resolve torrent uid');
+      return ctx.reply(ctx.t('torrent-files-error'));
+    }
+
+    let files: QBFile[];
+
+    try {
+      files = await this.getTorrentFiles(hash);
+    } catch (error) {
+      this.logger.error(error, 'Failed to get torrent files');
+      return ctx.reply(ctx.t('torrent-files-error'));
+    }
+
+    if (files.length === 0) {
+      return ctx.reply(ctx.t('torrent-files-empty'));
+    }
+
+    const texts = await Promise.all(
+      files.map((file) => this.formatTorrentFile(ctx, uid, file)),
+    );
+    const text = texts.join('\n');
+
+    try {
+      await ctx.reply(text, {
+        parse_mode: 'HTML',
+      });
+    } catch (error) {
+      this.logger.error(error, 'An error occured while sending torrent files');
+    }
+  }
+
+  private async removeTorrentByUid(uid: string) {
+    const { hash } = await this.getTorrentByUid(uid);
+    await this.deleteTorrent(hash);
+    return hash;
+  }
+
+  private parseTorrentsCallback(data: string) {
+    const parts = data.split(':');
+    if (parts.length < 3 || parts[0] !== 'torrents') {
+      return;
+    }
+
+    const action = parts[1];
+
+    if (action === 'page' || action === 'refresh') {
+      const page = Number(parts[2]);
+      if (Number.isNaN(page)) {
+        return;
+      }
+      return { action, page } as const;
+    }
+
+    if (action === 'files' || action === 'remove') {
+      const uid = parts[2];
+      const page = Number(parts[3] ?? '1');
+      if (!uid || Number.isNaN(page)) {
+        return;
+      }
+      return { action, page, uid } as const;
+    }
+
+    return;
+  }
+
+  private async buildTorrentsList(chatId: number, page: number) {
+    const locale = await this.chatSettingsRepository.getLocale(chatId);
+    const t = fluent.withLocale(locale);
+
+    const metas = await this.torrentMetaRepository.getByChatId(chatId);
+
+    if (metas.length === 0) {
+      const keyboard = new InlineKeyboard().text(
+        t('torrents-btn-refresh'),
+        'torrents:refresh:1',
+      );
+      return {
+        text: `${t('torrents-list-empty')}\n${t('torrents-list-empty-hint')}`,
+        keyboard,
+      };
+    }
+
+    const totalPages = Math.max(1, Math.ceil(metas.length / PER_PAGE));
+    const safePage = Math.min(Math.max(page, 1), totalPages);
+    const pageMetas = metas.slice(
+      (safePage - 1) * PER_PAGE,
+      safePage * PER_PAGE,
+    );
+
+    const hashes = pageMetas.map((meta) => meta.hash);
+    const torrents = await this.getTorrents(hashes);
+    const torrentByHash = new Map(
+      torrents.map((torrent) => [torrent.hash, torrent] as const),
+    );
+
+    const items: string[] = [];
+    const keyboard = new InlineKeyboard();
+
+    for (const meta of pageMetas) {
+      const torrent = torrentByHash.get(meta.hash);
+      if (!torrent) {
+        continue;
+      }
+
+      const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
+      const eta =
+        torrent.eta >= 8_640_000 ? '∞' : formatDuration(torrent.eta, locale);
+
+      if (torrent.progress < 1) {
+        items.push(
+          t('torrents-item-downloading', {
+            title: torrent.name,
+            progress,
+            speed: `${formatBytes(torrent.dlspeed)}/s`,
+            eta,
+          }),
+        );
+        keyboard
+          .text(
+            t('torrents-btn-remove'),
+            `torrents:remove:${meta.uid}:${safePage}`,
+          )
+          .row();
+      } else {
+        items.push(
+          t('torrents-item-completed', {
+            title: torrent.name,
+            progress,
+            size: formatBytes(torrent.size),
+          }),
+        );
+        keyboard
+          .text(
+            t('torrents-btn-files'),
+            `torrents:files:${meta.uid}:${safePage}`,
+          )
+          .text(
+            t('torrents-btn-remove'),
+            `torrents:remove:${meta.uid}:${safePage}`,
+          )
+          .row();
+      }
+    }
+
+    if (items.length === 0) {
+      const emptyKeyboard = new InlineKeyboard().text(
+        t('torrents-btn-refresh'),
+        `torrents:refresh:${safePage}`,
+      );
+      return {
+        text: `${t('torrents-list-empty')}\n${t('torrents-list-empty-hint')}`,
+        keyboard: emptyKeyboard,
+      };
+    }
+
+    if (totalPages > 1) {
+      if (safePage > 1) {
+        keyboard.text(t('torrents-btn-prev'), `torrents:page:${safePage - 1}`);
+      }
+      keyboard.text(t('torrents-btn-refresh'), `torrents:refresh:${safePage}`);
+      if (safePage < totalPages) {
+        keyboard.text(t('torrents-btn-next'), `torrents:page:${safePage + 1}`);
+      }
+      keyboard.row();
+    } else {
+      keyboard.text(t('torrents-btn-refresh'), `torrents:refresh:${safePage}`);
+    }
+
+    return {
+      text: `${t('torrents-list-title', { page: safePage, totalPages })}\n\n${items.join('\n\n')}`,
+      keyboard,
+    };
+  }
+
   private async searchTorrents(query: string) {
     try {
       const promises = this.searchEngines.map(async (se) => {
@@ -428,17 +694,10 @@ export class TorrentsComposer extends Composer<MyContext> {
     }
   }
 
-  private async addTorrent({
-    torrent,
-    tags,
-  }: {
-    torrent: string;
-    tags: string[];
-  }) {
+  private async addTorrent(torrent: string) {
     try {
       const [hash] = await this.qBittorrent.addTorrents({
         torrents: [torrent],
-        tags,
       });
       return hash;
     } catch (error) {
@@ -458,12 +717,16 @@ export class TorrentsComposer extends Composer<MyContext> {
 
   private async getTorrentByUid(uid: string) {
     try {
-      const [torrent] = await this.qBittorrent.getTorrents({
-        tag: `uid_${uid}`,
-      });
-      return torrent;
+      const meta = await this.torrentMetaRepository.getByUid(uid);
+      if (!meta) {
+        throw new Error(`Torrent metadata not found for uid: ${uid}`);
+      }
+      return meta;
     } catch (error) {
-      this.logger.error(error, 'An error occured while fetching torrents');
+      this.logger.error(
+        error,
+        'An error occured while fetching torrent metadata',
+      );
       throw error;
     }
   }
@@ -483,6 +746,7 @@ export class TorrentsComposer extends Composer<MyContext> {
   private async deleteTorrent(hash: string) {
     try {
       await this.qBittorrent.deleteTorrents([hash], true);
+      await this.torrentMetaRepository.removeByHash(hash);
     } catch (error) {
       this.logger.error(error, 'An error occured while fetching torrents');
       throw error;
@@ -570,6 +834,19 @@ export class TorrentsComposer extends Composer<MyContext> {
     const completedTorrents: QBTorrent[] = [];
     const pendingTorrents: QBTorrent[] = [];
 
+    let metaByHash = new Map<string, TorrentMeta>();
+    try {
+      const metas = await this.torrentMetaRepository.getByHashes(
+        torrents.map((torrent) => torrent.hash),
+      );
+      metaByHash = new Map(metas.map((meta) => [meta.hash, meta]));
+    } catch (error) {
+      this.logger.error(
+        error,
+        'An error occured while fetching torrent metadata',
+      );
+    }
+
     for (const torrent of torrents) {
       if (torrent.progress < 1) {
         pendingTorrents.push(torrent);
@@ -578,6 +855,7 @@ export class TorrentsComposer extends Composer<MyContext> {
       }
     }
 
+    const locale = await this.chatSettingsRepository.getLocale(chatId);
     let message = this.chatMessages.get(chatId);
 
     if (
@@ -590,7 +868,9 @@ export class TorrentsComposer extends Composer<MyContext> {
 
     if (completedTorrents.length > 0) {
       const text = completedTorrents
-        .map((torrent) => this.formatTorrent(chatId, torrent))
+        .map((torrent) =>
+          this.formatTorrent(torrent, metaByHash.get(torrent.hash), locale),
+        )
         .join('\n');
 
       try {
@@ -610,7 +890,9 @@ export class TorrentsComposer extends Composer<MyContext> {
       this.chatTorrents.set(chatId, new Set(hashes));
 
       const text = pendingTorrents
-        .map((torrent) => this.formatTorrent(chatId, torrent))
+        .map((torrent) =>
+          this.formatTorrent(torrent, metaByHash.get(torrent.hash), locale),
+        )
         .join('\n');
 
       await (message
@@ -651,19 +933,18 @@ export class TorrentsComposer extends Composer<MyContext> {
     });
   }
 
-  private formatTorrent(chatId: number, torrent: QBTorrent) {
-    const tagPrefixI18n = `i18n_${chatId}_`;
-    const tagPrefixUid = 'uid_';
-    const tagI18n = torrent.tags.find((tag) => tag.startsWith(tagPrefixI18n));
-    const tagUid = torrent.tags.find((tag) => tag.startsWith(tagPrefixUid));
-    const locale = tagI18n?.replace(tagPrefixI18n, '') ?? 'en';
-    const uid = tagUid?.replace(tagPrefixUid, '');
+  private formatTorrent(
+    torrent: QBTorrent,
+    meta: TorrentMeta | undefined,
+    locale: string,
+  ) {
+    const uid = meta?.uid;
     const speed = `${formatBytes(torrent.dlspeed)}/s`;
     const eta =
       torrent.eta >= 8_640_000 ? '∞' : formatDuration(torrent.eta, locale);
     const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
-    const files = `/ls_${uid}`;
-    const remove = `/rm_${uid}`;
+    const files = uid ? `/ls_${uid}` : '—';
+    const remove = uid ? `/rm_${uid}` : '—';
 
     const t = fluent.withLocale(locale);
 

@@ -43,3 +43,27 @@ torrent-file-will-be-compressed = будет сжат
 torrent-file-too-big = Файл слишком большой!
 torrent-file-error = Произошла ошибка при отправке файла
 torrent-file-empty = Файл не найден
+
+torrents-list-title = 📋 Ваши торренты (страница {$page}/{$totalPages}):
+torrents-list-empty = У вас нет добавленных торрентов.
+torrents-list-empty-hint = Используйте поиск для добавления торрентов.
+torrents-list-error = Произошла ошибка при получении списка торрентов.
+
+torrents-item-completed =
+    <b>{$title}</b>
+    Прогресс: {$progress} ✅
+    Размер: {$size}
+torrents-item-downloading =
+    <b>{$title}</b>
+    Прогресс: {$progress} ⏳
+    Скорость: {$speed}
+    Оставшееся время: {$eta}
+
+torrents-btn-files = 📁 Файлы
+torrents-btn-remove = 🗑 Удалить
+torrents-btn-refresh = 🔄
+torrents-btn-prev = ⬅️
+torrents-btn-next = ➡️
+
+torrents-removed-success = ✅ Торрент удалён
+torrents-removed-error = ❌ Ошибка при удалении торрента

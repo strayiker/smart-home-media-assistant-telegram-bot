@@ -618,29 +618,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mikro-orm/knex@npm:6.4.16":
-  version: 6.4.16
-  resolution: "@mikro-orm/knex@npm:6.4.16"
-  dependencies:
-    fs-extra: "npm:11.3.0"
-    knex: "npm:3.1.0"
-    sqlstring: "npm:2.3.3"
-  peerDependencies:
-    "@mikro-orm/core": ^6.0.0
-    better-sqlite3: "*"
-    libsql: "*"
-    mariadb: "*"
-  peerDependenciesMeta:
-    better-sqlite3:
-      optional: true
-    libsql:
-      optional: true
-    mariadb:
-      optional: true
-  checksum: 10c0/b0584fe3bd79b131512712ec9e31a1b76e272dcff519d5607daebfd5b3dd856116d9aae836c86baa006abc58e0331926aa3bd4ef4bba1a7ced4781d8c6fd3d21
-  languageName: node
-  linkType: hard
-
 "@mikro-orm/migrations@npm:^6.4.16":
   version: 6.4.16
   resolution: "@mikro-orm/migrations@npm:6.4.16"
