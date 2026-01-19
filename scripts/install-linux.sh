@@ -152,15 +152,12 @@ ensure_root_deps_debian() {
   export TZ=Etc/UTC
 
   sudo apt-get -qq update
-  sudo apt-get -qq install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    openssl \
-    python3 \
-    sqlite3 \
-    jq \
-    systemd \
-    iproute2
+
+  # Install only required packages
+  require_cmd curl
+  require_cmd sqlite3
+  require_cmd jq
+  require_cmd systemd
 }
 
 ensure_docker() {
@@ -201,6 +198,8 @@ install_qbittorrent_service() {
   if [[ -f /etc/debian_version ]]; then
     if grep -q "host.docker.internal" /etc/hosts 2>/dev/null; then
       echo "✔ host.docker.internal already exists in /etc/hosts, skipping..."
+      # Remove duplicate entries, keep only the first one
+      grep -n "host.docker.internal" /etc/hosts | tail -n +2 | cut -d: -f1 | xargs -I {} sudo -i {}d /etc/hosts || true
     else
       echo "Adding host.docker.internal to /etc/hosts..."
       sudo tee -a /etc/hosts <<< "127.0.0.1 host.docker.internal"
