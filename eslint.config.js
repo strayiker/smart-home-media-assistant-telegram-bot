@@ -55,19 +55,5 @@ export default tslint.config(
   {
     ignores: ['**/dist/**', '**/types/**'],
   },
-  {
-    files: ['**/__tests__/**', '**/*.test.*', '**/*.spec.*'],
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      'unicorn/no-null': 'off',
-      '@typescript-eslint/no-unused-vars': [
-        'warn',
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-        },
-      ],
-    },
-  },
   
 );
