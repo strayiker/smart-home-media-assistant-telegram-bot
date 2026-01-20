@@ -5,6 +5,7 @@ import { loadConfig } from './config/env.schema.js';
 import type { FeatureFlagStore } from './domain/services/FeatureFlagService.js';
 import { FeatureFlagService } from './domain/services/FeatureFlagService.js';
 import { type FileService } from './domain/services/FileService.js';
+import { MediaService } from './domain/services/MediaService.js';
 import { type SearchService } from './domain/services/SearchService.js';
 import { type TorrentService } from './domain/services/TorrentService.js';
 import { InMemoryFeatureFlagStore } from './infrastructure/featureFlags/InMemoryFeatureFlagStore.js';
@@ -100,20 +101,26 @@ container.registerFactory('FileHandler', () => {
 });
 
 container.registerFactory('DownloadHandler', () => {
-  const fileSvc = container.resolve<FileService>('FileService');
   const torrentSvc = container.resolve<TorrentService>('TorrentService');
+  const mediaSvc = container.resolve<MediaService>('MediaService');
   const log = container.resolve<PinoLogger>('Logger');
   return new DownloadHandler({
-    fileService: fileSvc,
     torrentService: torrentSvc,
+    mediaService: mediaSvc,
+    dataPath: container.resolve<string>('BotDataPath'),
     logger: log,
   });
 });
 
-container.registerFactory('MediaHandler', () => {
-  const torrentSvc = container.resolve<TorrentService>('TorrentService');
+container.registerFactory('MediaService', () => {
   const log = container.resolve<PinoLogger>('Logger');
-  return new MediaHandler({ torrentService: torrentSvc, logger: log });
+  return new MediaService({ logger: log });
+});
+
+container.registerFactory('MediaHandler', () => {
+  const mediaSvc = container.resolve<MediaService>('MediaService');
+  const log = container.resolve<PinoLogger>('Logger');
+  return new MediaHandler({ mediaService: mediaSvc, logger: log });
 });
 
 // Feature flags (in-memory default)

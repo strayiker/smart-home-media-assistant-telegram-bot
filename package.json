@@ -7,6 +7,10 @@
   "type": "module",
   "main": "index.js",
   "packageManager": "yarn@4.5.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "yarn": ">=4.0.0"
+  },
   "scripts": {
     "dev": "NODE_ENV=development && node --loader ts-node/esm --enable-source-maps --no-warnings=ExperimentalWarning ./src/index.ts",
     "build": "rm -rf dist && tsc",

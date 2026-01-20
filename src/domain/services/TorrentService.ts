@@ -90,6 +90,60 @@ export class TorrentService {
     }
   }
 
+  async getTorrentsByHash(hashes: string[]): Promise<QBTorrent[]> {
+    try {
+      const torrentMap = new Map<string, QBTorrent>();
+      const torrents = await this.qbittorrent.getTorrents({ hashes });
+      for (const torrent of torrents) {
+        torrentMap.set(torrent.hash, torrent);
+      }
+      return hashes
+        .map((hash) => torrentMap.get(hash) as QBTorrent | undefined)
+        .filter((t): t is QBTorrent => t !== undefined);
+    } catch (error) {
+      this.logger.error(error, 'An error occurred while fetching torrents');
+      throw error;
+    }
+  }
+
+  async getTorrentListPage(
+    chatId: number,
+    page: number = 1,
+    itemsPerPage: number = 5,
+  ): Promise<{
+    torrents: QBTorrent[];
+    totalPages: number;
+    pageItems: QBTorrent[];
+  }> {
+    try {
+      const metas = await this.torrentMetaRepository.getByChatId(chatId);
+      if (metas.length === 0) {
+        return { torrents: [], totalPages: 1, pageItems: [] };
+      }
+
+      const totalPages = Math.max(1, Math.ceil(metas.length / itemsPerPage));
+      const safePage = Math.min(Math.max(page, 1), totalPages);
+      const offset = (safePage - 1) * itemsPerPage;
+
+      const pageMetas = metas.slice(offset, offset + itemsPerPage);
+      const hashes = pageMetas.map((meta) => meta.hash);
+      const torrents = await this.qbittorrent.getTorrents({ hashes });
+      const torrentMap = new Map(torrents.map((t) => [t.hash, t]));
+
+      const pageItems: QBTorrent[] = pageMetas
+        .map((meta) => torrentMap.get(meta.hash)!)
+        .filter((t): t is QBTorrent => t !== undefined);
+
+      return { torrents: pageItems, totalPages, pageItems };
+    } catch (error) {
+      this.logger.error(
+        error,
+        'An error occurred while fetching torrent list page',
+      );
+      throw error;
+    }
+  }
+
   async getTorrentByUid(uid: string) {
     try {
       const meta = await this.torrentMetaRepository.getByUid(uid);
@@ -124,7 +178,7 @@ export class TorrentService {
       await this.torrentMetaRepository.removeByHash(hash);
 
       this.logger.debug('A torrent was successfully deleted: %s', hash);
-      return ok<void>();
+      return ok<void>(undefined);
     } catch (error) {
       this.logger.error(error, 'An error occurred while deleting torrent');
       return err(
@@ -133,6 +187,53 @@ export class TorrentService {
           : new Error('Unknown error deleting torrent'),
       );
     }
+  }
+
+  async getTorrentMetasByChatId(chatId: number) {
+    return await this.torrentMetaRepository.getByChatId(chatId);
+  }
+
+  async getTorrentFilesByUid(uid: string): Promise<QBFile[]> {
+    const meta = await this.getTorrentByUid(uid);
+    return await this.qbittorrent.getTorrentFiles(meta.hash);
+  }
+
+  /**
+   * Format duration in human-readable format.
+   * Converts seconds to "Xh Ym" or "Ym" format.
+   */
+  formatDuration(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    return `${minutes}m`;
+  }
+
+  /**
+   * Format bytes in human-readable format (KB, MB, GB).
+   */
+  formatBytes(bytes: number): string {
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const size = Math.floor(Math.log(bytes) / Math.log(1024));
+    const value = bytes / Math.pow(1024, size);
+    return `${value.toFixed(1)} ${units[size]}`;
+  }
+
+  /**
+   * Format a torrent file item for display in the file list.
+   */
+  formatTorrentFileItem(ctx: any, uid: string, file: QBFile): string {
+    const dlCmd = `/dl_file_${uid}_${file.index}`;
+    const fileName = `<a href="${dlCmd}">${file.name}</a>`;
+    const fileSize = this.formatBytes(file.size);
+
+    return ctx.t('torrent-file-item', {
+      fileName,
+      fileSize,
+    });
   }
 
   async searchTorrents(

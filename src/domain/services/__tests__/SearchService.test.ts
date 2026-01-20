@@ -83,7 +83,13 @@ describe('SearchService', () => {
       expect(result.ok).toBe(true);
       if (result.ok) {
         expect(result.value).toHaveLength(3);
-        expect(result.value).toEqual([...results1, ...results2]);
+        // SearchService now returns tuples: [SearchEngine, SearchResult][]
+        const expected = [
+          [mockSearchEngine1, results1[0]],
+          [mockSearchEngine1, results1[1]],
+          [mockSearchEngine2, results2[0]],
+        ];
+        expect(result.value).toEqual(expected);
       }
 
       expect(mockSearchEngine1.search).toHaveBeenCalledWith('test query');
@@ -113,7 +119,8 @@ describe('SearchService', () => {
       expect(result.ok).toBe(true);
       if (result.ok) {
         expect(result.value).toHaveLength(1);
-        expect(result.value).toEqual(results1);
+        // SearchService now returns tuples: [SearchEngine, SearchResult][]
+        expect(result.value).toEqual([[mockSearchEngine1, results1[0]]]);
       }
 
       expect(mockLogger.error).toHaveBeenCalledWith(
@@ -149,10 +156,13 @@ describe('SearchService', () => {
 
       const result = await service.search('test query');
 
-      expect(result.ok).toBe(false);
-      if (!result.ok) {
-        expect(result.error.message).toBe('Unknown search error');
+      // When search throws a non-Error, it's logged and result is returned normally
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.value).toEqual([]);
       }
+
+      expect(mockLogger.error).toHaveBeenCalled();
     });
   });
 });

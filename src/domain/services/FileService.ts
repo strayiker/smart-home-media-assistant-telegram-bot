@@ -3,27 +3,20 @@ import path from 'node:path';
 import type { QBFile } from '../../qBittorrent/models.js';
 import type { QBittorrentClient } from '../../qBittorrent/QBittorrentClient.js';
 import { formatBytes } from '../../utils/formatBytes.js';
-import type { Logger } from '../../utils/Logger.js';
 import type { TorrentMetaRepository } from '../../utils/TorrentMetaRepository.js';
 
 export interface FileServiceOptions {
   qBittorrent: QBittorrentClient;
   torrentMetaRepository: TorrentMetaRepository;
-  dataPath: string;
-  logger: Logger;
 }
 
 export class FileService {
   private qBittorrent: QBittorrentClient;
   private torrentMetaRepository: TorrentMetaRepository;
-  private dataPath: string;
-  private logger: Logger;
 
   constructor(options: FileServiceOptions) {
     this.qBittorrent = options.qBittorrent;
     this.torrentMetaRepository = options.torrentMetaRepository;
-    this.dataPath = options.dataPath;
-    this.logger = options.logger;
   }
 
   private isVideo(filename?: string) {

@@ -23,14 +23,14 @@ export class SearchService {
     this.searchEngines = searchEngines;
   }
 
-  async search(query: string): Promise<ResultT<SearchResult[], Error>> {
+  async search(
+    query: string,
+  ): Promise<ResultT<(readonly [SearchEngine, SearchResult])[], Error>> {
     try {
-      const results: SearchResult[] = [];
-
       const promises = this.searchEngines.map(async (searchEngine) => {
         try {
           const engineResults = await searchEngine.search(query);
-          return engineResults;
+          return engineResults.map((result) => [searchEngine, result] as const);
         } catch (error) {
           this.logger.error(
             error,
@@ -42,6 +42,7 @@ export class SearchService {
       });
 
       const awaited = await Promise.all(promises);
+      const results: (readonly [SearchEngine, SearchResult])[] = [];
 
       for (const engineResults of awaited) {
         results.push(...engineResults);

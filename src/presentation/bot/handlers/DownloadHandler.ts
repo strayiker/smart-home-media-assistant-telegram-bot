@@ -1,25 +1,42 @@
-import { Composer } from 'grammy';
+import { Composer, InputFile } from 'grammy';
+import ffmpeg from 'fluent-ffmpeg';
+import path from 'node:path';
+import fs from 'node:fs';
+import tmp from 'tmp';
 
 import type { MyContext } from '../../../Context.js';
-import type { FileService } from '../../../domain/services/FileService.js';
 import type { TorrentService } from '../../../domain/services/TorrentService.js';
+import type { MediaService } from '../../../domain/services/MediaService.js';
 import type { Logger } from '../../../utils/Logger.js';
 
+const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2 GB
+const MAX_FILE_SIZE_KB = 2 * 1000 * 1000;
+const MAX_VIDEO_BITRATE = [
+  [480, 1500],
+  [720, 3000],
+  [1080, 6000],
+  [1440, 10000],
+  [2160, 20000],
+] as const;
+
 export interface DownloadHandlerOptions {
-  fileService: FileService;
   torrentService: TorrentService;
+  mediaService: MediaService;
+  dataPath: string;
   logger: Logger;
 }
 
 export class DownloadHandler extends Composer<MyContext> {
-  private fileService: FileService;
   private torrentService: TorrentService;
+  private mediaService: MediaService;
+  private dataPath: string;
   private logger: Logger;
 
   constructor(options: DownloadHandlerOptions) {
     super();
-    this.fileService = options.fileService;
     this.torrentService = options.torrentService;
+    this.mediaService = options.mediaService;
+    this.dataPath = options.dataPath;
     this.logger = options.logger;
 
     this.on('message::bot_command', async (ctx, next) => {
@@ -27,8 +44,9 @@ export class DownloadHandler extends Composer<MyContext> {
       if (ctx.message.text.startsWith('/dl_file_')) {
         return handleDownloadFileCommand(
           ctx,
-          this.fileService,
           this.torrentService,
+          this.mediaService,
+          this.dataPath,
           this.logger,
         );
       }
@@ -39,51 +57,195 @@ export class DownloadHandler extends Composer<MyContext> {
 
 export async function handleDownloadFileCommand(
   ctx: MyContext,
-  fileService: FileService,
   torrentService: TorrentService,
+  mediaService: MediaService,
+  dataPath: string,
   logger: Logger,
 ) {
   if (!ctx.message?.text) return;
-  const parts = ctx.message.text.split('_');
-  const uid = parts[2];
-  const index = Number(parts[3]);
-  if (!uid || Number.isNaN(index)) {
-    await ctx.reply(ctx.t('file-download-error'));
+
+  const [trackerName, id, fileIndex] = ctx.message.text
+    .replace('/dl_file_', '')
+    .split('_');
+  const uid = `${trackerName}_${id}`;
+
+  let hash: string;
+
+  try {
+    ({ hash } = await torrentService.getTorrentByUid(uid));
+  } catch (error) {
+    logger.error(error, 'Failed to resolve torrent uid');
+    await ctx.reply(ctx.t('torrent-file-error'));
     return;
   }
 
+  let qbFile: any;
+
   try {
-    // Verify torrent exists
-    const meta = await torrentService.getTorrentByUid(uid);
-    if (!meta) {
-      await ctx.reply(ctx.t('file-not-found'));
-      return;
-    }
-
-    const files = await torrentService.getTorrentFiles(meta.hash, [index]);
-    if (!files || files.length === 0) {
-      await ctx.reply(ctx.t('file-not-found'));
-      return;
-    }
-
-    const file = files[0];
-    // Simple policy: disallow huge non-video files
-    const isVideo =
-      file.name &&
-      ['mp4', 'mkv', 'avi'].includes(
-        file.name.split('.').pop()?.toLowerCase() || '',
-      );
-    if ((file.size ?? 0) > 2 * 1024 * 1024 * 1024 && !isVideo) {
-      await ctx.reply(ctx.t('file-too-big'));
-      return;
-    }
-
-    // For now reply that download is initiated; actual streaming endpoint is out of scope here
-    await ctx.reply(ctx.t('file-download-started'));
+    [qbFile] = await torrentService.getTorrentFiles(hash, [Number(fileIndex)]);
   } catch (error) {
-    logger.error(error, 'Failed to download file');
-    await ctx.reply(ctx.t('file-download-error'));
+    logger.error(error, 'Failed to get torrent files');
+    await ctx.reply(ctx.t('torrent-file-error'));
+    return;
   }
+
+  if (!qbFile) {
+    await ctx.reply(ctx.t('torrent-file-empty'));
+    return;
+  }
+
+  const filePath = path.resolve(path.join(dataPath, qbFile.name));
+
+  try {
+    const file = new InputFile(filePath);
+
+    const fileType = await mediaService.getFileType(filePath);
+    if (!fileType) {
+      await ctx.reply(ctx.t('torrent-file-error'));
+      return;
+    }
+
+    if (mediaService.isVideo(qbFile.name)) {
+      const metadata = await mediaService.getVideoMetadata(filePath);
+
+      if (!metadata) {
+        await ctx.reply(ctx.t('torrent-file-error'));
+        return;
+      }
+
+      const duration = metadata.format.duration;
+
+      if (!duration) {
+        await ctx.reply(ctx.t('torrent-file-error'));
+        return;
+      }
+
+      const videoStream = metadata.streams.find((stream) => {
+        return stream.codec_type === 'video';
+      });
+      const videoStreamHeight = videoStream?.height;
+      const videoStreamWidth = videoStream?.width;
+
+      const videoOptions: Parameters<typeof ctx.replyWithVideo>[1] = {
+        caption: path.basename(qbFile.name),
+        duration,
+      };
+
+      if (videoStreamHeight !== undefined) {
+        videoOptions.height = videoStreamHeight;
+      }
+      if (videoStreamWidth !== undefined) {
+        videoOptions.width = videoStreamWidth;
+      }
+
+      if (qbFile.size <= MAX_FILE_SIZE) {
+        await ctx.reply(ctx.t('torrent-file-uploading'));
+        await ctx.replyWithVideo(file, videoOptions);
+      } else {
+        await handleLargeVideoFile(
+          ctx,
+          filePath,
+          videoOptions,
+          duration,
+          videoStreamHeight ?? Infinity,
+          logger,
+        );
+      }
+    } else {
+      if (qbFile.size <= MAX_FILE_SIZE) {
+        await ctx.replyWithDocument(file);
+      } else {
+        await ctx.reply(ctx.t('torrent-file-too-big'));
+      }
+    }
+  } catch (error) {
+    logger.error(error, 'An error occurred while sending file');
+    await ctx.reply(ctx.t('torrent-file-error'));
+  }
+}
+
+async function handleLargeVideoFile(
+  ctx: MyContext,
+  filePath: string,
+  videoOptions: any,
+  duration: number,
+  videoStreamHeight: number,
+  logger: Logger,
+) {
+  const aBitrate = 192;
+  const vMaxBitrate = MAX_VIDEO_BITRATE.find(
+    ([height]) => height > videoStreamHeight,
+  )?.[1];
+  const vBitrate = Math.min(
+    Math.floor((MAX_FILE_SIZE_KB * 8) / duration - aBitrate),
+    vMaxBitrate ?? Infinity,
+  );
+
+  logger.debug('Duration: %s', duration);
+  logger.debug('Video bitrate: %s', vBitrate);
+  logger.debug('Audio bitrate: %s', aBitrate);
+
+  const tmpFile = tmp.tmpNameSync({ postfix: '.mp4' });
+
+  ffmpeg(filePath)
+    .outputOptions('-c:a', 'libfdk_aac')
+    .outputOptions('-c:v', 'libx264')
+    .outputOptions('-b:a', `${aBitrate}k`)
+    .outputOptions('-b:v', `${vBitrate}k`)
+    .outputOptions('-pix_fmt', 'yuv420p')
+    .outputOptions('-movflags', 'faststart')
+    .outputOptions('-tag:v', 'avc1')
+    .outputOptions('-map', '0:v:0')
+    .outputOptions('-map', '0:a:0')
+    .outputOptions('-preset', 'fast')
+    .outputFormat('mp4')
+    .on('start', (cmd) => {
+      logger.debug(cmd);
+    })
+    .on('progress', async (progress) => {
+      const text = ctx.t('torrent-file-compressing', {
+        progress: Math.round(progress.percent || 0),
+      });
+      if (text !== progressMessage.text) {
+        try {
+          await ctx.api.editMessageText(
+            progressMessage.chat.id,
+            progressMessage.message_id,
+            text,
+          );
+          progressMessage.text = text;
+        } catch {
+          /* empty */
+        }
+      }
+    })
+    .on('end', async () => {
+      try {
+        await ctx.api.editMessageText(
+          progressMessage.chat.id,
+          progressMessage.message_id,
+          ctx.t('torrent-file-uploading'),
+        );
+        await ctx.replyWithVideo(new InputFile(tmpFile), videoOptions);
+      } catch (error) {
+        logger.error(error, 'An error occurred while sending file');
+      } finally {
+        fs.rmSync(tmpFile, {
+          force: true,
+        });
+      }
+    })
+    .on('error', (error) => {
+      logger.error(error, 'An error occurred while sending file');
+      fs.rmSync(tmpFile, {
+        force: true,
+      });
+    })
+    .saveToFile(tmpFile);
+
+  const progressMessage = await ctx.reply(
+    ctx.t('torrent-file-compressing', { progress: 0 }),
+  );
 }
 
 export default DownloadHandler;

@@ -8,7 +8,10 @@ export interface CleanupHandle {
 }
 
 // startSessionCleanup will periodically remove expired sessions from DB.
-export function startSessionCleanup(orm: MikroORM, intervalMs = 1000 * 60 * 60): CleanupHandle {
+export function startSessionCleanup(
+  orm: MikroORM,
+  intervalMs = 1000 * 60 * 60,
+): CleanupHandle {
   let timer: NodeJS.Timeout | undefined = undefined;
   let stopped = false;
 

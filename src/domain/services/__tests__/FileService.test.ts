@@ -6,7 +6,6 @@ describe('FileService', () => {
   let service: FileService;
   let mockQBittorrent: any;
   let mockTorrentMetaRepository: any;
-  let mockLogger: any;
 
   beforeEach(() => {
     mockQBittorrent = {
@@ -17,18 +16,9 @@ describe('FileService', () => {
       getByUid: vi.fn(),
     };
 
-    mockLogger = {
-      debug: vi.fn(),
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-    };
-
     service = new FileService({
       qBittorrent: mockQBittorrent,
       torrentMetaRepository: mockTorrentMetaRepository,
-      dataPath: '/tmp',
-      logger: mockLogger,
     });
   });
 

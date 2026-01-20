@@ -28,7 +28,11 @@ import {
 } from 'grammy';
 
 import { AuthComposer } from './composers/AuthComposer.js';
-import { TorrentsComposer } from './composers/TorrentsComposer.js';
+import { createDIContainerMiddleware } from './presentation/bot/middleware/DIContainerMiddleware.js';
+import { SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
+import { TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
+import { DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js';
+import { errorMiddleware } from './presentation/bot/middleware/ErrorMiddleware.js';
 import {
   botApiAddress,
   botDataPath,
@@ -45,6 +49,7 @@ import {
 import { type MyContext, type SessionData } from './Context.js';
 import { container } from './di.js';
 import { SearchService } from './domain/services/SearchService.js';
+import { FileService } from './domain/services/FileService.js';
 import { TorrentService } from './domain/services/TorrentService.js';
 import { fluent } from './fluent.js';
 import { startSessionCleanup } from './infrastructure/session/cleanup.js';
@@ -80,6 +85,8 @@ const qBittorrent = new QBittorrentClient({
 
 // Register QBittorrentClient in DI
 container.registerInstance('QBittorrentClient', qBittorrent);
+container.registerInstance('BotDataPath', botDataPath);
+container.registerInstance('BotDataTorrentsPath', botDataTorrentsPath);
 
 // Initialize ORM (run migrations on startup explicitly)
 const orm = await initORM({ runMigrations: true });
@@ -114,11 +121,11 @@ container.registerFactory('SearchService', () => {
   });
 });
 
-// Register SearchService as a factory
-container.registerFactory('SearchService', () => {
-  return new SearchService({
-    searchEngines: [], // Will be populated later
-    logger: container.resolve('Logger'),
+// Register FileService as a factory
+container.registerFactory('FileService', () => {
+  return new FileService({
+    qBittorrent: container.resolve('QBittorrentClient'),
+    torrentMetaRepository: container.resolve('TorrentMetaRepository'),
   });
 });
 
@@ -141,15 +148,11 @@ if (rutrackerUsername && rutrackerPassword) {
 const searchService = container.resolve('SearchService') as SearchService;
 searchService.setSearchEngines(searchEngines);
 
-const torrentsComposer = new TorrentsComposer({
-  bot,
-  dataPath: botDataTorrentsPath,
-  em: orm.em.fork(),
-  searchEngines,
-  qBittorrent,
-  logger,
-});
+// Register SearchEngines in DI after initialization
+container.registerInstance('SearchEngines', searchEngines);
 
+bot.use(createDIContainerMiddleware());
+bot.use(errorMiddleware);
 bot.use(
   session({
     initial: () => ({}),
@@ -174,7 +177,15 @@ bot.use(
   }),
 );
 bot.use(authComposer);
-bot.use(torrentsComposer);
+
+// Register new handlers from DI
+const searchHandler = container.resolve<SearchHandler>('SearchHandler');
+const torrentHandler = container.resolve<TorrentHandler>('TorrentHandler');
+const downloadHandler = container.resolve<DownloadHandler>('DownloadHandler');
+
+bot.use(searchHandler);
+bot.use(torrentHandler);
+bot.use(downloadHandler);
 
 // eslint-disable-next-line unicorn/prefer-top-level-await
 bot.catch(({ error }) => {
@@ -189,7 +200,6 @@ bot.catch(({ error }) => {
 
 const shutdown = async () => {
   await bot.stop();
-  await torrentsComposer.dispose();
   if (sessionCleanup) await sessionCleanup.stop();
   await orm.close(true);
 };
