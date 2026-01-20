@@ -9,7 +9,7 @@ export type SimpleDbAdapter = {
 // SQLiteSessionStore accepts an injected adapter implementing SimpleDbAdapter.
 // If no adapter is provided, it falls back to an in-memory Map.
 export class SQLiteSessionStore implements ChatSessionService {
-  private adapter?: SimpleDbAdapter;
+  private adapter: SimpleDbAdapter | undefined;
   private map: Map<number, SessionData> | null = null;
   private prefix: string;
 

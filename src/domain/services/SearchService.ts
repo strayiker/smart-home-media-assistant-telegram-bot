@@ -47,9 +47,7 @@ export class SearchService {
       return ok(results);
     } catch (error) {
       this.logger.error(error, 'An error occurred during search');
-      return err(
-        error instanceof Error ? error : new Error('Unknown search error'),
-      );
+      return err(new Error('Unknown search error'));
     }
   }
 }

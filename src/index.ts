@@ -45,7 +45,7 @@ import {
 import { type MyContext, type SessionData } from './Context.js';
 import { fluent } from './fluent.js';
 import { logger } from './logger.js';
-import { orm } from './orm.js';
+import { initORM } from './orm.js';
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
 import { RutrackerSearchEngine } from './searchEngines/RutrackerSearchEngine.js';
 import { SearchEngine } from './searchEngines/SearchEngine.js';
@@ -77,6 +77,9 @@ const qBittorrent = new QBittorrentClient({
 
 // Register QBittorrentClient in DI
 container.registerInstance('QBittorrentClient', qBittorrent);
+
+// Initialize ORM (run migrations on startup explicitly)
+const orm = await initORM({ runMigrations: true });
 
 const authComposer = new AuthComposer(orm.em.fork(), secretKey);
 const chatSettingsRepository = new ChatSettingsRepository(orm.em.fork());

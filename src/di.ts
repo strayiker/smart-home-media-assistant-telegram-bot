@@ -1,6 +1,6 @@
 import { logger } from './logger.js';
 import { loadConfig } from './config/env.schema.js';
-import { InMemorySessionStore } from './infrastructure/session/InMemorySessionStore.js';
+// session store implementation resolved below
 import { SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
 import { SearchService } from './domain/services/SearchService.js';
 import type { Logger as PinoLogger } from 'pino';
@@ -9,7 +9,6 @@ import { TorrentService } from './domain/services/TorrentService.js';
 import { FileHandler } from './presentation/bot/handlers/FileHandler.js';
 import { FileService } from './domain/services/FileService.js';
 import { DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js';
-import { TorrentService } from './domain/services/TorrentService.js';
 import { MediaHandler } from './presentation/bot/handlers/MediaHandler.js';
 import { FeatureFlagService } from './domain/services/FeatureFlagService.js';
 import { InMemoryFeatureFlagStore } from './infrastructure/featureFlags/InMemoryFeatureFlagStore.js';

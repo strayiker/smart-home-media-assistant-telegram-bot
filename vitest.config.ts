@@ -10,8 +10,10 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'lcov'],
     },
-    tsconfig: 'tsconfig.test.json',
+    // Vitest will pick up TypeScript settings from the project's `tsconfig.json` by default.
+    include: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
   },
+  // Note: if tests require inlining of certain deps, configure via `deps.inline` here.
   resolve: {
     alias: {
       '#tests': path.resolve(__dirname, './src/__tests__'),

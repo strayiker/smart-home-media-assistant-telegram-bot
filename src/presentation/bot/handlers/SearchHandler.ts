@@ -30,9 +30,9 @@ export async function handleSearchMessage(
   next?: () => Promise<unknown>,
 ) {
   // only handle simple text queries (avoid bot commands)
-  if (ctx.message.text?.startsWith('/')) return next ? next() : undefined;
+  if (ctx.message?.text?.startsWith('/')) return next ? next() : undefined;
   try {
-    const result = await searchService.search(ctx.message.text || '');
+    const result = await searchService.search(ctx.message?.text || '');
     if (result.ok) {
       if (result.value.length === 0) {
         await ctx.reply(ctx.t('search-empty-results'));

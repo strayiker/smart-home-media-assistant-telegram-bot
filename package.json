@@ -15,10 +15,6 @@
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage"
-    ,
-    "mikro-orm:migrate:create": "mikro-orm migration:create",
-    "mikro-orm:migrate:up": "mikro-orm migration:up",
-    "mikro-orm:migrate:down": "mikro-orm migration:down"
   },
   "dependencies": {
     "@grammyjs/fluent": "^1.0.3",

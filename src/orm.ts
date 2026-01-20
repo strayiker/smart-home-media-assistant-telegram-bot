@@ -5,7 +5,7 @@ import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 
 import { botDataPath } from './config.js';
 
-const config = defineConfig({
+export const mikroOrmConfig = defineConfig({
   debug: process.env.NODE_ENV !== 'production',
   dbName: `${botDataPath}/db.sqlite`,
   extensions: [Migrator],
@@ -20,10 +20,14 @@ const config = defineConfig({
   metadataProvider: TsMorphMetadataProvider,
 });
 
-const orm = await MikroORM.init(config);
+export async function initORM(opts: { runMigrations?: boolean } = {}) {
+  const { runMigrations = false } = opts;
+  const orm = await MikroORM.init(mikroOrmConfig);
+  if (runMigrations) {
+    const migrator = orm.getMigrator();
+    await migrator.up();
+  }
+  return orm;
+}
 
-const migrator = orm.getMigrator();
-await migrator.up();
-
-export { orm };
-export default config;
+export default mikroOrmConfig;

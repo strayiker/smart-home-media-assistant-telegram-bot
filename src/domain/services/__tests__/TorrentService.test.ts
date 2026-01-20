@@ -4,7 +4,7 @@ import type { TorrentMetaRepository } from '../../utils/TorrentMetaRepository.js
 import type { Logger } from '../../utils/Logger.js';
 import type { SearchEngine, SearchResult } from '../../searchEngines/SearchEngine.js';
 import { TorrentService } from '../TorrentService.js';
-import { ok, err } from '../../utils/result.js';
+import { ok, err } from '../../../utils/result.js';
 import type { QBTorrent, QBFile } from '../../qBittorrent/models.js';
 import type { TorrentMeta } from '../../entities/TorrentMeta.js';
 
