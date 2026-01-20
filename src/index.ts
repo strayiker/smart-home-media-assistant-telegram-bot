@@ -1,4 +1,20 @@
+import 'reflect-metadata';
 import './dayjs.js';
+import { ZodError } from 'zod';
+import { loadConfig } from './config/env.schema.js';
+
+try {
+  loadConfig();
+} catch (err) {
+  if (err instanceof ZodError) {
+    // eslint-disable-next-line no-console
+    console.error('Configuration validation failed:', err.errors);
+  } else {
+    // eslint-disable-next-line no-console
+    console.error('Unknown error during configuration load', err);
+  }
+  process.exit(1);
+}
 
 import path from 'node:path';
 
@@ -32,14 +48,22 @@ import { logger } from './logger.js';
 import { orm } from './orm.js';
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
 import { RutrackerSearchEngine } from './searchEngines/RutrackerSearchEngine.js';
+import { SearchEngine } from './searchEngines/SearchEngine.js';
 import { ChatSettingsRepository } from './utils/ChatSettingsRepository.js';
 import { CookieStorage } from './utils/CookieStorage.js';
+import { container } from './di.js';
+import { TorrentService } from './domain/services/TorrentService.js';
+import { TorrentMetaRepository } from './utils/TorrentMetaRepository.js';
+import { SearchService } from './domain/services/SearchService.js';
 
-const bot = new Bot<MyContext>(botToken, {
-  client: {
-    apiRoot: botApiAddress,
-  },
-});
+if (!qbtWebuiAddress || !qbtWebuiUsername || !qbtWebuiPassword) {
+  throw new Error('QBT_WEBUI_ADDRESS, QBT_WEBUI_USERNAME, QBT_WEBUI_PASSWORD are required');
+}
+
+const botOptions: ConstructorParameters<typeof Bot<MyContext>>[1] =
+  botApiAddress ? { client: { apiRoot: botApiAddress } } : {};
+
+const bot = new Bot<MyContext>(botToken, botOptions);
 const cookieStorage = new CookieStorage({
   filePath: path.join(botDataPath, 'cookies.json'),
   logger,
@@ -50,20 +74,66 @@ const qBittorrent = new QBittorrentClient({
   password: qbtWebuiPassword,
   savePath: qbtSavePath,
 });
+
+// Register QBittorrentClient in DI
+container.registerInstance('QBittorrentClient', qBittorrent);
+
 const authComposer = new AuthComposer(orm.em.fork(), secretKey);
 const chatSettingsRepository = new ChatSettingsRepository(orm.em.fork());
-const torrentsComposer = new TorrentsComposer({
-  bot,
-  dataPath: botDataTorrentsPath,
-  em: orm.em.fork(),
-  searchEngines: [
+const torrentMetaRepository = new TorrentMetaRepository(orm.em.fork());
+
+// Register TorrentMetaRepository in DI
+container.registerInstance('TorrentMetaRepository', torrentMetaRepository);
+
+// Register TorrentService as a factory
+container.registerFactory('TorrentService', () => {
+  return new TorrentService(
+    container.resolve('QBittorrentClient'),
+    container.resolve('TorrentMetaRepository'),
+    container.resolve('Logger'),
+  );
+});
+
+// Register SearchService as a factory
+container.registerFactory('SearchService', () => {
+  return new SearchService({
+    searchEngines: [], // Will be populated later
+    logger: container.resolve('Logger'),
+  });
+});
+
+// Register SearchService as a factory
+container.registerFactory('SearchService', () => {
+  return new SearchService({
+    searchEngines: [], // Will be populated later
+    logger: container.resolve('Logger'),
+  });
+});
+
+const searchEngines: SearchEngine[] = [];
+
+if (rutrackerUsername && rutrackerPassword) {
+  searchEngines.push(
     new RutrackerSearchEngine({
       username: rutrackerUsername,
       password: rutrackerPassword,
       cookieStorage,
       logger,
     }),
-  ],
+  );
+} else {
+  logger.warn('Rutracker credentials are missing; search engine is disabled');
+}
+
+// Update SearchService with actual search engines
+const searchService = container.resolve('SearchService') as SearchService;
+searchService.setSearchEngines(searchEngines);
+
+const torrentsComposer = new TorrentsComposer({
+  bot,
+  dataPath: botDataTorrentsPath,
+  em: orm.em.fork(),
+  searchEngines,
   qBittorrent,
   logger,
 });

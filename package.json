@@ -11,7 +11,14 @@
     "dev": "NODE_ENV=development && node --loader ts-node/esm --enable-source-maps --no-warnings=ExperimentalWarning ./src/index.ts",
     "build": "rm -rf dist && tsc",
     "start": "NODE_ENV=production && node ./dist/index.js",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage"
+    ,
+    "mikro-orm:migrate:create": "mikro-orm migration:create",
+    "mikro-orm:migrate:up": "mikro-orm migration:up",
+    "mikro-orm:migrate:down": "mikro-orm migration:down"
   },
   "dependencies": {
     "@grammyjs/fluent": "^1.0.3",
@@ -30,9 +37,11 @@
     "parse-torrent": "^11.0.18",
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
+    "reflect-metadata": "^0.1.13",
     "tmp": "^0.2.3",
     "tough-cookie": "^5.1.2",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zod": "^3.22.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
@@ -53,6 +62,7 @@
     "semantic-release": "^24.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.32.0"
+    "typescript-eslint": "^8.32.0",
+    "vitest": "^1.0.0"
   }
 }

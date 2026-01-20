@@ -5,8 +5,8 @@ export interface SearchResult {
   size: number;
   seeds: number;
   peers: number;
-  publishDate?: Date;
-  detailsUrl?: string;
+  publishDate?: Date | undefined;
+  detailsUrl?: string | undefined;
   downloadUrl: string;
 }
 

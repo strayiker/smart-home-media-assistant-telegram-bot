@@ -10,10 +10,20 @@ export interface TorrentMetaCreateInput {
   trackerId: string;
 }
 
-export class TorrentMetaRepository {
+export interface ITorrentMetaRepository {
+  create(input: TorrentMetaCreateInput): Promise<TorrentMeta>;
+  getByUid(uid: string): Promise<TorrentMeta | null>;
+  getByHash(hash: string): Promise<TorrentMeta | null>;
+  getByHashes(hashes: string[]): Promise<TorrentMeta[]>;
+  getByChatId(chatId: number): Promise<TorrentMeta[]>;
+  removeByHash(hash: string): Promise<void>;
+  removeByUid(uid: string): Promise<void>;
+}
+
+export class TorrentMetaRepository implements ITorrentMetaRepository {
   constructor(private em: EntityManager) {}
 
-  async create(input: TorrentMetaCreateInput) {
+  async create(input: TorrentMetaCreateInput): Promise<TorrentMeta> {
     const now = new Date();
     const meta = this.em.create(TorrentMeta, {
       ...input,
@@ -24,15 +34,15 @@ export class TorrentMetaRepository {
     return meta;
   }
 
-  async getByUid(uid: string) {
+  async getByUid(uid: string): Promise<TorrentMeta | null> {
     return this.em.findOne(TorrentMeta, { uid });
   }
 
-  async getByHash(hash: string) {
+  async getByHash(hash: string): Promise<TorrentMeta | null> {
     return this.em.findOne(TorrentMeta, { hash });
   }
 
-  async getByHashes(hashes: string[]) {
+  async getByHashes(hashes: string[]): Promise<TorrentMeta[]> {
     if (hashes.length === 0) {
       return [] as TorrentMeta[];
     }
@@ -42,7 +52,7 @@ export class TorrentMetaRepository {
     });
   }
 
-  async getByChatId(chatId: number) {
+  async getByChatId(chatId: number): Promise<TorrentMeta[]> {
     return this.em.find(
       TorrentMeta,
       { chatId },
@@ -50,11 +60,11 @@ export class TorrentMetaRepository {
     );
   }
 
-  async removeByHash(hash: string) {
+  async removeByHash(hash: string): Promise<void> {
     await this.em.nativeDelete(TorrentMeta, { hash });
   }
 
-  async removeByUid(uid: string) {
+  async removeByUid(uid: string): Promise<void> {
     await this.em.nativeDelete(TorrentMeta, { uid });
   }
 }

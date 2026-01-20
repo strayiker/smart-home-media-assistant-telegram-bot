@@ -399,14 +399,21 @@ export class TorrentsComposer extends Composer<MyContext> {
         const videoStreamHeight = videoStream?.height;
         const videoStreamWidth = videoStream?.width;
 
+        const videoOptions: Parameters<typeof ctx.replyWithVideo>[1] = {
+          caption: path.basename(qbFile.name),
+          duration,
+        };
+
+        if (videoStreamHeight !== undefined) {
+          videoOptions.height = videoStreamHeight;
+        }
+        if (videoStreamWidth !== undefined) {
+          videoOptions.width = videoStreamWidth;
+        }
+
         if (qbFile.size <= MAX_FILE_SIZE) {
           await ctx.reply(ctx.t('torrent-file-uploading'));
-          await ctx.replyWithVideo(file, {
-            caption: path.basename(qbFile.name),
-            duration,
-            height: videoStreamHeight,
-            width: videoStreamWidth,
-          });
+          await ctx.replyWithVideo(file, videoOptions);
         } else {
           const aBitrate = 192;
           const vMaxBitrate = MAX_VIDEO_BITRATE.find(
@@ -462,12 +469,7 @@ export class TorrentsComposer extends Composer<MyContext> {
                   progressMessage.message_id,
                   ctx.t('torrent-file-uploading'),
                 );
-                await ctx.replyWithVideo(new InputFile(tmpFile), {
-                  caption: path.basename(qbFile.name),
-                  duration,
-                  height: videoStreamHeight,
-                  width: videoStreamWidth,
-                });
+                await ctx.replyWithVideo(new InputFile(tmpFile), videoOptions);
               } catch (error) {
                 this.logger.error(error, 'An error occured while sending file');
               } finally {
@@ -596,8 +598,8 @@ export class TorrentsComposer extends Composer<MyContext> {
     );
 
     const hashes = pageMetas.map((meta) => meta.hash);
-    const torrents = await this.getTorrents(hashes);
-    const torrentByHash = new Map(
+    const torrents: QBTorrent[] = await this.getTorrents(hashes);
+    const torrentByHash = new Map<string, QBTorrent>(
       torrents.map((torrent) => [torrent.hash, torrent] as const),
     );
 
@@ -696,17 +698,23 @@ export class TorrentsComposer extends Composer<MyContext> {
 
   private async addTorrent(torrent: string) {
     try {
-      const [hash] = await this.qBittorrent.addTorrents({
+      const result = await this.qBittorrent.addTorrents({
         torrents: [torrent],
       });
-      return hash;
+
+      if (result.ok) {
+        const [hash] = result.value;
+        return hash;
+      }
+
+      throw result.error ?? new Error('Failed to add torrent');
     } catch (error) {
       this.logger.error(error, 'An error occured while adding new torrent');
       throw error;
     }
   }
 
-  private async getTorrents(hashes: string[]) {
+  private async getTorrents(hashes: string[]): Promise<QBTorrent[]> {
     try {
       return this.qBittorrent.getTorrents({ hashes });
     } catch (error) {

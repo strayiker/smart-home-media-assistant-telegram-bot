@@ -1,6 +1,7 @@
 import { URLSearchParams } from 'node:url';
 
 import parseTorrent from 'parse-torrent';
+import { ok, err, type ResultT } from '../utils/result.js';
 import { CookieJar } from 'tough-cookie';
 
 import { type QBFile, type QBTorrent } from './models.js';
@@ -8,18 +9,19 @@ import {
   type QBClientAddTorrentsOptions,
   type QBClientGetTorrentsOptions,
 } from './types.js';
+import { QBTorrentsResponseSchema, normalizeTorrent } from './schemas.js';
 
 interface QBClientOptions {
   url: string;
   username: string;
   password: string;
-  savePath?: string;
+  savePath?: string | undefined;
 }
 
 export class QBittorrentClient {
   private username: string;
   private password: string;
-  private savePath?: string;
+  private savePath: string | undefined;
   private cookieJar: CookieJar = new CookieJar();
   private apiBase: string;
 
@@ -94,7 +96,7 @@ export class QBittorrentClient {
     tags,
     savepath = this.savePath,
     ...rest
-  }: QBClientAddTorrentsOptions) {
+  }: QBClientAddTorrentsOptions): Promise<ResultT<string[], unknown>> {
     const data = new FormData();
     const hashes: string[] = [];
 
@@ -128,10 +130,18 @@ export class QBittorrentClient {
       body: data,
     });
 
-    return hashes;
+    return ok(hashes);
   }
 
-  async getTorrents({ hashes, ...rest }: QBClientGetTorrentsOptions) {
+  async addTorrentsSafe(opts: QBClientAddTorrentsOptions): Promise<ResultT<string[], unknown>> {
+    try {
+      return await this.addTorrents(opts);
+    } catch (e) {
+      return err(e as unknown);
+    }
+  }
+
+  async getTorrents({ hashes, ...rest }: QBClientGetTorrentsOptions): Promise<QBTorrent[]> {
     const data = new URLSearchParams();
 
     if (hashes) {
@@ -153,12 +163,11 @@ export class QBittorrentClient {
       body: data.toString(),
     });
 
-    const json: { tags: string }[] = await response.json();
+    const json = await response.json();
 
-    return json.map((item) => ({
-      ...item,
-      tags: item.tags.split(',').map((tag) => tag.trim()),
-    })) as QBTorrent[];
+    const parsed = QBTorrentsResponseSchema.parse(json);
+
+    return parsed.map(normalizeTorrent);
   }
 
   async pauseTorrents(hashes: string[]) {

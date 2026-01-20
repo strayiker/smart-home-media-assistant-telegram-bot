@@ -11,7 +11,7 @@ export interface RpcResponse<R> {
 }
 
 export class RpcClient {
-  private sessionId?: string;
+  private sessionId?: string | undefined;
 
   constructor(
     private url: string,
@@ -40,8 +40,7 @@ export class RpcClient {
     });
 
     if (response.status === 409) {
-      this.sessionId =
-        response.headers.get('X-Transmission-Session-Id') ?? undefined;
+      this.sessionId = response.headers.get('X-Transmission-Session-Id') ?? undefined;
       return this.sendRequest(request);
     }
 
