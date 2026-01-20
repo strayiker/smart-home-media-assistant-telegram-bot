@@ -13,6 +13,8 @@
     "start": "NODE_ENV=production && node ./dist/index.js",
     "migrate": "NODE_ENV=development && node --loader ts-node/esm --enable-source-maps --no-warnings=ExperimentalWarning ./src/scripts/migrate.ts",
     "lint": "eslint src",
+    "fix:imports-js:dry": "node --loader ts-node/esm ./src/tools/add-js-extension.ts",
+    "fix:imports-js": "node --loader ts-node/esm ./src/tools/add-js-extension.ts --apply",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage"
