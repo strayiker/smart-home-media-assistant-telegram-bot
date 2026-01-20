@@ -18,7 +18,10 @@ const toBoolean = (value: unknown) => {
 };
 
 const numberish = z.preprocess(toNumber, z.number()).optional().default(0);
-const booleanish = z.preprocess(toBoolean, z.boolean()).optional().default(false);
+const booleanish = z
+  .preprocess(toBoolean, z.boolean())
+  .optional()
+  .default(false);
 const stringDefaultEmpty = z.string().optional().default('');
 
 export const QBTorrentStateSchema = z.enum([
@@ -47,7 +50,10 @@ export const QBTorrentRawSchema = z
   .object({
     hash: z.string(),
     name: stringDefaultEmpty,
-    tags: z.union([z.string(), z.array(z.string())]).optional().default(''),
+    tags: z
+      .union([z.string(), z.array(z.string())])
+      .optional()
+      .default(''),
     size: numberish,
     progress: numberish,
     state: QBTorrentStateSchema.optional().default('unknown'),
@@ -100,9 +106,7 @@ export type QBTorrentRaw = z.infer<typeof QBTorrentRawSchema>;
 export const normalizeTags = (raw?: string | string[]) => {
   if (!raw) return [] as string[];
   const values = Array.isArray(raw) ? raw : raw.split(',');
-  return values
-    .map((tag) => tag.trim())
-    .filter((tag) => tag.length > 0);
+  return values.map((tag) => tag.trim()).filter((tag) => tag.length > 0);
 };
 
 export const normalizeTorrent = (raw: QBTorrentRaw): QBTorrent => ({

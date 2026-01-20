@@ -69,5 +69,4 @@ export default tslint.config(
   {
     ignores: ['**/dist/**', '**/types/**'],
   },
-  
 );

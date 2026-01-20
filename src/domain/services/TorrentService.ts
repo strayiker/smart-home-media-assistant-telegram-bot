@@ -1,6 +1,9 @@
-import type { QBFile,QBTorrent } from '../../qBittorrent/models.js';
+import type { QBFile, QBTorrent } from '../../qBittorrent/models.js';
 import type { QBittorrentClient } from '../../qBittorrent/QBittorrentClient.js';
-import type { SearchEngine, SearchResult } from '../../searchEngines/SearchEngine.js';
+import type {
+  SearchEngine,
+  SearchResult,
+} from '../../searchEngines/SearchEngine.js';
 import type { Logger } from '../../utils/Logger.js';
 import { err, ok, type ResultT } from '../../utils/result.js';
 import type { TorrentMetaRepository } from '../../utils/TorrentMetaRepository.js';
@@ -20,7 +23,9 @@ export class TorrentService {
     private readonly logger: Logger,
   ) {}
 
-  async addTorrent(options: AddTorrentOptions): Promise<ResultT<string, Error>> {
+  async addTorrent(
+    options: AddTorrentOptions,
+  ): Promise<ResultT<string, Error>> {
     const { torrent, uid, chatId, searchEngine, trackerId } = options;
 
     try {
@@ -69,7 +74,9 @@ export class TorrentService {
     } catch (error) {
       this.logger.error(error, 'An error occurred while adding new torrent');
       return err(
-        error instanceof Error ? error : new Error('Unknown error adding torrent'),
+        error instanceof Error
+          ? error
+          : new Error('Unknown error adding torrent'),
       );
     }
   }
@@ -121,7 +128,9 @@ export class TorrentService {
     } catch (error) {
       this.logger.error(error, 'An error occurred while deleting torrent');
       return err(
-        error instanceof Error ? error : new Error('Unknown error deleting torrent'),
+        error instanceof Error
+          ? error
+          : new Error('Unknown error deleting torrent'),
       );
     }
   }
@@ -168,7 +177,11 @@ export class TorrentService {
     return meta.hash;
   }
 
-  async downloadTorrentFile(seName: string, id: string, searchEngines: SearchEngine[]): Promise<ResultT<string, Error>> {
+  async downloadTorrentFile(
+    seName: string,
+    id: string,
+    searchEngines: SearchEngine[],
+  ): Promise<ResultT<string, Error>> {
     const se = searchEngines.find((se) => se.name === seName);
 
     if (!se) {
@@ -179,9 +192,15 @@ export class TorrentService {
       const torrent = await se.downloadTorrentFile(id);
       return ok(torrent);
     } catch (error) {
-      this.logger.error(error, 'Failed to download torrent file from: %s', seName);
+      this.logger.error(
+        error,
+        'Failed to download torrent file from: %s',
+        seName,
+      );
       return err(
-        error instanceof Error ? error : new Error('Failed to download torrent file'),
+        error instanceof Error
+          ? error
+          : new Error('Failed to download torrent file'),
       );
     }
   }

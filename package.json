@@ -11,6 +11,7 @@
     "dev": "NODE_ENV=development && node --loader ts-node/esm --enable-source-maps --no-warnings=ExperimentalWarning ./src/index.ts",
     "build": "rm -rf dist && tsc",
     "start": "NODE_ENV=production && node ./dist/index.js",
+    "migrate": "NODE_ENV=development && node --loader ts-node/esm --enable-source-maps --no-warnings=ExperimentalWarning ./src/scripts/migrate.ts",
     "lint": "eslint src",
     "test": "vitest",
     "test:watch": "vitest --watch",

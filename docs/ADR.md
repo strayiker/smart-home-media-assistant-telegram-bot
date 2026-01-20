@@ -8,9 +8,9 @@
 
 ## ADR-0001: Use Dependency Injection Container (tsyringe)
 
-**Date**: January 2026  
-**Status**: Proposed  
-**Author**: Technical Architecture Review  
+**Date**: January 2026
+**Status**: Proposed
+**Author**: Technical Architecture Review
 
 ### Context
 
@@ -30,15 +30,16 @@ We will adopt **tsyringe** (TypeScript Dependency Injection Container) for autom
 
 **Why tsyringe over alternatives?**
 
-| Criteria | tsyringe | inversify | awilix |
-|----------|----------|-----------|--------|
-| Bundle Size | Small | Large | Medium |
-| TypeScript Support | Native | Decorator-based | Good |
-| Learning Curve | Shallow | Steep | Medium |
-| ESM Support | ✅ | ✅ | ✅ |
-| Reflect-metadata Required | ✅ (optional) | ✅ (required) | ❌ |
+| Criteria                  | tsyringe      | inversify       | awilix |
+| ------------------------- | ------------- | --------------- | ------ |
+| Bundle Size               | Small         | Large           | Medium |
+| TypeScript Support        | Native        | Decorator-based | Good   |
+| Learning Curve            | Shallow       | Steep           | Medium |
+| ESM Support               | ✅            | ✅              | ✅     |
+| Reflect-metadata Required | ✅ (optional) | ✅ (required)   | ❌     |
 
 **Benefits**:
+
 - Automatic dependency resolution at startup
 - Type-safe injection with TypeScript
 - Easy to mock for testing
@@ -71,12 +72,14 @@ container.register(TorrentService, { useClass: TorrentService });
 ### Consequences
 
 **Positive**:
+
 - ✅ Improved testability
 - ✅ Reduced coupling
 - ✅ Better code organization
 - ✅ Easier to extend
 
 **Negative**:
+
 - ❌ Additional dependency (tsyringe)
 - ❌ Requires reflect-metadata
 - ❌ Slightly steeper learning curve for new developers
@@ -97,8 +100,8 @@ container.register(TorrentService, { useClass: TorrentService });
 
 ## ADR-0002: Use Zod for Runtime Validation
 
-**Date**: January 2026  
-**Status**: Proposed  
+**Date**: January 2026
+**Status**: Proposed
 **Author**: Technical Architecture Review
 
 ### Context
@@ -120,6 +123,7 @@ This creates several risks:
 ### Decision
 
 Adopt **Zod** for schema validation throughout the application:
+
 - Configuration validation on startup
 - API response validation for external services
 - Database entity validation before persistence
@@ -129,16 +133,17 @@ Adopt **Zod** for schema validation throughout the application:
 
 **Why Zod over alternatives?**
 
-| Criteria | zod | joi | yup |
-|----------|-----|-----|-----|
-| Bundle Size | Small | Large | Medium |
-| TypeScript Support | Native (inferred) | Decorators | Okay |
-| Schema Composition | Excellent | Good | Good |
-| Error Messages | Clear | Very Clear | Clear |
-| ESM Support | ✅ | ✅ | Limited |
-| Learning Curve | Shallow | Medium | Shallow |
+| Criteria           | zod               | joi        | yup     |
+| ------------------ | ----------------- | ---------- | ------- |
+| Bundle Size        | Small             | Large      | Medium  |
+| TypeScript Support | Native (inferred) | Decorators | Okay    |
+| Schema Composition | Excellent         | Good       | Good    |
+| Error Messages     | Clear             | Very Clear | Clear   |
+| ESM Support        | ✅                | ✅         | Limited |
+| Learning Curve     | Shallow           | Medium     | Shallow |
 
 **Benefits**:
+
 - Type inference from schema (single source of truth)
 - Composition and reusability
 - Clear, actionable error messages
@@ -184,6 +189,7 @@ try {
 ### Consequences
 
 **Positive**:
+
 - ✅ Fast feedback on configuration errors
 - ✅ Single source of truth for types and schema
 - ✅ Better error messages
@@ -191,6 +197,7 @@ try {
 - ✅ Self-documenting code
 
 **Negative**:
+
 - ❌ Additional dependency
 - ❌ Some performance overhead (negligible)
 - ❌ Validation boilerplate for external APIs
@@ -211,8 +218,8 @@ try {
 
 ## ADR-0003: Use Result Type Pattern (neverthrow)
 
-**Date**: January 2026  
-**Status**: Proposed  
+**Date**: January 2026
+**Status**: Proposed
 **Author**: Technical Architecture Review
 
 ### Context
@@ -242,7 +249,9 @@ Problems:
 Adopt **Result type pattern** (using neverthrow library) for explicit error handling:
 
 ```typescript
-async function addTorrent(data: Buffer): Promise<Result<Torrent, TorrentError>> {
+async function addTorrent(
+  data: Buffer,
+): Promise<Result<Torrent, TorrentError>> {
   // ...
 }
 
@@ -298,11 +307,9 @@ async function downloadAndCompress(torrentId: string) {
 async function downloadAndCompress(
   torrentId: string,
 ): Promise<Result<Buffer, DownloadError | CompressionError>> {
-  return (
-    (await getTorrent(torrentId))
-      .asyncAndThen(torrent => downloadFile(torrent))
-      .asyncAndThen(file => compressVideo(file))
-  );
+  return (await getTorrent(torrentId))
+    .asyncAndThen((torrent) => downloadFile(torrent))
+    .asyncAndThen((file) => compressVideo(file));
 }
 
 // Usage:
@@ -319,7 +326,10 @@ if (result.isOk()) {
 ```typescript
 // domain/errors/TorrentError.ts
 export class TorrentError extends Error {
-  constructor(public readonly code: string, message: string) {
+  constructor(
+    public readonly code: string,
+    message: string,
+  ) {
     super(message);
   }
 }
@@ -354,6 +364,7 @@ export class TorrentService {
 ### Consequences
 
 **Positive**:
+
 - ✅ Explicit error handling
 - ✅ Type-safe error flows
 - ✅ Better testability
@@ -361,6 +372,7 @@ export class TorrentService {
 - ✅ Clear error recovery paths
 
 **Negative**:
+
 - ❌ Additional dependency
 - ❌ More verbose code initially
 - ❌ Learning curve for team
@@ -383,13 +395,14 @@ export class TorrentService {
 
 ## ADR-0004: Split TorrentsComposer into Separate Handlers
 
-**Date**: January 2026  
-**Status**: Proposed  
+**Date**: January 2026
+**Status**: Proposed
 **Author**: Technical Architecture Review
 
 ### Context
 
 `TorrentsComposer.ts` is 997 lines and handles:
+
 - Torrent search
 - Torrent download
 - Torrent management
@@ -400,6 +413,7 @@ export class TorrentService {
 - In-memory state management
 
 This violates Single Responsibility Principle and makes the code:
+
 - Unmaintainable
 - Untestable
 - Hard to understand
@@ -416,6 +430,7 @@ Split `TorrentsComposer` into separate, focused handlers:
 5. **MediaHandler** - Video compression, file processing
 
 Each handler:
+
 - Extends grammy Composer
 - Handles 1-2 related commands
 - 100-200 lines max
@@ -430,7 +445,7 @@ Each handler:
 export class SearchHandler extends Composer<MyContext> {
   constructor(private searchService: SearchService) {
     super();
-    
+
     this.on('message::bot_command', async (ctx, next) => {
       if (ctx.hasCommand('search')) {
         await this.handleSearch(ctx);
@@ -443,7 +458,7 @@ export class SearchHandler extends Composer<MyContext> {
   private async handleSearch(ctx: MyContext): Promise<void> {
     const query = ctx.match[0];
     const result = await this.searchService.search(query);
-    
+
     if (result.isOk()) {
       await ctx.reply(this.formatResults(result.value));
     } else {
@@ -500,8 +515,8 @@ bot.use(fileHandler);
 
 ## ADR-0005: Use Persistent Session Storage
 
-**Date**: January 2026  
-**Status**: Proposed  
+**Date**: January 2026
+**Status**: Proposed
 **Author**: Technical Architecture Review
 
 ### Context
@@ -526,16 +541,19 @@ Problems:
 Migrate to persistent session storage:
 
 **Option 1 (Recommended)**: SQLite session store
+
 - Same database as entities
 - Works in single-instance deployment
 - No additional infrastructure
 
 **Option 2**: Redis session store
+
 - Distributed sessions
 - Enables multi-instance deployment
 - External dependency
 
 **Option 3**: Memory + Periodic Flush
+
 - Hybrid approach
 - Balance performance and persistence
 
@@ -589,8 +607,8 @@ export class ChatSession {
 
 ## ADR-0006: Use Vitest for Testing Framework
 
-**Date**: January 2026  
-**Status**: Proposed  
+**Date**: January 2026
+**Status**: Proposed
 **Author**: Technical Architecture Review
 
 ### Context
@@ -665,9 +683,9 @@ describe('TorrentService', () => {
 ```markdown
 # ADR-000X: [Title]
 
-**Date**: [YYYY-MM-DD]  
-**Status**: Proposed | Accepted | Deprecated | Superseded  
-**Author**: [Name]  
+**Date**: [YYYY-MM-DD]
+**Status**: Proposed | Accepted | Deprecated | Superseded
+**Author**: [Name]
 
 ### Context
 
@@ -698,13 +716,13 @@ describe('TorrentService', () => {
 
 ## Summary of Key Decisions
 
-| ADR | Decision | Status | Impact |
-|-----|----------|--------|--------|
-| ADR-0001 | Use tsyringe for DI | Proposed | High |
-| ADR-0002 | Use Zod for validation | Proposed | High |
-| ADR-0003 | Use Result type (neverthrow) | Proposed | High |
-| ADR-0004 | Split TorrentsComposer | Proposed | High |
-| ADR-0005 | Persistent session storage | Proposed | Medium |
-| ADR-0006 | Use vitest for testing | Proposed | High |
+| ADR      | Decision                     | Status   | Impact |
+| -------- | ---------------------------- | -------- | ------ |
+| ADR-0001 | Use tsyringe for DI          | Proposed | High   |
+| ADR-0002 | Use Zod for validation       | Proposed | High   |
+| ADR-0003 | Use Result type (neverthrow) | Proposed | High   |
+| ADR-0004 | Split TorrentsComposer       | Proposed | High   |
+| ADR-0005 | Persistent session storage   | Proposed | Medium |
+| ADR-0006 | Use vitest for testing       | Proposed | High   |
 
 All ADRs are currently **Proposed** pending team review and approval.

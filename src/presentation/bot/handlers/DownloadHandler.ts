@@ -25,7 +25,12 @@ export class DownloadHandler extends Composer<MyContext> {
     this.on('message::bot_command', async (ctx, next) => {
       if (!ctx.message?.text) return next();
       if (ctx.message.text.startsWith('/dl_file_')) {
-        return handleDownloadFileCommand(ctx, this.fileService, this.torrentService, this.logger);
+        return handleDownloadFileCommand(
+          ctx,
+          this.fileService,
+          this.torrentService,
+          this.logger,
+        );
       }
       return next();
     });
@@ -63,7 +68,11 @@ export async function handleDownloadFileCommand(
 
     const file = files[0];
     // Simple policy: disallow huge non-video files
-    const isVideo = file.name && ['mp4', 'mkv', 'avi'].includes(file.name.split('.').pop()?.toLowerCase() || '');
+    const isVideo =
+      file.name &&
+      ['mp4', 'mkv', 'avi'].includes(
+        file.name.split('.').pop()?.toLowerCase() || '',
+      );
     if ((file.size ?? 0) > 2 * 1024 * 1024 * 1024 && !isVideo) {
       await ctx.reply(ctx.t('file-too-big'));
       return;

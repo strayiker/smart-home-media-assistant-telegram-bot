@@ -9,10 +9,8 @@ try {
   loadConfig();
 } catch (error) {
   if (error instanceof ZodError) {
-     
     console.error('Configuration validation failed:', error.errors);
   } else {
-     
     console.error('Unknown error during configuration load', error);
   }
   process.exit(1);
@@ -49,6 +47,7 @@ import { container } from './di.js';
 import { SearchService } from './domain/services/SearchService.js';
 import { TorrentService } from './domain/services/TorrentService.js';
 import { fluent } from './fluent.js';
+import { startSessionCleanup } from './infrastructure/session/cleanup.js';
 import { logger } from './logger.js';
 import { initORM } from './orm.js';
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
@@ -59,7 +58,9 @@ import { CookieStorage } from './utils/CookieStorage.js';
 import { TorrentMetaRepository } from './utils/TorrentMetaRepository.js';
 
 if (!qbtWebuiAddress || !qbtWebuiUsername || !qbtWebuiPassword) {
-  throw new Error('QBT_WEBUI_ADDRESS, QBT_WEBUI_USERNAME, QBT_WEBUI_PASSWORD are required');
+  throw new Error(
+    'QBT_WEBUI_ADDRESS, QBT_WEBUI_USERNAME, QBT_WEBUI_PASSWORD are required',
+  );
 }
 
 const botOptions: ConstructorParameters<typeof Bot<MyContext>>[1] =
@@ -85,6 +86,9 @@ const orm = await initORM({ runMigrations: true });
 
 // Register ORM in DI so components can obtain repositories / EM
 container.registerInstance('ORM', orm);
+
+// Start periodic session cleanup job (defaults to 1h interval)
+const sessionCleanup = startSessionCleanup(orm);
 
 const authComposer = new AuthComposer(orm.em.fork(), secretKey);
 const chatSettingsRepository = new ChatSettingsRepository(orm.em.fork());
@@ -186,6 +190,7 @@ bot.catch(({ error }) => {
 const shutdown = async () => {
   await bot.stop();
   await torrentsComposer.dispose();
+  if (sessionCleanup) await sessionCleanup.stop();
   await orm.close(true);
 };
 

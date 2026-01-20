@@ -16,7 +16,8 @@ export const secretKey = cfg.SECRET_KEY;
 export const botToken = cfg.BOT_TOKEN;
 export const botApiAddress = cfg.BOT_API_ADDRESS;
 export const botDataPath = cfg.BOT_DATA_PATH ?? '/data/bot';
-export const botDataTorrentsPath = cfg.BOT_DATA_TORRENTS_PATH ?? '/data/torrents';
+export const botDataTorrentsPath =
+  cfg.BOT_DATA_TORRENTS_PATH ?? '/data/torrents';
 export const rutrackerUsername = cfg.RUTRACKER_USERNAME;
 export const rutrackerPassword = cfg.RUTRACKER_PASSWORD;
 export const qbtWebuiAddress = cfg.QBT_WEBUI_ADDRESS ?? cfg.QBT_WEBUI_ADDRESS;

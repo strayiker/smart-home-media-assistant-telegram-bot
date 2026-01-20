@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
 export const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
   BOT_TOKEN: z.string().min(1),
   BOT_API_ADDRESS: z.string().url().optional(),
   BOT_DATA_PATH: z.string().optional(),

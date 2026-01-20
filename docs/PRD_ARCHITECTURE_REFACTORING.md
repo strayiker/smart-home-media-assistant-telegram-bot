@@ -1,8 +1,8 @@
 # Smart Home Media Assistant Telegram Bot - Architecture Refactoring PRD
 
-**Document Version:** 1.0  
-**Created:** January 2026  
-**Author:** Technical Architecture Review  
+**Document Version:** 1.0
+**Created:** January 2026
+**Author:** Technical Architecture Review
 **Status:** Ready for Implementation
 
 ---
@@ -18,6 +18,7 @@ This PRD outlines a strategic refactoring to modernize the codebase, improve mai
 ## Current State Assessment
 
 ### Strengths
+
 - ✅ Clear core functionality (search torrents, manage downloads, retrieve files)
 - ✅ Proper use of TypeScript with decent type safety
 - ✅ Entity-based database abstraction with MikroORM
@@ -29,6 +30,7 @@ This PRD outlines a strategic refactoring to modernize the codebase, improve mai
 ### Pain Points
 
 #### 1. **Architecture Issues**
+
 - **Monolithic Composers**: `TorrentsComposer.ts` is 997 lines - single responsibility principle violated
 - **No Service Layer**: Business logic mixed with HTTP/Telegram handling
 - **Tight Coupling**: Direct database calls in composers, QBittorrent client usage scattered
@@ -37,12 +39,14 @@ This PRD outlines a strategic refactoring to modernize the codebase, improve mai
 - **In-Memory State Management**: `chatMessages`, `chatTorrents` Maps leak memory, no persistence
 
 #### 2. **Code Organization**
+
 - `utils/` directory is a dumping ground (15+ files with mixed concerns)
 - Repositories buried in utils instead of domain layer
 - Config management scattered across multiple files
 - No clear domain boundaries
 
 #### 3. **Testing & Quality**
+
 - ❌ Zero unit tests
 - ❌ No integration tests
 - ❌ No E2E tests
@@ -53,26 +57,27 @@ This PRD outlines a strategic refactoring to modernize the codebase, improve mai
 
 **Current Dependencies Review:**
 
-| Package | Version | Status | Alternative | Action |
-|---------|---------|--------|-------------|--------|
-| grammy | ^1.36.3 | ✅ Active | - | Keep |
-| @grammyjs/fluent | ^1.0.3 | ✅ Active | - | Keep |
-| @mikro-orm/* | 6.4.16 | ✅ Active | TypeORM, Prisma, Drizzle | **Consider Drizzle** (lighter, better DX) |
-| fluent-ffmpeg | ^2.1.3 | ✅ Active | ffmpeg.wasm, sharp | Keep (ffmpeg binding solid) |
-| pino | ^9.6.0 | ✅ Active | winston, bunyan | Keep (performant) |
-| cheerio | ^1.0.0 | ✅ Active | jsdom, htmlparser2 | Keep |
-| tough-cookie | ^5.1.2 | ✅ Active | cookie | Keep |
-| dayjs | ^1.11.13 | ✅ Active | date-fns (recommended) | **Consider date-fns** |
-| parse-torrent | ^11.0.18 | ✅ Active | - | Keep |
-| uuid | ^11.1.0 | ✅ Active | - | Keep |
-| dotenv | ^16.5.0 | ✅ Active | - | Keep |
-| file-type | ^21.0.0 | ✅ Active | - | Keep |
-| tmp | ^0.2.3 | ✅ Active | - | Keep |
-| typescript | ^5.8.3 | ✅ Latest | - | Keep |
-| eslint | ^9.25.1 | ✅ Latest | - | Keep |
-| prettier | ^3.5.3 | ✅ Latest | - | Keep |
+| Package          | Version  | Status    | Alternative              | Action                                    |
+| ---------------- | -------- | --------- | ------------------------ | ----------------------------------------- |
+| grammy           | ^1.36.3  | ✅ Active | -                        | Keep                                      |
+| @grammyjs/fluent | ^1.0.3   | ✅ Active | -                        | Keep                                      |
+| @mikro-orm/\*    | 6.4.16   | ✅ Active | TypeORM, Prisma, Drizzle | **Consider Drizzle** (lighter, better DX) |
+| fluent-ffmpeg    | ^2.1.3   | ✅ Active | ffmpeg.wasm, sharp       | Keep (ffmpeg binding solid)               |
+| pino             | ^9.6.0   | ✅ Active | winston, bunyan          | Keep (performant)                         |
+| cheerio          | ^1.0.0   | ✅ Active | jsdom, htmlparser2       | Keep                                      |
+| tough-cookie     | ^5.1.2   | ✅ Active | cookie                   | Keep                                      |
+| dayjs            | ^1.11.13 | ✅ Active | date-fns (recommended)   | **Consider date-fns**                     |
+| parse-torrent    | ^11.0.18 | ✅ Active | -                        | Keep                                      |
+| uuid             | ^11.1.0  | ✅ Active | -                        | Keep                                      |
+| dotenv           | ^16.5.0  | ✅ Active | -                        | Keep                                      |
+| file-type        | ^21.0.0  | ✅ Active | -                        | Keep                                      |
+| tmp              | ^0.2.3   | ✅ Active | -                        | Keep                                      |
+| typescript       | ^5.8.3   | ✅ Latest | -                        | Keep                                      |
+| eslint           | ^9.25.1  | ✅ Latest | -                        | Keep                                      |
+| prettier         | ^3.5.3   | ✅ Latest | -                        | Keep                                      |
 
 **Missing Packages (High Priority):**
+
 - ❌ `zod` or `joi` - No runtime schema validation
 - ❌ `pino-http` - No structured HTTP request logging
 - ❌ `neverthrow` or similar - No Result/Either pattern for error handling
@@ -80,11 +85,13 @@ This PRD outlines a strategic refactoring to modernize the codebase, improve mai
 - ❌ `vitest` or `jest` - No testing framework
 
 #### 5. **Type Safety Gaps**
+
 - No validation layer between external data and domain models
 - Config values not validated at startup
 - Loose typing on API responses from qBittorrent
 
 #### 6. **Scalability Concerns**
+
 - Can't easily add new search engines without modifying core
 - Hard to add new command handlers (composer structure)
 - No plugin architecture
@@ -198,36 +205,43 @@ src/
 ### Key Architectural Improvements
 
 #### 1. **Dependency Injection**
+
 - Introduce `tsyringe` for IoC container
 - All services registered at startup
 - Better testability and loose coupling
 
 #### 2. **Error Handling**
+
 - Introduce `neverthrow` Result type
 - Explicit error handling patterns
 - Custom error hierarchy
 
 #### 3. **Validation**
+
 - Runtime validation with `zod`
 - Config validation on startup
 - API payload validation
 
 #### 4. **Service Layer**
+
 - Extract business logic from composers
 - Clear interfaces between layers
 - Easier to test and extend
 
 #### 5. **Handler Pattern**
+
 - Split TorrentsComposer into 5-6 separate handlers
 - Each handler focuses on one use case
 - Shared middleware for cross-cutting concerns
 
 #### 6. **Session Management**
+
 - Persistent session storage (Redis or SQLite)
 - Proper session lifecycle
 - No in-memory leaks
 
 #### 7. **Plugin Architecture**
+
 - Search engines as plugins
 - Handler registration system
 - Extensible design
@@ -237,6 +251,7 @@ src/
 ## Implementation Roadmap
 
 ### Phase 1: Foundation (Weeks 1-2)
+
 - [ ] Setup DI container with tsyringe
 - [ ] Create validation schema with zod
 - [ ] Setup config validation at startup
@@ -245,12 +260,14 @@ src/
 - [ ] Add Result type pattern
 
 **Deliverables:**
+
 - DI container working
 - Config validation passing
 - Unit test examples
 - Error handling patterns established
 
 ### Phase 2: Core Refactoring (Weeks 3-4)
+
 - [ ] Extract services from composers
   - [ ] TorrentService
   - [ ] SearchService
@@ -261,11 +278,13 @@ src/
 - [ ] Move business logic to services
 
 **Deliverables:**
+
 - Services layer complete
 - Core business logic decoupled
 - 80% unit test coverage for services
 
 ### Phase 3: Presentation Refactoring (Weeks 5-6)
+
 - [ ] Extract handlers from composers
   - [ ] SearchHandler
   - [ ] TorrentHandler
@@ -276,11 +295,13 @@ src/
 - [ ] Implement error middleware
 
 **Deliverables:**
+
 - Handlers properly separated
 - Middleware chain working
 - Better error responses
 
 ### Phase 4: Testing & Documentation (Weeks 7-8)
+
 - [ ] Add unit test suite (60%+ coverage)
 - [ ] Add integration tests
 - [ ] Setup E2E test structure
@@ -289,11 +310,13 @@ src/
 - [ ] Create ADR (Architecture Decision Records)
 
 **Deliverables:**
+
 - Test suite with 60%+ coverage
 - Documentation complete
 - ADR document for major decisions
 
 ### Phase 5: Infrastructure & Cleanup (Weeks 9-10)
+
 - [ ] Update TypeScript configuration
 - [ ] Optimize Docker build
 - [ ] Add health check endpoints
@@ -301,17 +324,20 @@ src/
 - [ ] Logging improvements
 
 **Deliverables:**
+
 - Optimized build
 - Monitoring in place
 - Production-ready
 
 ### Phase 6: Documentation & Knowledge Transfer (Week 11)
+
 - [ ] Generate architecture diagrams
 - [ ] Create contributor guide
 - [ ] Document API contracts
 - [ ] Create troubleshooting guide
 
 **Deliverables:**
+
 - Comprehensive docs
 - Developer-friendly setup guide
 
@@ -320,31 +346,34 @@ src/
 ## Dependencies to Add
 
 ### Core
+
 ```json
 {
-  "tsyringe": "^4.8.1",              // Dependency Injection
-  "zod": "^3.22.4",                  // Runtime validation
-  "neverthrow": "^4.3.2",            // Result type pattern
-  "axios": "^1.7.7",                 // HTTP client (replaces fetch wrapper)
-  "pino-http": "^10.1.2",            // HTTP request logging
-  "date-fns": "^3.3.1"               // Date utility (consider replacing dayjs)
+  "tsyringe": "^4.8.1", // Dependency Injection
+  "zod": "^3.22.4", // Runtime validation
+  "neverthrow": "^4.3.2", // Result type pattern
+  "axios": "^1.7.7", // HTTP client (replaces fetch wrapper)
+  "pino-http": "^10.1.2", // HTTP request logging
+  "date-fns": "^3.3.1" // Date utility (consider replacing dayjs)
 }
 ```
 
 ### Dev
+
 ```json
 {
-  "vitest": "^1.1.0",                // Testing framework
-  "@vitest/ui": "^1.1.0",            // Test UI
+  "vitest": "^1.1.0", // Testing framework
+  "@vitest/ui": "^1.1.0", // Test UI
   "@testing-library/node": "^1.2.0", // Testing utilities
-  "ts-node": "^10.9.2",              // Already present
-  "@types/jest": "^29.5.0",          // Type definitions for test patterns
-  "tsx": "^4.7.0",                   // TypeScript execution
-  "tsc-alias": "^1.8.8"              // Path alias support in built code
+  "ts-node": "^10.9.2", // Already present
+  "@types/jest": "^29.5.0", // Type definitions for test patterns
+  "tsx": "^4.7.0", // TypeScript execution
+  "tsc-alias": "^1.8.8" // Path alias support in built code
 }
 ```
 
 ### Dependencies to Deprecate
+
 - `dayjs` → `date-fns` (more tree-shakeable, better DX)
 - Direct database calls → Repository pattern via DI
 
@@ -353,6 +382,7 @@ src/
 ## Code Quality Improvements
 
 ### Linting & Formatting
+
 - Keep ESLint & Prettier
 - Add stricter rules:
   ```js
@@ -368,6 +398,7 @@ src/
   ```
 
 ### Type Safety
+
 - Enable stricter tsconfig:
   ```json
   {
@@ -381,6 +412,7 @@ src/
   ```
 
 ### Testing Standards
+
 - Minimum 60% coverage for Phase 4
 - 80% for critical paths (services, repositories)
 - 100% for pure utilities and domain logic
@@ -390,12 +422,14 @@ src/
 ## Migration Strategy
 
 ### Non-Breaking Changes
+
 1. Add new layers alongside existing code
 2. Implement adapters/facades to existing code
 3. Gradual migration of composers to handlers
 4. No changes to public APIs
 
 ### Phase-by-Phase Approach
+
 ```
 Week 1-2:  New code + old code coexist (DI, validation)
 Week 3-4:  Services extracted but still used by old composers
@@ -404,6 +438,7 @@ Week 7-8:  Remove old composers, full refactor complete
 ```
 
 ### Rollback Strategy
+
 - Feature flags for new vs. old implementations
 - Ability to switch back if issues arise
 - Database schema backward compatible
@@ -413,22 +448,23 @@ Week 7-8:  Remove old composers, full refactor complete
 ## Testing Strategy
 
 ### Unit Tests
+
 ```typescript
 // services/__tests__/TorrentService.test.ts
 describe('TorrentService', () => {
   let service: TorrentService;
   let mockRepository: Mock<ITorrentRepository>;
-  
+
   beforeEach(() => {
     mockRepository = createMockRepository();
     service = new TorrentService(mockRepository);
   });
-  
+
   it('should add torrent with valid input', async () => {
     const result = await service.addTorrent({...});
     expect(result.isOk()).toBe(true);
   });
-  
+
   it('should fail with invalid torrent file', async () => {
     const result = await service.addTorrent({...});
     expect(result.isErr()).toBe(true);
@@ -437,6 +473,7 @@ describe('TorrentService', () => {
 ```
 
 ### Integration Tests
+
 ```typescript
 // __tests__/integration/TorrentWorkflow.test.ts
 describe('Torrent Download Workflow', () => {
@@ -447,6 +484,7 @@ describe('Torrent Download Workflow', () => {
 ```
 
 ### E2E Tests
+
 ```typescript
 // __tests__/e2e/bot.test.ts
 describe('Bot E2E Tests', () => {
@@ -461,22 +499,23 @@ describe('Bot E2E Tests', () => {
 ## Performance Considerations
 
 ### Optimizations
+
 1. **Session Persistence**: Move from in-memory to SQLite/Redis
    - Reduce memory leaks
    - Enable multi-instance deployment
-   
+
 2. **Lazy Loading**: Entities and services loaded on demand
-   
+
 3. **Caching Strategy**:
    - Cache search results (5 min TTL)
    - Cache user preferences
    - Cache file metadata
-   
+
 4. **Async Processing**:
    - Queue long-running operations
    - Non-blocking video compression
    - Background torrent status updates
-   
+
 5. **Database Optimization**:
    - Proper indexes on frequently queried columns
    - Connection pooling configuration
@@ -487,17 +526,20 @@ describe('Bot E2E Tests', () => {
 ## Monitoring & Observability
 
 ### Logging
+
 - Structured JSON logging with Pino
 - Request/response tracing
 - Error stack traces with context
 
 ### Metrics
+
 - Command execution times
 - qBittorrent API response times
 - Search engine performance
 - Database query performance
 
 ### Health Checks
+
 ```typescript
 // GET /health
 {
@@ -513,22 +555,24 @@ describe('Bot E2E Tests', () => {
 ## Documentation Requirements
 
 ### Architecture Documentation
+
 1. **Architecture Decision Records (ADRs)**
    - ADR-001: Why DI Container
    - ADR-002: Why Result Type Pattern
    - ADR-003: Service Layer Design
-   
+
 2. **System Diagrams**
    - Component diagram
    - Data flow diagram
    - Deployment diagram
-   
+
 3. **API Documentation**
    - OpenAPI/Swagger for handlers
    - Domain service interfaces
    - Repository contracts
 
 ### Developer Documentation
+
 1. **Setup Guide**: Step-by-step development environment
 2. **Contributing Guide**: How to add features
 3. **Troubleshooting**: Common issues and solutions
@@ -552,12 +596,12 @@ describe('Bot E2E Tests', () => {
 
 ## Risk Mitigation
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|-----------|
-| Breaking changes to bot API | Low | High | Use adapters, feature flags |
-| Database migration issues | Medium | High | Thorough testing, backups |
-| Performance degradation | Low | Medium | Load testing, profiling |
-| Developer confusion | Medium | Medium | Documentation, examples |
+| Risk                        | Probability | Impact | Mitigation                  |
+| --------------------------- | ----------- | ------ | --------------------------- |
+| Breaking changes to bot API | Low         | High   | Use adapters, feature flags |
+| Database migration issues   | Medium      | High   | Thorough testing, backups   |
+| Performance degradation     | Low         | Medium | Load testing, profiling     |
+| Developer confusion         | Medium      | Medium | Documentation, examples     |
 
 ---
 
@@ -566,6 +610,7 @@ describe('Bot E2E Tests', () => {
 This refactoring will transform the Smart Home Media Assistant from a functional monolith into a well-architected, maintainable, and testable system. The phased approach allows for gradual migration without disrupting current functionality, and the new structure will support future growth and feature additions.
 
 **Next Steps:**
+
 1. Review and approve PRD
 2. Setup project board with Phase 1 tasks
 3. Begin DI container and validation setup

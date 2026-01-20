@@ -1,15 +1,16 @@
 # Architecture Review Summary
 
-**Project**: Smart Home Media Assistant Telegram Bot  
-**Review Date**: January 2026  
-**Reviewed By**: Senior Technical Architect  
-**Status**: Complete & Ready for Implementation  
+**Project**: Smart Home Media Assistant Telegram Bot
+**Review Date**: January 2026
+**Reviewed By**: Senior Technical Architect
+**Status**: Complete & Ready for Implementation
 
 ---
 
 ## Quick Overview
 
 This project is a **functional Telegram bot** (~2400 LOC) that enables users to:
+
 - Search torrents on Rutracker
 - Download torrents via qBittorrent
 - Manage downloads and share files through Telegram
@@ -70,6 +71,7 @@ This project is a **functional Telegram bot** (~2400 LOC) that enables users to:
 ## Proposed Architecture
 
 ### Layered Architecture
+
 ```
 Presentation Layer (grammy handlers, formatters)
     ↓
@@ -82,21 +84,23 @@ Configuration & DI
 
 ### Key Improvements
 
-| Area | Current | Proposed | Benefit |
-|------|---------|----------|---------|
-| Dependency Injection | Manual | tsyringe | Testable, maintainable |
-| Validation | None | Zod | Type-safe, explicit |
-| Error Handling | try/catch | Result type | Composable, explicit |
-| Composition | 2 handlers | 5+ handlers | Single responsibility |
-| Sessions | In-memory | Persistent SQLite | No leaks, scalable |
-| Testing | 0% | 60%+ coverage | Confidence, quality |
+| Area                 | Current    | Proposed          | Benefit                |
+| -------------------- | ---------- | ----------------- | ---------------------- |
+| Dependency Injection | Manual     | tsyringe          | Testable, maintainable |
+| Validation           | None       | Zod               | Type-safe, explicit    |
+| Error Handling       | try/catch  | Result type       | Composable, explicit   |
+| Composition          | 2 handlers | 5+ handlers       | Single responsibility  |
+| Sessions             | In-memory  | Persistent SQLite | No leaks, scalable     |
+| Testing              | 0%         | 60%+ coverage     | Confidence, quality    |
 
 ---
 
 ## Implementation Timeline
 
-### **Phase 1: Foundation (Weeks 1-2)** 
+### **Phase 1: Foundation (Weeks 1-2)**
+
 Setup DI container, validation layer, error patterns
+
 - [ ] Install tsyringe, Zod, neverthrow
 - [ ] Create config validation schema
 - [ ] Setup vitest test framework
@@ -105,9 +109,11 @@ Setup DI container, validation layer, error patterns
 **Deliverable**: Working DI + validation + tests running
 
 ### **Phase 2: Core Refactoring (Weeks 3-4)**
+
 Extract services from composers
+
 - [ ] Create TorrentService
-- [ ] Create SearchService  
+- [ ] Create SearchService
 - [ ] Create FileService
 - [ ] Create ChatSessionService
 - [ ] Implement repositories
@@ -115,7 +121,9 @@ Extract services from composers
 **Deliverable**: 80% unit test coverage for services
 
 ### **Phase 3: Presentation (Weeks 5-6)**
+
 Split handlers and create middleware
+
 - [ ] Create SearchHandler
 - [ ] Create TorrentHandler
 - [ ] Create FileHandler
@@ -125,7 +133,9 @@ Split handlers and create middleware
 **Deliverable**: Handlers properly separated, working middleware
 
 ### **Phase 4: Testing & Docs (Weeks 7-8)**
+
 Comprehensive test suite and documentation
+
 - [ ] Add integration tests
 - [ ] Add E2E test structure
 - [ ] Create architecture documentation
@@ -134,7 +144,9 @@ Comprehensive test suite and documentation
 **Deliverable**: 60%+ coverage, docs complete
 
 ### **Phase 5: Infrastructure (Weeks 9-10)**
+
 Polish and optimize
+
 - [ ] TypeScript strict mode
 - [ ] Docker optimization
 - [ ] Health check endpoints
@@ -143,7 +155,9 @@ Polish and optimize
 **Deliverable**: Production-ready optimized build
 
 ### **Phase 6: Knowledge Transfer (Week 11)**
+
 Documentation and onboarding
+
 - [ ] Architecture diagrams
 - [ ] Video walkthrough
 - [ ] Troubleshooting guide
@@ -156,34 +170,38 @@ Documentation and onboarding
 ## Dependencies to Add
 
 ### Critical (Blocking)
+
 ```json
 {
-  "zod": "^3.22.4",                  // Validation
-  "tsyringe": "^4.8.1",              // Dependency injection
-  "neverthrow": "^4.3.2",            // Error handling
-  "vitest": "^1.1.0"                 // Testing
+  "zod": "^3.22.4", // Validation
+  "tsyringe": "^4.8.1", // Dependency injection
+  "neverthrow": "^4.3.2", // Error handling
+  "vitest": "^1.1.0" // Testing
 }
 ```
 
 ### Important (Next Phase)
+
 ```json
 {
-  "pino-http": "^10.1.2",            // HTTP logging
-  "axios": "^1.7.7",                 // HTTP client (optional)
-  "date-fns": "^3.3.1"               // Date utility (optional)
+  "pino-http": "^10.1.2", // HTTP logging
+  "axios": "^1.7.7", // HTTP client (optional)
+  "date-fns": "^3.3.1" // Date utility (optional)
 }
 ```
 
 ### Development
+
 ```json
 {
-  "@vitest/ui": "^1.1.0",            // Test UI
-  "tsx": "^4.7.0",                   // TS execution
-  "tsc-alias": "^1.8.8"              // Build path aliases
+  "@vitest/ui": "^1.1.0", // Test UI
+  "tsx": "^4.7.0", // TS execution
+  "tsc-alias": "^1.8.8" // Build path aliases
 }
 ```
 
 ### Dependencies to Remove
+
 ```
 @moebius/fluent (redundant with @grammyjs/fluent)
 ```
@@ -192,21 +210,22 @@ Documentation and onboarding
 
 ## Success Metrics
 
-| Metric | Target | Current | Priority |
-|--------|--------|---------|----------|
-| Unit Test Coverage | 60%+ | 0% | CRITICAL |
-| Max File Size | <400 lines | 997 (TorrentsComposer) | CRITICAL |
-| Type Coverage | 100% | ~85% | HIGH |
-| In-Memory State | 0 | 2 maps | HIGH |
-| Circular Dependencies | 0 | ~3 | MEDIUM |
-| Config Validation | 100% | 0% | HIGH |
-| Documentation | Comprehensive | Minimal | MEDIUM |
+| Metric                | Target        | Current                | Priority |
+| --------------------- | ------------- | ---------------------- | -------- |
+| Unit Test Coverage    | 60%+          | 0%                     | CRITICAL |
+| Max File Size         | <400 lines    | 997 (TorrentsComposer) | CRITICAL |
+| Type Coverage         | 100%          | ~85%                   | HIGH     |
+| In-Memory State       | 0             | 2 maps                 | HIGH     |
+| Circular Dependencies | 0             | ~3                     | MEDIUM   |
+| Config Validation     | 100%          | 0%                     | HIGH     |
+| Documentation         | Comprehensive | Minimal                | MEDIUM   |
 
 ---
 
 ## Documents Created
 
 ### 1. **PRD_ARCHITECTURE_REFACTORING.md** (15KB)
+
 - Complete refactoring strategy
 - 6-phase implementation plan
 - Architecture patterns and principles
@@ -214,6 +233,7 @@ Documentation and onboarding
 - Success metrics
 
 ### 2. **DEPENDENCY_ANALYSIS.md** (12KB)
+
 - Current dependency review (20+ packages)
 - Vulnerability assessment
 - Missing critical packages
@@ -221,6 +241,7 @@ Documentation and onboarding
 - Maintenance schedule
 
 ### 3. **CODE_REVIEW.md** (18KB)
+
 - Architecture pattern analysis
 - Anti-pattern identification
 - File-by-file review
@@ -228,6 +249,7 @@ Documentation and onboarding
 - Error handling review
 
 ### 4. **ADR.md** (20KB)
+
 - 6 key Architecture Decision Records
 - Context, decision, rationale for each
 - Implementation examples
@@ -239,18 +261,21 @@ Documentation and onboarding
 ## Next Steps
 
 ### Immediate (This Week)
+
 1. **Review** all 4 documents with team
 2. **Discuss** key architectural decisions
 3. **Approve** PRD and ADRs
 4. **Schedule** refactoring sprint
 
 ### Short Term (Next 2 Weeks)
+
 1. Setup DI container (tsyringe)
 2. Create validation schema (Zod)
 3. Implement Result type pattern (neverthrow)
 4. Add test infrastructure (vitest)
 
 ### Medium Term (Next 8 Weeks)
+
 Follow implementation roadmap across 6 phases
 
 ---
@@ -286,14 +311,15 @@ Key topics for team discussion:
 ## Appendix: Architecture Comparison
 
 ### Before Refactoring
+
 ```
 src/
 ├── composers/          (2 handlers, 1 monolithic)
 ├── entities/           (3 entities)
 ├── utils/              (15+ mixed files)
-├── qBittorrent/        
-├── searchEngines/      
-├── migrations/         
+├── qBittorrent/
+├── searchEngines/
+├── migrations/
 └── Scattered config    (4 files)
 
 Problems:
@@ -306,6 +332,7 @@ Problems:
 ```
 
 ### After Refactoring
+
 ```
 src/
 ├── domain/             (services, repos, entities)
@@ -335,6 +362,6 @@ Benefits:
 
 ---
 
-**Status**: ✅ Ready for review and implementation  
-**Date**: January 2026  
+**Status**: ✅ Ready for review and implementation
+**Date**: January 2026
 **Prepared by**: Senior Technical Architect

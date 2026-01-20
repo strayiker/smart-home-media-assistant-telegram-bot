@@ -5,7 +5,7 @@ import { CookieJar } from 'tough-cookie';
 
 import { err, ok, type ResultT } from '../utils/result.js';
 import { type QBFile, type QBTorrent } from './models.js';
-import { normalizeTorrent,QBTorrentsResponseSchema } from './schemas.js';
+import { normalizeTorrent, QBTorrentsResponseSchema } from './schemas.js';
 import {
   type QBClientAddTorrentsOptions,
   type QBClientGetTorrentsOptions,
@@ -133,7 +133,9 @@ export class QBittorrentClient {
     return ok(hashes);
   }
 
-  async addTorrentsSafe(opts: QBClientAddTorrentsOptions): Promise<ResultT<string[], unknown>> {
+  async addTorrentsSafe(
+    opts: QBClientAddTorrentsOptions,
+  ): Promise<ResultT<string[], unknown>> {
     try {
       return await this.addTorrents(opts);
     } catch (error) {
@@ -141,7 +143,10 @@ export class QBittorrentClient {
     }
   }
 
-  async getTorrents({ hashes, ...rest }: QBClientGetTorrentsOptions): Promise<QBTorrent[]> {
+  async getTorrents({
+    hashes,
+    ...rest
+  }: QBClientGetTorrentsOptions): Promise<QBTorrent[]> {
     const data = new URLSearchParams();
 
     if (hashes) {

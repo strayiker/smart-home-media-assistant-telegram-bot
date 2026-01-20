@@ -19,7 +19,9 @@ describe('FileHandler', () => {
   });
 
   it('replies with file list when service succeeds', async () => {
-    mockFileService.listFilesByUid.mockResolvedValue(['0: a.mkv — 1MB — /dl_file_uid123_0']);
+    mockFileService.listFilesByUid.mockResolvedValue([
+      '0: a.mkv — 1MB — /dl_file_uid123_0',
+    ]);
     await handleListFilesCommand(ctx, mockFileService, mockLogger);
     expect(mockFileService.listFilesByUid).toHaveBeenCalledWith('uid123');
     expect(ctx.reply).toHaveBeenCalled();

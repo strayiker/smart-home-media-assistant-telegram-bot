@@ -44,12 +44,15 @@ export class FileService {
       const size = formatBytes(file.size ?? 0);
       let note = '';
       if ((file.size ?? 0) > 2 * 1024 * 1024 * 1024) {
-        note = this.isVideo(file.name) ? ' (will be compressed)' : ' (too big to download)';
+        note = this.isVideo(file.name)
+          ? ' (will be compressed)'
+          : ' (too big to download)';
       }
 
-      const download = (file.size ?? 0) > 2 * 1024 * 1024 * 1024 && !this.isVideo(file.name)
-        ? 'N/A'
-        : `/dl_file_${uid}_${file.index}`;
+      const download =
+        (file.size ?? 0) > 2 * 1024 * 1024 * 1024 && !this.isVideo(file.name)
+          ? 'N/A'
+          : `/dl_file_${uid}_${file.index}`;
 
       return `${file.index}: ${file.name} — ${size}${note} — ${download}`;
     });

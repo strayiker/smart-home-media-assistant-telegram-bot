@@ -1,18 +1,18 @@
 # Code Architecture Review & Analysis
 
-**Document Version:** 1.0  
-**Date:** January 2026  
+**Document Version:** 1.0
+**Date:** January 2026
 **Reviewer Role:** Senior Architect
 
 ---
 
 ## Project Overview
 
-**Project**: Smart Home Media Assistant Telegram Bot  
-**Type**: Node.js / TypeScript Telegram Bot + Media Manager  
-**Size**: ~2400 LOC (production code)  
-**Purpose**: Search torrents on Rutracker, download via qBittorrent, share files via Telegram  
-**Status**: Functional, ready for modernization  
+**Project**: Smart Home Media Assistant Telegram Bot
+**Type**: Node.js / TypeScript Telegram Bot + Media Manager
+**Size**: ~2400 LOC (production code)
+**Purpose**: Search torrents on Rutracker, download via qBittorrent, share files via Telegram
+**Status**: Functional, ready for modernization
 
 ---
 
@@ -23,6 +23,7 @@
 #### ✅ Positive Patterns
 
 **Composer Pattern (grammy)**
+
 ```typescript
 export class AuthComposer extends Composer<MyContext> {
   constructor(em: EntityManager, secretKey: string) {
@@ -33,24 +34,28 @@ export class AuthComposer extends Composer<MyContext> {
   }
 }
 ```
+
 - **Good**: Clean separation of command handlers
 - **Usage**: Used for AuthComposer, TorrentsComposer
 - **Issue**: One composer handling too many concerns
 
 **Repository Pattern (Partial)**
+
 ```typescript
 export class TorrentMetaRepository {
   constructor(private em: EntityManager) {}
-  
+
   async findByUid(uid: string) {
     return this.em.findOne(TorrentMeta, { uid });
   }
 }
 ```
+
 - **Good**: Database access abstraction
 - **Issue**: Only partially implemented; not all data access follows this pattern
 
 **Entity Models (MikroORM)**
+
 ```typescript
 @Entity()
 export class TorrentMeta {
@@ -62,23 +67,26 @@ export class TorrentMeta {
   // ...
 }
 ```
+
 - **Good**: Clear data modeling
 - **Issue**: Entity behavior logic mixing with persistence
 
 #### ❌ Anti-Patterns
 
 **Monolithic Composers**
+
 ```typescript
 // TorrentsComposer.ts: 997 LINES!
 export class TorrentsComposer extends Composer<MyContext> {
   // Handles: search, download, file management, compression, metadata
-  // Methods: handleSearchCommand(), handleDownloadCommand(), 
+  // Methods: handleSearchCommand(), handleDownloadCommand(),
   //          formatTorrent(), createOrUpdateTorrentsMessages(),
   //          compressVideo(), and 50+ more...
 }
 ```
 
 **Issues**:
+
 - Single Responsibility Principle violation
 - Impossible to unit test individual features
 - Hard to understand flow
@@ -86,6 +94,7 @@ export class TorrentsComposer extends Composer<MyContext> {
 - Memory leaks with `chatMessages` and `chatTorrents` maps
 
 **In-Memory State Management**
+
 ```typescript
 private chatMessages = new Map<number, Message>();
 private chatTorrents = new Map<number, Set<string>>();
@@ -96,6 +105,7 @@ private timeout: NodeJS.Timeout;
 ```
 
 **Tight Coupling**
+
 ```typescript
 // index.ts - Creates all dependencies manually
 const qBittorrent = new QBittorrentClient({...});
@@ -106,6 +116,7 @@ const torrentsComposer = new TorrentsComposer({
 ```
 
 **Magic Strings for Commands**
+
 ```typescript
 if (ctx.message.text?.startsWith('/dl_')) {
   // Handle download
@@ -116,6 +127,7 @@ if (ctx.message.text?.startsWith('/dl_')) {
 ```
 
 **No Error Boundaries**
+
 ```typescript
 bot.catch(({ error }) => {
   if (error instanceof GrammyError) {
@@ -130,6 +142,7 @@ bot.catch(({ error }) => {
 ```
 
 **Unvalidated External Data**
+
 ```typescript
 // From config.ts - no validation
 export const botToken = config.get('BOT_TOKEN', {
@@ -145,6 +158,7 @@ export const botToken = config.get('BOT_TOKEN', {
 ### 2. Code Organization Review
 
 #### Current Structure
+
 ```
 src/
 ├── composers/          # Bot command handlers
@@ -180,6 +194,7 @@ src/
 ```
 
 **Issues**:
+
 - `utils/` is a dumping ground (15+ mixed responsibilities)
 - Repositories should be in domain layer, not utils
 - No clear separation between domain logic and presentation
@@ -187,6 +202,7 @@ src/
 - Config spread across multiple files
 
 #### Recommended Structure (from PRD)
+
 ```
 src/
 ├── domain/           # Core business logic
@@ -203,6 +219,7 @@ src/
 ### 3. Type Safety Analysis
 
 #### ✅ Good Type Safety
+
 - Used throughout codebase
 - Proper interface definitions
 - Generic types where appropriate
@@ -210,6 +227,7 @@ src/
 #### ❌ Type Safety Gaps
 
 **Unvalidated Config**
+
 ```typescript
 // config.ts
 export const botToken = config.get('BOT_TOKEN', { required: true });
@@ -217,6 +235,7 @@ export const botToken = config.get('BOT_TOKEN', { required: true });
 ```
 
 **Loose Typing on External APIs**
+
 ```typescript
 // QBittorrentClient - responses not fully typed
 const response = await fetch(url);
@@ -225,6 +244,7 @@ const data = await response.json(); // any type
 ```
 
 **Missing Return Types**
+
 ```typescript
 // Some methods have implicit any returns
 async createOrUpdateTorrentsMessage(chatId: number) {
@@ -233,6 +253,7 @@ async createOrUpdateTorrentsMessage(chatId: number) {
 ```
 
 **Recommendation**: Enable stricter TypeScript config
+
 ```json
 {
   "compilerOptions": {
@@ -249,6 +270,7 @@ async createOrUpdateTorrentsMessage(chatId: number) {
 ### 4. File-by-File Analysis
 
 #### src/index.ts (123 lines) ✅ GOOD
+
 ```typescript
 // Responsibilities: Bootstrap bot, setup middleware, error handling
 // Size: Appropriate for main entry point
@@ -257,6 +279,7 @@ async createOrUpdateTorrentsMessage(chatId: number) {
 ```
 
 #### src/config.ts (54 lines) ⚠️ NEEDS VALIDATION
+
 ```typescript
 // Issues:
 // 1. No validation of values at startup
@@ -275,6 +298,7 @@ export const config = configSchema.parse(process.env);
 ```
 
 #### src/composers/AuthComposer.ts (165 lines) ✅ GOOD
+
 ```typescript
 // Responsibilities: Handle auth-related commands
 // Size: Reasonable
@@ -283,8 +307,9 @@ export const config = configSchema.parse(process.env);
 ```
 
 #### src/composers/TorrentsComposer.ts (997 lines) ❌ CRITICAL
+
 ```typescript
-// Responsibilities: 
+// Responsibilities:
 //   - Search torrents (100+ lines)
 //   - Download torrents (150+ lines)
 //   - Manage downloads (200+ lines)
@@ -371,17 +396,16 @@ if (ctx.message.text?.startsWith('/dl_')) {
 ### 5. Database Layer Analysis
 
 #### MikroORM Setup ✅ GOOD
+
 ```typescript
 // orm.ts - Clean setup
 export const orm = new MikroORM<DbDriver>(
-  ormConfig(
-    path.resolve('./dist/entities'),
-    path.resolve('./dist/migrations'),
-  ),
+  ormConfig(path.resolve('./dist/entities'), path.resolve('./dist/migrations')),
 );
 ```
 
 #### Entities ✅ MOSTLY GOOD
+
 ```typescript
 // Entities are well-defined
 @Entity()
@@ -393,15 +417,16 @@ export class User {
 ```
 
 **Issue**: Missing relationships and constraints
+
 ```typescript
 // Should have:
 @Entity()
 export class ChatSettings {
   @PrimaryKey() id!: number;
-  
+
   @Property() chatId!: number;
   @Property() locale!: string;
-  
+
   // Missing: Unique constraint on chatId
   // Missing: Relationship to User
   @ManyToOne()
@@ -410,6 +435,7 @@ export class ChatSettings {
 ```
 
 #### Repositories ⚠️ PARTIAL
+
 ```typescript
 // Repositories exist but inconsistently
 // Some repositories: TorrentMetaRepository, ChatSettingsRepository
@@ -427,6 +453,7 @@ const chatSettings = await chatSettingsRepository.findByChat(chatId);
 ### 6. Testing Review
 
 #### Test Coverage: 0% ❌ CRITICAL
+
 - No unit tests
 - No integration tests
 - No E2E tests
@@ -439,6 +466,7 @@ const chatSettings = await chatSettingsRepository.findByChat(chatId);
 ### 7. Error Handling Review
 
 #### Current Approach: Try/Catch
+
 ```typescript
 bot.catch(({ error }) => {
   if (error instanceof GrammyError) {
@@ -450,6 +478,7 @@ bot.catch(({ error }) => {
 ```
 
 #### Issues:
+
 - Generic error messages
 - No context about what operation failed
 - No recovery strategy
@@ -457,6 +486,7 @@ bot.catch(({ error }) => {
 - Hard to debug
 
 #### Recommended Approach: Result Type
+
 ```typescript
 type Result<T, E> = Ok<T> | Err<E>;
 
@@ -465,12 +495,12 @@ async addTorrent(torrentData: Buffer): Promise<Result<Torrent, TorrentError>> {
   if (!parseResult.isOk()) {
     return err(new InvalidTorrentError(parseResult.error));
   }
-  
+
   const qbtResult = await this.qbittorrent.add(parseResult.value);
   if (!qbtResult.isOk()) {
     return err(new QBittorentError(qbtResult.error));
   }
-  
+
   return ok(qbtResult.value);
 }
 ```
@@ -480,6 +510,7 @@ async addTorrent(torrentData: Buffer): Promise<Result<Torrent, TorrentError>> {
 ### 8. Logging Analysis
 
 #### Current: Pino Logger ✅ GOOD
+
 ```typescript
 // logger.ts
 export const logger = pino();
@@ -490,12 +521,14 @@ logger.error(error, 'Error in request');
 ```
 
 #### Issues:
+
 - No request/response logging
 - No structured field logging
 - No trace IDs for debugging
 - No performance metrics
 
 #### Recommendations:
+
 1. Add pino-http middleware
 2. Add trace IDs to contexts
 3. Add performance metrics
@@ -510,7 +543,7 @@ logger.info(
     durationMs: performance.now() - start,
     resultCount: results.length,
   },
-  'Torrent search completed'
+  'Torrent search completed',
 );
 ```
 
@@ -519,6 +552,7 @@ logger.info(
 ### 9. Configuration Management
 
 #### Current Approach: Direct Exports ⚠️
+
 ```typescript
 export const botToken = config.get('BOT_TOKEN', { required: true });
 export const secretKey = config.get('SECRET_KEY', { required: true });
@@ -526,12 +560,14 @@ export const secretKey = config.get('SECRET_KEY', { required: true });
 ```
 
 #### Issues:
+
 - No validation (get() can fail at runtime)
 - Hard to see all config at once
 - No TypeScript types
 - Config scattered across multiple calls
 
 #### Recommended Approach: Single Typed Config
+
 ```typescript
 // config/env.schema.ts
 export const envSchema = z.object({
@@ -558,6 +594,7 @@ export const appConfig: AppConfig = envSchema.parse({
 ### 10. Dependency Injection Review
 
 #### Current Approach: Manual Wiring ⚠️
+
 ```typescript
 // index.ts - manual dependency creation
 const qBittorrent = new QBittorrentClient({
@@ -587,12 +624,14 @@ const torrentsComposer = new TorrentsComposer({
 ```
 
 #### Issues:
+
 - Hard to test (need to inject mocks)
 - Difficult to add new dependencies
 - Easy to forget to pass a dependency
 - No centralized dependency graph
 
 #### Recommended Approach: IoC Container
+
 ```typescript
 // di.ts
 import 'reflect-metadata';
@@ -620,6 +659,7 @@ const handler = container.resolve(TorrentsHandler);
 ### 11. Search Engine Architecture
 
 #### Current: Abstract Class ✅
+
 ```typescript
 export abstract class SearchEngine {
   abstract name: string;
@@ -633,16 +673,19 @@ export class RutrackerSearchEngine extends SearchEngine {
 ```
 
 #### Good:
+
 - Clear contract
 - Easy to add new engines
 - Used in TorrentsComposer
 
 #### Issues:
+
 - Not registered in IoC container
 - Hard to extend or configure
 - No error handling contract
 
 #### Improved Design:
+
 ```typescript
 // domain/search/SearchEngine.ts
 export interface SearchEngine {
@@ -654,11 +697,11 @@ export interface SearchEngine {
 // Plugin registry
 export class SearchEngineRegistry {
   private engines = new Map<string, SearchEngine>();
-  
+
   register(engine: SearchEngine) {
     this.engines.set(engine.name, engine);
   }
-  
+
   searchAll(query: string): Promise<SearchResult[]> {
     // Search with all registered engines
   }
@@ -669,18 +712,18 @@ export class SearchEngineRegistry {
 
 ## Summary Table
 
-| Aspect | Grade | Status | Priority |
-|--------|-------|--------|----------|
-| Project Structure | D+ | Needs reorganization | HIGH |
-| TorrentsComposer Size | D- | Too large, needs split | CRITICAL |
-| Type Safety | B- | Good but gaps | MEDIUM |
-| Error Handling | D | Generic, no pattern | HIGH |
-| Config Management | C | Works but not validated | MEDIUM |
-| Testing | F | Zero tests | CRITICAL |
-| Logging | B | Good but incomplete | LOW |
-| DI Pattern | D | Manual wiring | HIGH |
-| Database Layer | B | Good but partial | MEDIUM |
-| Code Documentation | C | Minimal docs | MEDIUM |
+| Aspect                | Grade | Status                  | Priority |
+| --------------------- | ----- | ----------------------- | -------- |
+| Project Structure     | D+    | Needs reorganization    | HIGH     |
+| TorrentsComposer Size | D-    | Too large, needs split  | CRITICAL |
+| Type Safety           | B-    | Good but gaps           | MEDIUM   |
+| Error Handling        | D     | Generic, no pattern     | HIGH     |
+| Config Management     | C     | Works but not validated | MEDIUM   |
+| Testing               | F     | Zero tests              | CRITICAL |
+| Logging               | B     | Good but incomplete     | LOW      |
+| DI Pattern            | D     | Manual wiring           | HIGH     |
+| Database Layer        | B     | Good but partial        | MEDIUM   |
+| Code Documentation    | C     | Minimal docs            | MEDIUM   |
 
 ---
 

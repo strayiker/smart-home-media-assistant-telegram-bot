@@ -1,10 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { err,ok } from '../../../utils/result.js';
+import { err, ok } from '../../../utils/result.js';
 import type { TorrentMeta } from '../../entities/TorrentMeta.js';
 import type { QBFile as _QBFile, QBTorrent } from '../../qBittorrent/models.js';
 import type { QBittorrentClient } from '../../qBittorrent/QBittorrentClient.js';
-import type { SearchEngine, SearchResult } from '../../searchEngines/SearchEngine.js';
+import type {
+  SearchEngine,
+  SearchResult,
+} from '../../searchEngines/SearchEngine.js';
 import type { Logger } from '../../utils/Logger.js';
 import type { TorrentMetaRepository } from '../../utils/TorrentMetaRepository.js';
 import { TorrentService } from '../TorrentService.js';
@@ -51,7 +54,11 @@ describe('TorrentService', () => {
       downloadTorrentFile: vi.fn(),
     } as unknown as SearchEngine;
 
-    service = new TorrentService(mockQBittorrentClient, mockTorrentMetaRepository, mockLogger);
+    service = new TorrentService(
+      mockQBittorrentClient,
+      mockTorrentMetaRepository,
+      mockLogger,
+    );
   });
 
   describe('addTorrent', () => {
@@ -60,8 +67,12 @@ describe('TorrentService', () => {
       const uid = 'test-engine_12345';
       const hash = 'abc123hash';
 
-      vi.mocked(mockQBittorrentClient.addTorrents).mockResolvedValue(ok([hash]));
-      vi.mocked(mockTorrentMetaRepository.create).mockResolvedValue({} as TorrentMeta);
+      vi.mocked(mockQBittorrentClient.addTorrents).mockResolvedValue(
+        ok([hash]),
+      );
+      vi.mocked(mockTorrentMetaRepository.create).mockResolvedValue(
+        {} as TorrentMeta,
+      );
 
       const result = await service.addTorrent({
         torrent: torrentData,
@@ -94,7 +105,9 @@ describe('TorrentService', () => {
 
     it('should rollback and return error if QBittorrentClient fails', async () => {
       const error = new Error('qBittorrent connection failed');
-      vi.mocked(mockQBittorrentClient.addTorrents).mockResolvedValue(err(error));
+      vi.mocked(mockQBittorrentClient.addTorrents).mockResolvedValue(
+        err(error),
+      );
 
       const result = await service.addTorrent({
         torrent: 'data',
@@ -115,8 +128,12 @@ describe('TorrentService', () => {
       const hash = 'abc123';
       const createError = new Error('Database write failed');
 
-      vi.mocked(mockQBittorrentClient.addTorrents).mockResolvedValue(ok([hash]));
-      vi.mocked(mockTorrentMetaRepository.create).mockRejectedValue(createError);
+      vi.mocked(mockQBittorrentClient.addTorrents).mockResolvedValue(
+        ok([hash]),
+      );
+      vi.mocked(mockTorrentMetaRepository.create).mockRejectedValue(
+        createError,
+      );
       vi.mocked(mockQBittorrentClient.deleteTorrents).mockResolvedValue();
 
       const result = await service.addTorrent({
@@ -132,7 +149,10 @@ describe('TorrentService', () => {
         expect(result.error).toEqual(createError);
       }
 
-      expect(mockQBittorrentClient.deleteTorrents).toHaveBeenCalledWith([hash], true);
+      expect(mockQBittorrentClient.deleteTorrents).toHaveBeenCalledWith(
+        [hash],
+        true,
+      );
       expect(mockLogger.error).toHaveBeenCalledWith(
         createError,
         'Failed to persist torrent metadata',
@@ -153,7 +173,9 @@ describe('TorrentService', () => {
       const result = await service.getTorrents(hashes);
 
       expect(result).toEqual(torrents);
-      expect(mockQBittorrentClient.getTorrents).toHaveBeenCalledWith({ hashes });
+      expect(mockQBittorrentClient.getTorrents).toHaveBeenCalledWith({
+        hashes,
+      });
     });
 
     it('should throw error if fetch fails', async () => {
@@ -173,8 +195,13 @@ describe('TorrentService', () => {
       const result = await service.deleteTorrent('hash1');
 
       expect(result.ok).toBe(true);
-      expect(mockQBittorrentClient.deleteTorrents).toHaveBeenCalledWith(['hash1'], true);
-      expect(mockTorrentMetaRepository.removeByHash).toHaveBeenCalledWith('hash1');
+      expect(mockQBittorrentClient.deleteTorrents).toHaveBeenCalledWith(
+        ['hash1'],
+        true,
+      );
+      expect(mockTorrentMetaRepository.removeByHash).toHaveBeenCalledWith(
+        'hash1',
+      );
       expect(mockLogger.debug).toHaveBeenCalledWith(
         'A torrent was successfully deleted: %s',
         'hash1',
@@ -218,7 +245,9 @@ describe('TorrentService', () => {
     });
 
     it('should handle search engine failures gracefully', async () => {
-      vi.mocked(mockSearchEngine.search).mockRejectedValue(new Error('Search failed'));
+      vi.mocked(mockSearchEngine.search).mockRejectedValue(
+        new Error('Search failed'),
+      );
 
       const results = await service.searchTorrents('query', [mockSearchEngine]);
 
@@ -230,9 +259,13 @@ describe('TorrentService', () => {
   describe('downloadTorrentFile', () => {
     it('should download torrent file from supported engine', async () => {
       const torrentData = 'base64torrentdata';
-      vi.mocked(mockSearchEngine.downloadTorrentFile).mockResolvedValue(torrentData);
+      vi.mocked(mockSearchEngine.downloadTorrentFile).mockResolvedValue(
+        torrentData,
+      );
 
-      const result = await service.downloadTorrentFile('test-engine', 'id', [mockSearchEngine]);
+      const result = await service.downloadTorrentFile('test-engine', 'id', [
+        mockSearchEngine,
+      ]);
 
       expect(result.ok).toBe(true);
       if (result.ok) {
@@ -241,7 +274,9 @@ describe('TorrentService', () => {
     });
 
     it('should return error for unsupported engine', async () => {
-      const result = await service.downloadTorrentFile('unsupported', 'id', [mockSearchEngine]);
+      const result = await service.downloadTorrentFile('unsupported', 'id', [
+        mockSearchEngine,
+      ]);
 
       expect(result.ok).toBe(false);
       if (!result.ok) {

@@ -1,5 +1,5 @@
 import parseTorrent from 'parse-torrent';
-import { describe, expect, it, type Mock,vi } from 'vitest';
+import { describe, expect, it, type Mock, vi } from 'vitest';
 
 import { isErr, isOk, unsafeUnwrap } from '../../utils/result.js';
 import { QBittorrentClient } from '../QBittorrentClient.js';
@@ -11,10 +11,18 @@ describe('QBittorrentClient.addTorrentsSafe', () => {
     const mockedParse = parseTorrent as unknown as Mock;
     mockedParse.mockResolvedValue({ infoHash: 'abc123' });
 
-    const client = new QBittorrentClient({ url: 'http://localhost:8080', username: 'u', password: 'p' });
-    vi.spyOn(QBittorrentClient.prototype, 'request').mockResolvedValue({ ok: true } as any);
+    const client = new QBittorrentClient({
+      url: 'http://localhost:8080',
+      username: 'u',
+      password: 'p',
+    });
+    vi.spyOn(QBittorrentClient.prototype, 'request').mockResolvedValue({
+      ok: true,
+    } as any);
 
-    const result = await client.addTorrentsSafe({ torrents: ['ZmFrZXRvcnJlbnQ='] });
+    const result = await client.addTorrentsSafe({
+      torrents: ['ZmFrZXRvcnJlbnQ='],
+    });
 
     expect(isOk(result)).toBe(true);
     expect(unsafeUnwrap(result)).toEqual(['abc123']);
@@ -24,10 +32,18 @@ describe('QBittorrentClient.addTorrentsSafe', () => {
     const mockedParse = parseTorrent as unknown as Mock;
     mockedParse.mockResolvedValue({ infoHash: 'abc123' });
 
-    const client = new QBittorrentClient({ url: 'http://localhost:8080', username: 'u', password: 'p' });
-    vi.spyOn(QBittorrentClient.prototype, 'request').mockRejectedValue(new Error('network'));
+    const client = new QBittorrentClient({
+      url: 'http://localhost:8080',
+      username: 'u',
+      password: 'p',
+    });
+    vi.spyOn(QBittorrentClient.prototype, 'request').mockRejectedValue(
+      new Error('network'),
+    );
 
-    const result = await client.addTorrentsSafe({ torrents: ['ZmFrZXRvcnJlbnQ='] });
+    const result = await client.addTorrentsSafe({
+      torrents: ['ZmFrZXRvcnJlbnQ='],
+    });
 
     expect(isErr(result)).toBe(true);
   });
@@ -35,7 +51,11 @@ describe('QBittorrentClient.addTorrentsSafe', () => {
 
 describe('QBittorrentClient.getTorrents', () => {
   it('parses and returns torrents with tags array', async () => {
-    const client = new QBittorrentClient({ url: 'http://localhost:8080', username: 'u', password: 'p' });
+    const client = new QBittorrentClient({
+      url: 'http://localhost:8080',
+      username: 'u',
+      password: 'p',
+    });
 
     const fakeResponse = {
       ok: true,
@@ -90,7 +110,9 @@ describe('QBittorrentClient.getTorrents', () => {
       ],
     } as any;
 
-    vi.spyOn(QBittorrentClient.prototype, 'request').mockResolvedValue(fakeResponse as any);
+    vi.spyOn(QBittorrentClient.prototype, 'request').mockResolvedValue(
+      fakeResponse as any,
+    );
 
     const result = await client.getTorrents({ hashes: ['abc123'] });
 
@@ -105,27 +127,39 @@ describe('QBittorrentClient.getTorrents', () => {
   });
 
   it('throws when response does not match schema', async () => {
-    const client = new QBittorrentClient({ url: 'http://localhost:8080', username: 'u', password: 'p' });
+    const client = new QBittorrentClient({
+      url: 'http://localhost:8080',
+      username: 'u',
+      password: 'p',
+    });
 
     const badResponse = {
       ok: true,
-      json: async () => [ { hash: 123 } ],
+      json: async () => [{ hash: 123 }],
     } as any;
 
-    vi.spyOn(QBittorrentClient.prototype, 'request').mockResolvedValue(badResponse as any);
+    vi.spyOn(QBittorrentClient.prototype, 'request').mockResolvedValue(
+      badResponse as any,
+    );
 
     await expect(client.getTorrents({})).rejects.toThrow();
   });
 
   it('throws when state is not allowed', async () => {
-    const client = new QBittorrentClient({ url: 'http://localhost:8080', username: 'u', password: 'p' });
+    const client = new QBittorrentClient({
+      url: 'http://localhost:8080',
+      username: 'u',
+      password: 'p',
+    });
 
     const badResponse = {
       ok: true,
-      json: async () => [ { hash: 'abc123', state: 'invalid' } ],
+      json: async () => [{ hash: 'abc123', state: 'invalid' }],
     } as any;
 
-    vi.spyOn(QBittorrentClient.prototype, 'request').mockResolvedValue(badResponse as any);
+    vi.spyOn(QBittorrentClient.prototype, 'request').mockResolvedValue(
+      badResponse as any,
+    );
 
     await expect(client.getTorrents({})).rejects.toThrow();
   });

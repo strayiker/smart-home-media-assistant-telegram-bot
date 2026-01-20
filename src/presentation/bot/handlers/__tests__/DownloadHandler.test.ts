@@ -26,7 +26,9 @@ describe('DownloadHandler', () => {
 
   it('starts download when file exists and is allowed', async () => {
     mockTorrentService.getTorrentByUid.mockResolvedValue({ hash: 'h' });
-    mockTorrentService.getTorrentFiles.mockResolvedValue([{ index: 0, name: 'a.mkv', size: 1024 }]);
+    mockTorrentService.getTorrentFiles.mockResolvedValue([
+      { index: 0, name: 'a.mkv', size: 1024 },
+    ]);
 
     await handleDownloadFileCommand(
       ctx as unknown as MyContext,
@@ -35,8 +37,12 @@ describe('DownloadHandler', () => {
       mockLogger as unknown as Logger,
     );
 
-    expect((mockTorrentService.getTorrentByUid as ReturnType<typeof vi.fn>)).toHaveBeenCalledWith('uid123');
-    expect((ctx.reply as ReturnType<typeof vi.fn>)).toHaveBeenCalledWith('file-download-started');
+    expect(
+      mockTorrentService.getTorrentByUid as ReturnType<typeof vi.fn>,
+    ).toHaveBeenCalledWith('uid123');
+    expect(ctx.reply as ReturnType<typeof vi.fn>).toHaveBeenCalledWith(
+      'file-download-started',
+    );
   });
 
   it('replies file-not-found when index missing', async () => {
@@ -48,13 +54,22 @@ describe('DownloadHandler', () => {
       mockTorrentService as unknown as TorrentService,
       mockLogger as unknown as Logger,
     );
-    expect((ctx.reply as ReturnType<typeof vi.fn>)).toHaveBeenCalledWith('file-not-found');
+    expect(ctx.reply as ReturnType<typeof vi.fn>).toHaveBeenCalledWith(
+      'file-not-found',
+    );
   });
 
   it('replies too-big for large non-video files', async () => {
     mockTorrentService.getTorrentByUid.mockResolvedValue({ hash: 'h' });
-    mockTorrentService.getTorrentFiles.mockResolvedValue([{ index: 0, name: 'file.bin', size: 3 * 1024 * 1024 * 1024 }]);
-    await handleDownloadFileCommand(ctx as any, mockFileService as any, mockTorrentService as any, mockLogger as any);
+    mockTorrentService.getTorrentFiles.mockResolvedValue([
+      { index: 0, name: 'file.bin', size: 3 * 1024 * 1024 * 1024 },
+    ]);
+    await handleDownloadFileCommand(
+      ctx as any,
+      mockFileService as any,
+      mockTorrentService as any,
+      mockLogger as any,
+    );
     expect((ctx as any).reply).toHaveBeenCalledWith('file-too-big');
   });
 
@@ -66,7 +81,9 @@ describe('DownloadHandler', () => {
       mockTorrentService as unknown as TorrentService,
       mockLogger as unknown as Logger,
     );
-    expect((mockLogger.error as ReturnType<typeof vi.fn>)).toHaveBeenCalled();
-    expect((ctx.reply as ReturnType<typeof vi.fn>)).toHaveBeenCalledWith('file-download-error');
+    expect(mockLogger.error as ReturnType<typeof vi.fn>).toHaveBeenCalled();
+    expect(ctx.reply as ReturnType<typeof vi.fn>).toHaveBeenCalledWith(
+      'file-download-error',
+    );
   });
 });

@@ -1,6 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { SearchEngine, SearchResult } from '../../searchEngines/SearchEngine.js';
+import type {
+  SearchEngine,
+  SearchResult,
+} from '../../searchEngines/SearchEngine.js';
 import type { Logger } from '../../utils/Logger.js';
 import { err as _err, ok as _ok } from '../../utils/result.js';
 import { SearchService } from '../SearchService.js';
@@ -101,7 +104,9 @@ describe('SearchService', () => {
       ];
 
       vi.mocked(mockSearchEngine1.search).mockResolvedValue(results1);
-      vi.mocked(mockSearchEngine2.search).mockRejectedValue(new Error('Engine 2 failed'));
+      vi.mocked(mockSearchEngine2.search).mockRejectedValue(
+        new Error('Engine 2 failed'),
+      );
 
       const result = await service.search('test query');
 
@@ -119,8 +124,12 @@ describe('SearchService', () => {
     });
 
     it('should return error if all engines fail', async () => {
-      vi.mocked(mockSearchEngine1.search).mockRejectedValue(new Error('Engine 1 failed'));
-      vi.mocked(mockSearchEngine2.search).mockRejectedValue(new Error('Engine 2 failed'));
+      vi.mocked(mockSearchEngine1.search).mockRejectedValue(
+        new Error('Engine 1 failed'),
+      );
+      vi.mocked(mockSearchEngine2.search).mockRejectedValue(
+        new Error('Engine 2 failed'),
+      );
 
       const result = await service.search('test query');
 

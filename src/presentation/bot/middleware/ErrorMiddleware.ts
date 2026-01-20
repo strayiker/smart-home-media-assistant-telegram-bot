@@ -20,8 +20,12 @@ export async function errorMiddleware(ctx: unknown, next: NextFunction) {
         'reply' in ctx &&
         typeof (ctx as { reply?: unknown }).reply === 'function'
       ) {
-        const ctxWithReply = ctx as { reply?: (msg: string) => Promise<unknown> };
-        await ctxWithReply.reply?.('Произошла внутренняя ошибка. Попробуйте позже.');
+        const ctxWithReply = ctx as {
+          reply?: (msg: string) => Promise<unknown>;
+        };
+        await ctxWithReply.reply?.(
+          'Произошла внутренняя ошибка. Попробуйте позже.',
+        );
       }
     } catch {
       // ignore reply failures

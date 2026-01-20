@@ -1,4 +1,7 @@
-import type { ChatSessionService, SessionData } from '../../domain/services/ChatSessionService.js';
+import type {
+  ChatSessionService,
+  SessionData,
+} from '../../domain/services/ChatSessionService.js';
 
 export class InMemorySessionStore implements ChatSessionService {
   private store: Map<number, SessionData> = new Map();

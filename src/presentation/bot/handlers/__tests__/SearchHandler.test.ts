@@ -19,7 +19,13 @@ describe('SearchHandler', () => {
   });
 
   it('replies with aggregated results when search succeeds', async () => {
-    mockSearchService.search.mockResolvedValue({ ok: true, value: [{ title: 'a', size: 1 }, { title: 'b', size: 2 }] });
+    mockSearchService.search.mockResolvedValue({
+      ok: true,
+      value: [
+        { title: 'a', size: 1 },
+        { title: 'b', size: 2 },
+      ],
+    });
     await handleSearchMessage(ctx as any, mockSearchService, mockLogger);
     expect(ctx.reply).toHaveBeenCalled();
   });
@@ -31,7 +37,10 @@ describe('SearchHandler', () => {
   });
 
   it('handles service error', async () => {
-    mockSearchService.search.mockResolvedValue({ ok: false, error: new Error('fail') });
+    mockSearchService.search.mockResolvedValue({
+      ok: false,
+      error: new Error('fail'),
+    });
     await handleSearchMessage(ctx as any, mockSearchService, mockLogger);
     expect(mockLogger.error).toHaveBeenCalled();
     expect(ctx.reply).toHaveBeenCalledWith('search-unknown-error');

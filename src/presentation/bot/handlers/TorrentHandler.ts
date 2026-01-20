@@ -25,7 +25,11 @@ export class TorrentHandler extends Composer<MyContext> {
     this.on('message::bot_command', async (ctx, next) => {
       if (!ctx.message.text) return next();
       if (ctx.message.text.startsWith('/dl_')) {
-        return handleDownloadCommand(ctx, this.torrentService, this.searchEngines);
+        return handleDownloadCommand(
+          ctx,
+          this.torrentService,
+          this.searchEngines,
+        );
       }
       if (ctx.message.text.startsWith('/rm_')) {
         return handleRemoveCommand(ctx, this.torrentService, this.logger);
@@ -45,7 +49,11 @@ export async function handleDownloadCommand(
   const uid = ctx.message.text.replace('/dl_', '');
   const [seName, id] = uid.split('_');
 
-  const downloadResult = await torrentService.downloadTorrentFile(seName, id, searchEngines);
+  const downloadResult = await torrentService.downloadTorrentFile(
+    seName,
+    id,
+    searchEngines,
+  );
   if (!downloadResult.ok) {
     await ctx.reply(ctx.t('torrent-download-error'));
     return;

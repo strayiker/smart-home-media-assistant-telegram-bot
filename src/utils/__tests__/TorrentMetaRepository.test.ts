@@ -2,7 +2,10 @@ import type { EntityManager } from '@mikro-orm/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TorrentMeta } from '../../entities/TorrentMeta.js';
-import { type ITorrentMetaRepository,TorrentMetaRepository } from '../TorrentMetaRepository.js';
+import {
+  type ITorrentMetaRepository,
+  TorrentMetaRepository,
+} from '../TorrentMetaRepository.js';
 
 describe('TorrentMetaRepository', () => {
   let repository: ITorrentMetaRepository;
@@ -47,11 +50,14 @@ describe('TorrentMetaRepository', () => {
 
       const result = await repository.create(input);
 
-      expect(mockEm.create).toHaveBeenCalledWith(TorrentMeta, expect.objectContaining({
-        ...input,
-        createdAt: expect.any(Date),
-        updatedAt: expect.any(Date),
-      }));
+      expect(mockEm.create).toHaveBeenCalledWith(
+        TorrentMeta,
+        expect.objectContaining({
+          ...input,
+          createdAt: expect.any(Date),
+          updatedAt: expect.any(Date),
+        }),
+      );
       expect(mockEm.persistAndFlush).toHaveBeenCalledWith(mockMeta);
       expect(result).toBe(mockMeta);
     });
@@ -63,7 +69,9 @@ describe('TorrentMetaRepository', () => {
 
       const result = await repository.getByUid('test-engine_12345');
 
-      expect(mockEm.findOne).toHaveBeenCalledWith(TorrentMeta, { uid: 'test-engine_12345' });
+      expect(mockEm.findOne).toHaveBeenCalledWith(TorrentMeta, {
+        uid: 'test-engine_12345',
+      });
       expect(result).toBe(mockMeta);
     });
 
@@ -82,7 +90,9 @@ describe('TorrentMetaRepository', () => {
 
       const result = await repository.getByHash('abc123');
 
-      expect(mockEm.findOne).toHaveBeenCalledWith(TorrentMeta, { hash: 'abc123' });
+      expect(mockEm.findOne).toHaveBeenCalledWith(TorrentMeta, {
+        hash: 'abc123',
+      });
       expect(result).toBe(mockMeta);
     });
 
@@ -140,7 +150,9 @@ describe('TorrentMetaRepository', () => {
 
       await repository.removeByHash('abc123');
 
-      expect(mockEm.nativeDelete).toHaveBeenCalledWith(TorrentMeta, { hash: 'abc123' });
+      expect(mockEm.nativeDelete).toHaveBeenCalledWith(TorrentMeta, {
+        hash: 'abc123',
+      });
     });
   });
 
@@ -150,7 +162,9 @@ describe('TorrentMetaRepository', () => {
 
       await repository.removeByUid('test-engine_12345');
 
-      expect(mockEm.nativeDelete).toHaveBeenCalledWith(TorrentMeta, { uid: 'test-engine_12345' });
+      expect(mockEm.nativeDelete).toHaveBeenCalledWith(TorrentMeta, {
+        uid: 'test-engine_12345',
+      });
     });
   });
 });

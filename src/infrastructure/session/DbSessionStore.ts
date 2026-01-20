@@ -1,6 +1,9 @@
 import type { EntityManager } from '@mikro-orm/core';
 
-import type { ChatSessionService, SessionData } from '../../domain/services/ChatSessionService.js';
+import type {
+  ChatSessionService,
+  SessionData,
+} from '../../domain/services/ChatSessionService.js';
 import { ChatSession } from '../../entities/ChatSession.js';
 
 export class DbSessionStore implements ChatSessionService {
