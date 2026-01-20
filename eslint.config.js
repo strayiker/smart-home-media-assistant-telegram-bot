@@ -40,7 +40,16 @@ export default tslint.config(
       'unicorn/no-array-push-push': 'off',
       'unicorn/no-process-exit': 'off',
       'unicorn/prevent-abbreviations': 'off',
-      'unicorn/filename-case': 'off',
+      'unicorn/filename-case': [
+        'error',
+        {
+          cases: {
+            camelCase: true,
+            pascalCase: true,
+            kebabCase: true,
+          },
+        },
+      ],
     },
   },
   {
