@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { SearchEngine, SearchResult } from '../../searchEngines/SearchEngine.js';
 import type { Logger } from '../../utils/Logger.js';
-import { err,ok } from '../../utils/result.js';
+import { err as _err, ok as _ok } from '../../utils/result.js';
 import { SearchService } from '../SearchService.js';
 
 describe('SearchService', () => {

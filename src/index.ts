@@ -83,6 +83,9 @@ container.registerInstance('QBittorrentClient', qBittorrent);
 // Initialize ORM (run migrations on startup explicitly)
 const orm = await initORM({ runMigrations: true });
 
+// Register ORM in DI so components can obtain repositories / EM
+container.registerInstance('ORM', orm);
+
 const authComposer = new AuthComposer(orm.em.fork(), secretKey);
 const chatSettingsRepository = new ChatSettingsRepository(orm.em.fork());
 const torrentMetaRepository = new TorrentMetaRepository(orm.em.fork());

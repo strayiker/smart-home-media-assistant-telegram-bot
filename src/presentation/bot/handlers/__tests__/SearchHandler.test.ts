@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { handleSearchMessage,SearchHandler } from '../SearchHandler.js';
+import { handleSearchMessage } from '../SearchHandler.js';
 
 describe('SearchHandler', () => {
-  let handler: SearchHandler;
   let mockSearchService: any;
   let mockLogger: any;
   let ctx: any;
@@ -11,7 +10,6 @@ describe('SearchHandler', () => {
   beforeEach(() => {
     mockSearchService = { search: vi.fn() };
     mockLogger = { error: vi.fn() };
-    handler = new SearchHandler({ searchService: mockSearchService, logger: mockLogger });
 
     ctx = {
       message: { text: 'query' },

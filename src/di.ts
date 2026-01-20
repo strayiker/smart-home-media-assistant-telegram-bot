@@ -1,3 +1,4 @@
+import type { MikroORM } from '@mikro-orm/core';
 import type { Logger as PinoLogger } from 'pino';
 
 import { loadConfig } from './config/env.schema.js';
@@ -11,7 +12,6 @@ import { logger } from './logger.js';
 import { DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js';
 import { FileHandler } from './presentation/bot/handlers/FileHandler.js';
 import { MediaHandler } from './presentation/bot/handlers/MediaHandler.js';
-// session store implementation resolved below
 import { SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
 import { TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
 import type { SearchEngine } from './searchEngines/SearchEngine.js';
@@ -59,8 +59,17 @@ try {
 
 // Register ChatSessionService (in-memory by default)
 // Use SQLite-backed session store by default (falls back to in-memory when adapter not provided)
-import { SqliteSessionStore } from './infrastructure/session/SqliteSessionStore.js';
-container.registerInstance('ChatSessionService', new SqliteSessionStore());
+import { DbSessionStore } from './infrastructure/session/DbSessionStore.js';
+
+// Register ChatSessionService as a factory so we can resolve the ORM at runtime
+container.registerFactory('ChatSessionService', () => {
+	const orm = container.resolve<MikroORM>('ORM');
+	if (!orm) {
+		throw new Error('ORM not registered in container; ChatSessionService requires ORM to be available');
+	}
+	// Use a forked EM for request safety
+	return new DbSessionStore(orm.em.fork());
+});
 
 // Register SearchHandler factory (will resolve SearchService and Logger lazily)
 container.registerFactory('SearchHandler', () => {

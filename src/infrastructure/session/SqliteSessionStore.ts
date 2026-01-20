@@ -1,7 +1,7 @@
 import type { ChatSessionService, SessionData } from '../../domain/services/ChatSessionService.js';
 
 export interface SimpleDbAdapter {
-	get(key: string): Promise<string | null>;
+	get(key: string): Promise<string | undefined>;
 	set(key: string, value: string): Promise<void>;
 	del(key: string): Promise<void>;
 }
@@ -26,7 +26,7 @@ export class SqliteSessionStore implements ChatSessionService {
 	async get(chatId: number): Promise<SessionData | undefined> {
 		if (this.adapter) {
 			const raw = await this.adapter.get(this.key(chatId));
-			if (!raw) return undefined;
+			if (raw == undefined) return undefined;
 			try {
 				return JSON.parse(raw) as SessionData;
 			} catch {

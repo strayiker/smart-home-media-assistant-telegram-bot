@@ -13,6 +13,7 @@ export const envSchema = z.object({
   SECRET_KEY: z.string().min(8),
   RUTRACKER_USERNAME: z.string().optional(),
   RUTRACKER_PASSWORD: z.string().optional(),
+  USE_NEW_HANDLERS: z.coerce.boolean().optional().default(false),
 });
 
 export type AppConfig = z.infer<typeof envSchema>;

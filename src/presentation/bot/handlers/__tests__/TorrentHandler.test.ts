@@ -3,9 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { handleDownloadCommand, handleRemoveCommand } from '../TorrentHandler.js';
 
 describe('TorrentHandler', () => {
-  let mockTorrentService: any;
-  let mockLogger: any;
-  let ctx: any;
+  let mockTorrentService: unknown;
+  let mockLogger: unknown;
+  let ctx: unknown;
 
   beforeEach(() => {
     mockTorrentService = {
@@ -20,14 +20,14 @@ describe('TorrentHandler', () => {
       reply: vi.fn(),
       t: (k: string) => k,
       chatId: 42,
-    };
+    } as unknown;
   });
 
   it('downloads and adds torrent successfully', async () => {
     mockTorrentService.downloadTorrentFile.mockResolvedValue({ ok: true, value: 'torrentdata' });
     mockTorrentService.addTorrent.mockResolvedValue({ ok: true, value: 'hash' });
 
-    await handleDownloadCommand(ctx, mockTorrentService, [{ name: 'engine' }], mockLogger);
+    await handleDownloadCommand(ctx as any, mockTorrentService as any, [{ name: 'engine' }], mockLogger as any);
 
     expect(mockTorrentService.downloadTorrentFile).toHaveBeenCalled();
     expect(mockTorrentService.addTorrent).toHaveBeenCalled();
@@ -36,21 +36,21 @@ describe('TorrentHandler', () => {
 
   it('replies error when download fails', async () => {
     mockTorrentService.downloadTorrentFile.mockResolvedValue({ ok: false, error: new Error('fail') });
-    await handleDownloadCommand(ctx, mockTorrentService, [{ name: 'engine' }], mockLogger);
+    await handleDownloadCommand(ctx as any, mockTorrentService as any, [{ name: 'engine' }], mockLogger as any);
     expect(ctx.reply).toHaveBeenCalledWith('torrent-download-error');
   });
 
   it('removes torrent and replies success', async () => {
     ctx.message.text = '/rm_engine_123';
     mockTorrentService.removeTorrentByUid.mockResolvedValue('hash');
-    await handleRemoveCommand(ctx, mockTorrentService, mockLogger);
+    await handleRemoveCommand(ctx as any, mockTorrentService as any, mockLogger as any);
     expect(ctx.reply).toHaveBeenCalledWith('torrents-removed-success');
   });
 
   it('replies error when remove fails', async () => {
     ctx.message.text = '/rm_engine_123';
     mockTorrentService.removeTorrentByUid.mockRejectedValue(new Error('fail'));
-    await handleRemoveCommand(ctx, mockTorrentService, mockLogger);
+    await handleRemoveCommand(ctx as any, mockTorrentService as any, mockLogger as any);
     expect(ctx.reply).toHaveBeenCalledWith('torrent-remove-error');
   });
 });

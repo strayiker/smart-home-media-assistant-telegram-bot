@@ -3,9 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { handleListFilesCommand } from '../FileHandler.js';
 
 describe('FileHandler', () => {
-  let mockFileService: any;
-  let mockLogger: any;
-  let ctx: any;
+  let mockFileService: unknown;
+  let mockLogger: unknown;
+  let ctx: unknown;
 
   beforeEach(() => {
     mockFileService = { listFilesByUid: vi.fn() };
@@ -15,7 +15,7 @@ describe('FileHandler', () => {
       message: { text: '/files_uid123' },
       reply: vi.fn(),
       t: (k: string) => k,
-    };
+    } as unknown;
   });
 
   it('replies with file list when service succeeds', async () => {

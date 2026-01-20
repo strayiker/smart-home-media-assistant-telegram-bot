@@ -24,4 +24,6 @@ export const qbtWebuiUsername = cfg.QBT_WEBUI_USERNAME;
 export const qbtWebuiPassword = cfg.QBT_WEBUI_PASSWORD;
 export const qbtSavePath = cfg.QBT_SAVE_PATH;
 
+export const useNewHandlers = cfg.USE_NEW_HANDLERS;
+
 export const appConfig = cfg;
