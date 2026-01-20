@@ -41,9 +41,7 @@ describe('DownloadHandler', () => {
     mockMediaService.getFileType.mockResolvedValue({ mime: 'video/mp4' });
     mockMediaService.getVideoMetadata.mockResolvedValue({
       format: { duration: 3600 },
-      streams: [
-        { codec_type: 'video', width: 1920, height: 1080 },
-      ],
+      streams: [{ codec_type: 'video', width: 1920, height: 1080 }],
     });
 
     await handleDownloadFileCommand(
@@ -85,7 +83,9 @@ describe('DownloadHandler', () => {
       { index: 0, name: 'file.bin', size: 3 * 1024 * 1024 * 1024 },
     ]);
     mockMediaService.isVideo.mockReturnValue(false);
-    mockMediaService.getFileType.mockResolvedValue({ mime: 'application/octet-stream' });
+    mockMediaService.getFileType.mockResolvedValue({
+      mime: 'application/octet-stream',
+    });
 
     await handleDownloadFileCommand(
       ctx as unknown as MyContext,
