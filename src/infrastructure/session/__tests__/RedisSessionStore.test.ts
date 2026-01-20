@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SqliteSessionStore } from '../SQLiteSessionStore.js';
+import { SqliteSessionStore } from '../SqliteSessionStore.js';
 
 describe('SqliteSessionStore (was Redis test file)', () => {
   let client: any;
