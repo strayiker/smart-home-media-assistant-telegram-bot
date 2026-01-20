@@ -15,22 +15,22 @@ describe('InMemorySessionStore', () => {
     expect(data).toEqual({ foo: 'bar' });
   });
 
-  it('returns null for missing sessions', async () => {
+  it('returns undefined for missing sessions', async () => {
     const data = await store.get(999);
-    expect(data).toBeNull();
+    expect(data).toBeUndefined();
   });
 
   it('deletes session data', async () => {
     await store.set(2, { a: 1 });
     await store.delete(2);
-    expect(await store.get(2)).toBeNull();
+    expect(await store.get(2)).toBeUndefined();
   });
 
   it('clears all sessions', async () => {
     await store.set(3, { x: 'y' });
     await store.set(4, { z: true });
     await store.clear();
-    expect(await store.get(3)).toBeNull();
-    expect(await store.get(4)).toBeNull();
+    expect(await store.get(3)).toBeUndefined();
+    expect(await store.get(4)).toBeUndefined();
   });
 });

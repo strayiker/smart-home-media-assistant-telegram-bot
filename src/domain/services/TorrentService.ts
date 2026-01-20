@@ -117,7 +117,7 @@ export class TorrentService {
       await this.torrentMetaRepository.removeByHash(hash);
 
       this.logger.debug('A torrent was successfully deleted: %s', hash);
-      return ok();
+      return ok<void>();
     } catch (error) {
       this.logger.error(error, 'An error occurred while deleting torrent');
       return err(

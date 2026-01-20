@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SQLiteSessionStore } from '../SQLiteSessionStore.js';
+import { SqliteSessionStore } from '../SqliteSessionStore.js';
 
-describe('SQLiteSessionStore (was Redis test file)', () => {
+describe('SqliteSessionStore (was Redis test file)', () => {
   let client: any;
-  let store: SQLiteSessionStore;
+  let store: SqliteSessionStore;
 
   beforeEach(() => {
     client = {
@@ -12,12 +12,12 @@ describe('SQLiteSessionStore (was Redis test file)', () => {
       set: vi.fn().mockResolvedValue(),
       del: vi.fn().mockResolvedValue(),
     };
-    store = new SQLiteSessionStore(client as any);
+    store = new SqliteSessionStore(client as any);
   });
 
-  it('returns null for missing session', async () => {
+  it('returns undefined for missing session', async () => {
     client.get.mockResolvedValue(null);
-    expect(await store.get(1)).toBeNull();
+    expect(await store.get(1)).toBeUndefined();
   });
 
   it('stores and retrieves session data', async () => {
@@ -35,11 +35,11 @@ describe('SQLiteSessionStore (was Redis test file)', () => {
   });
 
   it('falls back to in-memory when adapter not provided', async () => {
-    const s = new SQLiteSessionStore();
-    expect(await s.get(10)).toBeNull();
+    const s = new SqliteSessionStore();
+    expect(await s.get(10)).toBeUndefined();
     await s.set(10, { b: 2 });
     expect(await s.get(10)).toEqual({ b: 2 });
     await s.delete(10);
-    expect(await s.get(10)).toBeNull();
+    expect(await s.get(10)).toBeUndefined();
   });
 });

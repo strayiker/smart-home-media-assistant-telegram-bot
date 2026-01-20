@@ -59,8 +59,8 @@ try {
 
 // Register ChatSessionService (in-memory by default)
 // Use SQLite-backed session store by default (falls back to in-memory when adapter not provided)
-import { SQLiteSessionStore } from './infrastructure/session/SQLiteSessionStore.js';
-container.registerInstance('ChatSessionService', new SQLiteSessionStore());
+import { SqliteSessionStore } from './infrastructure/session/SqliteSessionStore.js';
+container.registerInstance('ChatSessionService', new SqliteSessionStore());
 
 // Register SearchHandler factory (will resolve SearchService and Logger lazily)
 container.registerFactory('SearchHandler', () => {
