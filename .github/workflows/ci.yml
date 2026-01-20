@@ -42,17 +42,10 @@ jobs:
           path: coverage/**
           if-no-files-found: warn
 
-      - name: Upload test results (artifact)
+      - name: (optional) Upload test results (artifact)
+        if: false
         uses: actions/upload-artifact@v6
         with:
           name: test-results
           path: test-results/**
           if-no-files-found: warn
-
-      - name: Send coverage to Codecov
-        if: ${{ secrets.CODECOV_TOKEN != '' }}
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage
-          flags: unittests
