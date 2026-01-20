@@ -9,7 +9,7 @@ const dateish = z
       const date = new Date(value);
       return Number.isNaN(date.getTime()) ? undefined : date;
     }
-    return undefined;
+    return;
   });
 
 export const SearchResultSchema = z.object({

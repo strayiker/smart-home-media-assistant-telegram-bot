@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { TorrentMetaRepository, ITorrentMetaRepository } from '../TorrentMetaRepository.js';
-import { TorrentMeta } from '../../entities/TorrentMeta.js';
 import type { EntityManager } from '@mikro-orm/core';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { TorrentMeta } from '../../entities/TorrentMeta.js';
+import { type ITorrentMetaRepository,TorrentMetaRepository } from '../TorrentMetaRepository.js';
 
 describe('TorrentMetaRepository', () => {
   let repository: ITorrentMetaRepository;
@@ -23,7 +24,7 @@ describe('TorrentMetaRepository', () => {
       id: 1,
       hash: 'abc123',
       uid: 'test-engine_12345',
-      chatId: 12345,
+      chatId: 12_345,
       searchEngine: 'test-engine',
       trackerId: '12345',
       createdAt: new Date('2024-01-01'),
@@ -36,13 +37,13 @@ describe('TorrentMetaRepository', () => {
       const input = {
         hash: 'abc123',
         uid: 'test-engine_12345',
-        chatId: 12345,
+        chatId: 12_345,
         searchEngine: 'test-engine',
         trackerId: '12345',
       };
 
       vi.mocked(mockEm.create).mockReturnValue(mockMeta);
-      vi.mocked(mockEm.persistAndFlush).mockResolvedValue(undefined);
+      vi.mocked(mockEm.persistAndFlush).mockResolvedValue();
 
       const result = await repository.create(input);
 
@@ -118,7 +119,7 @@ describe('TorrentMetaRepository', () => {
 
   describe('getByChatId', () => {
     it('should return TorrentMetas by chatId ordered by createdAt DESC', async () => {
-      const chatId = 12345;
+      const chatId = 12_345;
       const metas = [mockMeta];
       vi.mocked(mockEm.find).mockResolvedValue(metas);
 

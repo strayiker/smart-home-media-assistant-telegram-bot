@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, type Mock } from 'vitest';
 import parseTorrent from 'parse-torrent';
+import { describe, expect, it, type Mock,vi } from 'vitest';
+
+import { isErr, isOk, unsafeUnwrap } from '../../utils/result.js';
 import { QBittorrentClient } from '../QBittorrentClient.js';
-import { isOk, isErr, unsafeUnwrap } from '../../utils/result.js';
 
 vi.mock('parse-torrent', () => ({ __esModule: true, default: vi.fn() }));
 

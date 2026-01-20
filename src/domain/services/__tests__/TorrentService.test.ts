@@ -1,12 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import type { QBittorrentClient } from '../../qBittorrent/QBittorrentClient.js';
-import type { TorrentMetaRepository } from '../../utils/TorrentMetaRepository.js';
-import type { Logger } from '../../utils/Logger.js';
-import type { SearchEngine, SearchResult } from '../../searchEngines/SearchEngine.js';
-import { TorrentService } from '../TorrentService.js';
-import { ok, err } from '../../../utils/result.js';
-import type { QBTorrent, QBFile } from '../../qBittorrent/models.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { err,ok } from '../../../utils/result.js';
 import type { TorrentMeta } from '../../entities/TorrentMeta.js';
+import type { QBFile,QBTorrent } from '../../qBittorrent/models.js';
+import type { QBittorrentClient } from '../../qBittorrent/QBittorrentClient.js';
+import type { SearchEngine, SearchResult } from '../../searchEngines/SearchEngine.js';
+import type { Logger } from '../../utils/Logger.js';
+import type { TorrentMetaRepository } from '../../utils/TorrentMetaRepository.js';
+import { TorrentService } from '../TorrentService.js';
 
 describe('TorrentService', () => {
   let service: TorrentService;
@@ -65,7 +66,7 @@ describe('TorrentService', () => {
       const result = await service.addTorrent({
         torrent: torrentData,
         uid,
-        chatId: 12345,
+        chatId: 12_345,
         searchEngine: 'test-engine',
         trackerId: '12345',
       });
@@ -81,7 +82,7 @@ describe('TorrentService', () => {
       expect(mockTorrentMetaRepository.create).toHaveBeenCalledWith({
         hash,
         uid,
-        chatId: 12345,
+        chatId: 12_345,
         searchEngine: 'test-engine',
         trackerId: '12345',
       });
@@ -116,7 +117,7 @@ describe('TorrentService', () => {
 
       vi.mocked(mockQBittorrentClient.addTorrents).mockResolvedValue(ok([hash]));
       vi.mocked(mockTorrentMetaRepository.create).mockRejectedValue(createError);
-      vi.mocked(mockQBittorrentClient.deleteTorrents).mockResolvedValue(undefined);
+      vi.mocked(mockQBittorrentClient.deleteTorrents).mockResolvedValue();
 
       const result = await service.addTorrent({
         torrent: 'data',
@@ -166,8 +167,8 @@ describe('TorrentService', () => {
 
   describe('deleteTorrent', () => {
     it('should successfully delete torrent and metadata', async () => {
-      vi.mocked(mockQBittorrentClient.deleteTorrents).mockResolvedValue(undefined);
-      vi.mocked(mockTorrentMetaRepository.removeByHash).mockResolvedValue(undefined);
+      vi.mocked(mockQBittorrentClient.deleteTorrents).mockResolvedValue();
+      vi.mocked(mockTorrentMetaRepository.removeByHash).mockResolvedValue();
 
       const result = await service.deleteTorrent('hash1');
 

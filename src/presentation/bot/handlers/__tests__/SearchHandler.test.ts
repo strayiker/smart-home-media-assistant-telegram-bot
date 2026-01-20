@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { SearchHandler, handleSearchMessage } from '../SearchHandler.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { handleSearchMessage,SearchHandler } from '../SearchHandler.js';
 
 describe('SearchHandler', () => {
   let handler: SearchHandler;

@@ -1,17 +1,20 @@
-import { logger } from './logger.js';
+import type { Logger as PinoLogger } from 'pino';
+
 import { loadConfig } from './config/env.schema.js';
+import type { FeatureFlagStore } from './domain/services/FeatureFlagService.js';
+import { FeatureFlagService } from './domain/services/FeatureFlagService.js';
+import { type FileService } from './domain/services/FileService.js';
+import { type SearchService } from './domain/services/SearchService.js';
+import { type TorrentService } from './domain/services/TorrentService.js';
+import { InMemoryFeatureFlagStore } from './infrastructure/featureFlags/InMemoryFeatureFlagStore.js';
+import { logger } from './logger.js';
+import { DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js';
+import { FileHandler } from './presentation/bot/handlers/FileHandler.js';
+import { MediaHandler } from './presentation/bot/handlers/MediaHandler.js';
 // session store implementation resolved below
 import { SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
-import { SearchService } from './domain/services/SearchService.js';
-import type { Logger as PinoLogger } from 'pino';
 import { TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
-import { TorrentService } from './domain/services/TorrentService.js';
-import { FileHandler } from './presentation/bot/handlers/FileHandler.js';
-import { FileService } from './domain/services/FileService.js';
-import { DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js';
-import { MediaHandler } from './presentation/bot/handlers/MediaHandler.js';
-import { FeatureFlagService } from './domain/services/FeatureFlagService.js';
-import { InMemoryFeatureFlagStore } from './infrastructure/featureFlags/InMemoryFeatureFlagStore.js';
+import type { SearchEngine } from './searchEngines/SearchEngine.js';
 
 // Lightweight DI container to avoid external dependency on tsyringe.
 const registry = new Map<string | symbol, unknown>();
@@ -46,10 +49,10 @@ container.registerInstance('Logger', logger);
 try {
 	const appConfig = loadConfig();
 	container.registerInstance('AppConfig', appConfig);
-} catch (err) {
+} catch {
 	// If config fails to load, keep process.env as fallback to avoid breaking edits.
 	// Real startup validation happens in src/index.ts; this is a defensive registration.
-	// eslint-disable-next-line no-console
+	 
 	console.warn('AppConfig validation failed in DI registration; using process.env as fallback');
 	container.registerInstance('AppConfig', process.env);
 }
@@ -67,10 +70,10 @@ container.registerFactory('SearchHandler', () => {
 });
 
 container.registerFactory('TorrentHandler', () => {
-		const svc = container.resolve<TorrentService>('TorrentService');
-		const log = container.resolve<PinoLogger>('Logger');
-		const engines = container.resolve<any>('SearchEngines');
-		return new TorrentHandler({ torrentService: svc, logger: log, searchEngines: engines as any[] });
+    const svc = container.resolve<TorrentService>('TorrentService');
+    const log = container.resolve<PinoLogger>('Logger');
+    const engines = container.resolve<SearchEngine[]>('SearchEngines');
+    return new TorrentHandler({ torrentService: svc, logger: log, searchEngines: engines });
 });
 
 container.registerFactory('FileHandler', () => {
@@ -94,7 +97,7 @@ container.registerFactory('MediaHandler', () => {
 
 // Feature flags (in-memory default)
 container.registerInstance('FeatureFlagStore', new InMemoryFeatureFlagStore());
-container.registerInstance('FeatureFlagService', new FeatureFlagService(container.resolve('FeatureFlagStore') as any));
+container.registerInstance('FeatureFlagService', new FeatureFlagService(container.resolve<FeatureFlagStore>('FeatureFlagStore')));
 
 // Usage examples (replace with proper types when available):
 // import { container } from './di.js';

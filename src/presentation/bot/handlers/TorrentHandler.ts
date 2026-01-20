@@ -1,18 +1,20 @@
 import { Composer } from 'grammy';
+
 import type { MyContext } from '../../../Context.js';
 import type { TorrentService } from '../../../domain/services/TorrentService.js';
+import type { SearchEngine } from '../../../searchEngines/SearchEngine.js';
 import type { Logger } from '../../../utils/Logger.js';
 
 export interface TorrentHandlerOptions {
   torrentService: TorrentService;
   logger: Logger;
-  searchEngines: any[]; // kept generic for handler
+  searchEngines: SearchEngine[];
 }
 
 export class TorrentHandler extends Composer<MyContext> {
   private torrentService: TorrentService;
   private logger: Logger;
-  private searchEngines: any[];
+  private searchEngines: SearchEngine[];
 
   constructor(options: TorrentHandlerOptions) {
     super();
@@ -23,7 +25,7 @@ export class TorrentHandler extends Composer<MyContext> {
     this.on('message::bot_command', async (ctx, next) => {
       if (!ctx.message.text) return next();
       if (ctx.message.text.startsWith('/dl_')) {
-        return handleDownloadCommand(ctx, this.torrentService, this.searchEngines, this.logger);
+        return handleDownloadCommand(ctx, this.torrentService, this.searchEngines);
       }
       if (ctx.message.text.startsWith('/rm_')) {
         return handleRemoveCommand(ctx, this.torrentService, this.logger);
@@ -36,8 +38,7 @@ export class TorrentHandler extends Composer<MyContext> {
 export async function handleDownloadCommand(
   ctx: MyContext,
   torrentService: TorrentService,
-  searchEngines: any[],
-  logger: Logger,
+  searchEngines: SearchEngine[],
 ) {
   if (!ctx.message?.text) return;
 

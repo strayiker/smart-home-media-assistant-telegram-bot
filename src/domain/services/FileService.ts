@@ -1,9 +1,10 @@
 import path from 'node:path';
-import { formatBytes } from '../../utils/formatBytes.js';
+
 import type { QBFile } from '../../qBittorrent/models.js';
 import type { QBittorrentClient } from '../../qBittorrent/QBittorrentClient.js';
-import type { TorrentMetaRepository } from '../../utils/TorrentMetaRepository.js';
+import { formatBytes } from '../../utils/formatBytes.js';
 import type { Logger } from '../../utils/Logger.js';
+import type { TorrentMetaRepository } from '../../utils/TorrentMetaRepository.js';
 
 export interface FileServiceOptions {
   qBittorrent: QBittorrentClient;
@@ -43,11 +44,7 @@ export class FileService {
       const size = formatBytes(file.size ?? 0);
       let note = '';
       if ((file.size ?? 0) > 2 * 1024 * 1024 * 1024) {
-        if (this.isVideo(file.name)) {
-          note = ' (will be compressed)';
-        } else {
-          note = ' (too big to download)';
-        }
+        note = this.isVideo(file.name) ? ' (will be compressed)' : ' (too big to download)';
       }
 
       const download = (file.size ?? 0) > 2 * 1024 * 1024 * 1024 && !this.isVideo(file.name)

@@ -1,9 +1,9 @@
+import type { QBFile,QBTorrent } from '../../qBittorrent/models.js';
 import type { QBittorrentClient } from '../../qBittorrent/QBittorrentClient.js';
-import type { QBTorrent, QBFile } from '../../qBittorrent/models.js';
 import type { SearchEngine, SearchResult } from '../../searchEngines/SearchEngine.js';
-import type { TorrentMetaRepository } from '../../utils/TorrentMetaRepository.js';
 import type { Logger } from '../../utils/Logger.js';
-import { ok, err, type ResultT } from '../../utils/result.js';
+import { err, ok, type ResultT } from '../../utils/result.js';
+import type { TorrentMetaRepository } from '../../utils/TorrentMetaRepository.js';
 
 export interface AddTorrentOptions {
   torrent: string;
@@ -117,7 +117,7 @@ export class TorrentService {
       await this.torrentMetaRepository.removeByHash(hash);
 
       this.logger.debug('A torrent was successfully deleted: %s', hash);
-      return ok(undefined);
+      return ok();
     } catch (error) {
       this.logger.error(error, 'An error occurred while deleting torrent');
       return err(
@@ -142,14 +142,14 @@ export class TorrentService {
           'An error occurred while searching with engine: %s',
           searchEngine.name,
         );
-        return null;
+        return;
       }
     });
 
     const awaited = await Promise.all(promises);
 
     for (const result of awaited) {
-      if (result !== null) {
+      if (result !== undefined) {
         results.push(result);
       }
     }

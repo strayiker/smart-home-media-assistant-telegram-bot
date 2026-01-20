@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+
 import { loadConfig } from './env.schema.js';
 
 dotenv.config({

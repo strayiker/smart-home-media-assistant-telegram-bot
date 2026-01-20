@@ -1,10 +1,10 @@
 import type { ChatSessionService, SessionData } from '../../domain/services/ChatSessionService.js';
 
-export type SimpleDbAdapter = {
+export interface SimpleDbAdapter {
   get(key: string): Promise<string | null>;
   set(key: string, value: string): Promise<void>;
   del(key: string): Promise<void>;
-};
+}
 
 // SQLiteSessionStore accepts an injected adapter implementing SimpleDbAdapter.
 // If no adapter is provided, it falls back to an in-memory Map.
@@ -31,7 +31,7 @@ export class SQLiteSessionStore implements ChatSessionService {
       if (!raw) return null;
       try {
         return JSON.parse(raw) as SessionData;
-      } catch (_) {
+      } catch {
         return null;
       }
     }

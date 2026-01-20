@@ -1,17 +1,19 @@
 import 'reflect-metadata';
 import './dayjs.js';
+
 import { ZodError } from 'zod';
+
 import { loadConfig } from './config/env.schema.js';
 
 try {
   loadConfig();
-} catch (err) {
-  if (err instanceof ZodError) {
-    // eslint-disable-next-line no-console
-    console.error('Configuration validation failed:', err.errors);
+} catch (error) {
+  if (error instanceof ZodError) {
+     
+    console.error('Configuration validation failed:', error.errors);
   } else {
-    // eslint-disable-next-line no-console
-    console.error('Unknown error during configuration load', err);
+     
+    console.error('Unknown error during configuration load', error);
   }
   process.exit(1);
 }
@@ -43,18 +45,18 @@ import {
   secretKey,
 } from './config.js';
 import { type MyContext, type SessionData } from './Context.js';
+import { container } from './di.js';
+import { SearchService } from './domain/services/SearchService.js';
+import { TorrentService } from './domain/services/TorrentService.js';
 import { fluent } from './fluent.js';
 import { logger } from './logger.js';
 import { initORM } from './orm.js';
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
 import { RutrackerSearchEngine } from './searchEngines/RutrackerSearchEngine.js';
-import { SearchEngine } from './searchEngines/SearchEngine.js';
+import { type SearchEngine } from './searchEngines/SearchEngine.js';
 import { ChatSettingsRepository } from './utils/ChatSettingsRepository.js';
 import { CookieStorage } from './utils/CookieStorage.js';
-import { container } from './di.js';
-import { TorrentService } from './domain/services/TorrentService.js';
 import { TorrentMetaRepository } from './utils/TorrentMetaRepository.js';
-import { SearchService } from './domain/services/SearchService.js';
 
 if (!qbtWebuiAddress || !qbtWebuiUsername || !qbtWebuiPassword) {
   throw new Error('QBT_WEBUI_ADDRESS, QBT_WEBUI_USERNAME, QBT_WEBUI_PASSWORD are required');

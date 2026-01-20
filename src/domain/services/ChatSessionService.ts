@@ -1,7 +1,7 @@
 export type SessionData = Record<string, unknown>;
 
 export interface ChatSessionService {
-  get(chatId: number): Promise<SessionData | null>;
+  get(chatId: number): Promise<SessionData | undefined>;
   set(chatId: number, data: SessionData): Promise<void>;
   delete(chatId: number): Promise<void>;
   clear(): Promise<void>;

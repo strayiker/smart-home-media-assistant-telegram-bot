@@ -1,6 +1,6 @@
 // Lightweight Result implementation to avoid external dependency.
-export type Ok<T> = { readonly ok: true; readonly value: T };
-export type Err<E> = { readonly ok: false; readonly error: E };
+export interface Ok<T> { readonly ok: true; readonly value: T }
+export interface Err<E> { readonly ok: false; readonly error: E }
 export type ResultT<T, E = unknown> = Ok<T> | Err<E>;
 
 export const ok = <T>(value: T): ResultT<T, never> => ({ ok: true, value });
@@ -18,8 +18,8 @@ export async function fromAsync<T>(fn: () => Promise<T>): Promise<ResultT<T, unk
   try {
     const res = await fn();
     return ok(res);
-  } catch (e) {
-    return err(e as unknown);
+  } catch (error) {
+    return err(error as unknown);
   }
 }
 

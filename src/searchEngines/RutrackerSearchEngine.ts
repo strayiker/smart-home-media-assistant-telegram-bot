@@ -2,8 +2,8 @@ import * as cheerio from 'cheerio';
 
 import { type CookieStorage } from '../utils/CookieStorage.js';
 import { type Logger } from '../utils/Logger.js';
-import { SearchEngine, type SearchResult } from './SearchEngine.js';
 import { SearchResultsSchema } from './schemas.js';
+import { SearchEngine, type SearchResult } from './SearchEngine.js';
 
 const BASE_URL = 'https://rutracker.org/forum';
 const LOGIN_URL = `${BASE_URL}/login.php`;

@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { RutrackerSearchEngine } from '../RutrackerSearchEngine.js';
 import { type CookieStorage } from '../../utils/CookieStorage.js';
 import { type Logger } from '../../utils/Logger.js';
+import { RutrackerSearchEngine } from '../RutrackerSearchEngine.js';
 
 const noopLogger: Logger = {
   fatal: () => {},
@@ -37,16 +37,6 @@ describe('RutrackerSearchEngine.search', () => {
     vi.restoreAllMocks();
   });
 
-  const makeResponse = (html: string) => {
-    const buffer = Buffer.from(html, 'utf8');
-    return new Response(buffer, {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/html; charset=windows-1251',
-      },
-    });
-  };
-
   it('parses valid html and returns validated results', async () => {
     const html = `
       <html><body>
@@ -68,7 +58,15 @@ describe('RutrackerSearchEngine.search', () => {
       </body></html>
     `;
 
-    globalThis.fetch = vi.fn(async () => makeResponse(html)) as any;
+    globalThis.fetch = vi.fn(async () => {
+      const buffer = Buffer.from(html, 'utf8');
+      return new Response(buffer, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html; charset=windows-1251',
+        },
+      });
+    }) as any;
 
     const engine = new RutrackerSearchEngine({
       username: 'u',
@@ -112,7 +110,15 @@ describe('RutrackerSearchEngine.search', () => {
       </body></html>
     `;
 
-    globalThis.fetch = vi.fn(async () => makeResponse(html)) as any;
+    globalThis.fetch = vi.fn(async () => {
+      const buffer = Buffer.from(html, 'utf8');
+      return new Response(buffer, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html; charset=windows-1251',
+        },
+      });
+    }) as any;
 
     const engine = new RutrackerSearchEngine({
       username: 'u',

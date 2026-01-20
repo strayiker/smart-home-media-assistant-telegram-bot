@@ -1,6 +1,6 @@
 import type { SearchEngine, SearchResult } from '../../searchEngines/SearchEngine.js';
 import type { Logger } from '../../utils/Logger.js';
-import { ok, err, type ResultT } from '../../utils/result.js';
+import { err, ok, type ResultT } from '../../utils/result.js';
 
 export interface SearchServiceOptions {
   searchEngines: SearchEngine[];

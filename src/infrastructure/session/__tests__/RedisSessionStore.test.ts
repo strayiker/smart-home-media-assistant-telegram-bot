@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { SQLiteSessionStore } from '../SQLiteSessionStore.js';
 
 describe('SQLiteSessionStore (was Redis test file)', () => {
@@ -8,8 +9,8 @@ describe('SQLiteSessionStore (was Redis test file)', () => {
   beforeEach(() => {
     client = {
       get: vi.fn().mockResolvedValue(null),
-      set: vi.fn().mockResolvedValue(undefined),
-      del: vi.fn().mockResolvedValue(undefined),
+      set: vi.fn().mockResolvedValue(),
+      del: vi.fn().mockResolvedValue(),
     };
     store = new SQLiteSessionStore(client as any);
   });

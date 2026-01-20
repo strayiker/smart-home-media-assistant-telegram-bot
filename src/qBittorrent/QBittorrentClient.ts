@@ -1,15 +1,15 @@
 import { URLSearchParams } from 'node:url';
 
 import parseTorrent from 'parse-torrent';
-import { ok, err, type ResultT } from '../utils/result.js';
 import { CookieJar } from 'tough-cookie';
 
+import { err, ok, type ResultT } from '../utils/result.js';
 import { type QBFile, type QBTorrent } from './models.js';
+import { normalizeTorrent,QBTorrentsResponseSchema } from './schemas.js';
 import {
   type QBClientAddTorrentsOptions,
   type QBClientGetTorrentsOptions,
 } from './types.js';
-import { QBTorrentsResponseSchema, normalizeTorrent } from './schemas.js';
 
 interface QBClientOptions {
   url: string;
@@ -136,8 +136,8 @@ export class QBittorrentClient {
   async addTorrentsSafe(opts: QBClientAddTorrentsOptions): Promise<ResultT<string[], unknown>> {
     try {
       return await this.addTorrents(opts);
-    } catch (e) {
-      return err(e as unknown);
+    } catch (error) {
+      return err(error as unknown);
     }
   }
 
@@ -167,7 +167,7 @@ export class QBittorrentClient {
 
     const parsed = QBTorrentsResponseSchema.parse(json);
 
-    return parsed.map(normalizeTorrent);
+    return parsed.map((t) => normalizeTorrent(t));
   }
 
   async pauseTorrents(hashes: string[]) {

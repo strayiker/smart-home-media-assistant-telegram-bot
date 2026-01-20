@@ -1,21 +1,29 @@
 import { type NextFunction } from 'grammy';
+
 import { logger } from '../../../logger.js';
 
-export async function errorMiddleware(ctx: any, next: NextFunction) {
+export async function errorMiddleware(ctx: unknown, next: NextFunction) {
   try {
     await next();
   } catch (error) {
     try {
-      logger.error(error, 'Handler error');
-    } catch (_) {
+      logger.error(error as unknown, 'Handler error');
+    } catch {
       // ignore logging failures
     }
 
     try {
-      if (ctx && typeof ctx.reply === 'function') {
-        await ctx.reply('Произошла внутренняя ошибка. Попробуйте позже.');
+      // safe check for ctx.reply
+      if (
+        typeof ctx === 'object' &&
+        ctx !== null &&
+        'reply' in ctx &&
+        typeof (ctx as { reply?: unknown }).reply === 'function'
+      ) {
+        const ctxWithReply = ctx as { reply?: (msg: string) => Promise<unknown> };
+        await ctxWithReply.reply?.('Произошла внутренняя ошибка. Попробуйте позже.');
       }
-    } catch (_) {
+    } catch {
       // ignore reply failures
     }
   }

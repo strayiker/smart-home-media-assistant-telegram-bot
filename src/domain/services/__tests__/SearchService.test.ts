@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { SearchService } from '../SearchService.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import type { SearchEngine, SearchResult } from '../../searchEngines/SearchEngine.js';
 import type { Logger } from '../../utils/Logger.js';
-import { ok, err } from '../../utils/result.js';
+import { err,ok } from '../../utils/result.js';
+import { SearchService } from '../SearchService.js';
 
 describe('SearchService', () => {
   let service: SearchService;

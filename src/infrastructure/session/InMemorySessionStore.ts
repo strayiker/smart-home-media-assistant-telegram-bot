@@ -3,8 +3,8 @@ import type { ChatSessionService, SessionData } from '../../domain/services/Chat
 export class InMemorySessionStore implements ChatSessionService {
   private store: Map<number, SessionData> = new Map();
 
-  async get(chatId: number): Promise<SessionData | null> {
-    return this.store.get(chatId) ?? null;
+  async get(chatId: number): Promise<SessionData | undefined> {
+    return this.store.get(chatId);
   }
 
   async set(chatId: number, data: SessionData): Promise<void> {
