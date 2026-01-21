@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { container } from '../../../../di.js';
 import type { TorrentService } from '../../../../domain/services/TorrentService.js';
 import type { SearchEngine } from '../../../../searchEngines/searchEngine.js';
-import type { Logger } from '../../../../utils/Logger.js';
+import type { Logger } from '../../../../utils/logger.js';
 import { TorrentHandler } from '../TorrentHandler.js';
 
 describe('TorrentHandler Integration Tests', () => {

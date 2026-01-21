@@ -4,7 +4,7 @@ import type {
   SearchEngine,
   SearchResult,
 } from '../../../searchEngines/searchEngine.js';
-import type { Logger } from '../../utils/Logger.js';
+import type { Logger } from '../../utils/logger.js';
 import { err as _err, ok as _ok } from '../../utils/result.js';
 import { SearchService } from '../SearchService.js';
 
