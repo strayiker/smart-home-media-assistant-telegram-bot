@@ -49,7 +49,7 @@ export class MediaService {
     for (const [resolution, bitrate] of VIDEO_BITRATES) {
       if (width <= resolution) return bitrate;
     }
-    return VIDEO_BITRATES.at(-1)[1];
+    return VIDEO_BITRATES.at(-1)![1];
   }
 
   /**
