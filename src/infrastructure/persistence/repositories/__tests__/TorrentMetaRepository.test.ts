@@ -1,11 +1,11 @@
 import type { EntityManager } from '@mikro-orm/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { TorrentMeta } from '../../domain/entities/TorrentMeta.js';
+import { TorrentMeta } from '../../../../domain/entities/TorrentMeta.js';
 import {
   type ITorrentMetaRepository,
   TorrentMetaRepository,
-} from '../../infrastructure/persistence/repositories/TorrentMetaRepository.js';
+} from '../TorrentMetaRepository.js';
 
 describe('TorrentMetaRepository', () => {
   let repository: ITorrentMetaRepository;
