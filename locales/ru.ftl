@@ -67,3 +67,10 @@ torrents-btn-next = ➡️
 
 torrents-removed-success = ✅ Торрент удалён
 torrents-removed-error = ❌ Ошибка при удалении торрента
+
+commands.search = Поиск медиа по заголовку или запросу
+commands.torrents = Управление торрентами (список / удаление)
+commands.download = Запустить загрузку (используйте команду с id)
+commands.files = Показать файлы торрента (используйте uid)
+commands.preview = Сгенерировать превью (используйте параметры)
+commands.thumb = Сгенерировать миниатюру (используйте параметры)

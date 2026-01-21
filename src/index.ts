@@ -32,6 +32,7 @@ import {
   botApiAddress,
   botDataPath,
   botDataTorrentsPath,
+    botRegisterCommands,
   botToken,
   qbtSavePath,
   qbtWebuiAddress,
@@ -50,11 +51,13 @@ import { fluent } from './fluent.js';
 import { startSessionCleanup } from './infrastructure/session/cleanup.js';
 import { logger } from './logger.js';
 import { initORM } from './orm.js';
+import type { CommandsRegistry } from './presentation/bot/CommandsRegistry.js';
 import { type DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js';
 import { type SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
 import { type TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
 import { createDIContainerMiddleware } from './presentation/bot/middleware/diContainerMiddleware.js';
 import { errorMiddleware } from './presentation/bot/middleware/ErrorMiddleware.js';
+import { registerCommandsIfNeeded } from './presentation/bot/registerCommands.js';
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
 import { RutrackerSearchEngine } from './searchEngines/RutrackerSearchEngine.js';
 import { type SearchEngine } from './searchEngines/SearchEngine.js';
@@ -70,7 +73,6 @@ if (!qbtWebuiAddress || !qbtWebuiUsername || !qbtWebuiPassword) {
 
 const botOptions: ConstructorParameters<typeof Bot<MyContext>>[1] =
   botApiAddress ? { client: { apiRoot: botApiAddress } } : {};
-
 const bot = new Bot<MyContext>(botToken, botOptions);
 const cookieStorage = new CookieStorage({
   filePath: path.join(botDataPath, 'cookies.json'),
@@ -186,6 +188,20 @@ const downloadHandler = container.resolve<DownloadHandler>('DownloadHandler');
 bot.use(searchHandler);
 bot.use(torrentHandler);
 bot.use(downloadHandler);
+
+// Attempt to register aggregated, localized commands with Telegram API.
+try {
+  const commandsRegistry = container.resolve<CommandsRegistry>('CommandsRegistry');
+  const shouldRegister = Boolean(botRegisterCommands) && process.env.NODE_ENV !== 'test';
+  await registerCommandsIfNeeded({
+    bot,
+    commandsRegistry,
+    locale: process.env.BOT_COMMANDS_LOCALE ?? 'en',
+    shouldRegister,
+  });
+} catch (error) {
+  logger.warn(error, 'Error while preparing bot commands');
+}
 
 // eslint-disable-next-line unicorn/prefer-top-level-await
 bot.catch(({ error }) => {

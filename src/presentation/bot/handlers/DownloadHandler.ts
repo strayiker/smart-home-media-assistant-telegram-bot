@@ -154,7 +154,9 @@ export async function handleDownloadFileCommand(
         );
       }
     } else {
-      await (qbFile.size <= MAX_FILE_SIZE ? ctx.replyWithDocument(file) : ctx.reply(ctx.t('torrent-file-too-big')));
+      await (qbFile.size <= MAX_FILE_SIZE
+        ? ctx.replyWithDocument(file)
+        : ctx.reply(ctx.t('torrent-file-too-big')));
     }
   } catch (error) {
     logger.error(error, 'An error occurred while sending file');

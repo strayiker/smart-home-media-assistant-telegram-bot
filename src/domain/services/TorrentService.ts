@@ -226,11 +226,7 @@ export class TorrentService {
   /**
    * Format a torrent file item for display in the file list.
    */
-  formatTorrentFileItem(
-    ctx: MyContext,
-    uid: string,
-    file: QBFile,
-  ): string {
+  formatTorrentFileItem(ctx: MyContext, uid: string, file: QBFile): string {
     const dlCmd = `/dl_file_${uid}_${file.index}`;
     const fileName = `<a href="${dlCmd}">${file.name}</a>`;
     const fileSize = this.formatBytes(file.size);

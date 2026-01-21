@@ -91,6 +91,12 @@ export class TorrentHandler extends Composer<MyContext> {
       }
     });
   }
+
+  public getCommands(): Array<{ command: string; descriptionKey: string }> {
+    return [
+      { command: 'torrents', descriptionKey: 'commands.torrents' },
+    ];
+  }
 }
 
 export async function handleDownloadCommand(

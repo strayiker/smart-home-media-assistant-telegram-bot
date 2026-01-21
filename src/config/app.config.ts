@@ -27,4 +27,6 @@ export const qbtSavePath = cfg.QBT_SAVE_PATH;
 
 export const useNewHandlers = cfg.USE_NEW_HANDLERS;
 
+export const botRegisterCommands = cfg.BOT_REGISTER_COMMANDS;
+
 export const appConfig = cfg;

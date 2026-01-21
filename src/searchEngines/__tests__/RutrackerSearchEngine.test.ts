@@ -1,4 +1,3 @@
-import { Response } from 'undici';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type CookieStorage } from '../../utils/CookieStorage.js';
@@ -20,7 +19,7 @@ const createCookieStorage = (): CookieStorage => {
   return {
     setCookies: vi.fn(),
     setCookie: vi.fn(),
-    getCookies: vi.fn(() => cookies as any),
+    getCookies: vi.fn(() => cookies),
     getCookieString: vi.fn(() => 'bb_session=1'),
   } as unknown as CookieStorage;
 };

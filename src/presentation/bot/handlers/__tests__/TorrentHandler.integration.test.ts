@@ -120,7 +120,6 @@ describe('TorrentHandler Integration Tests', () => {
         .fn()
         .mockResolvedValue(mockTorrents);
 
-
       // This would be called by the TorrentHandler
       const result = await mockTorrentService.getTorrentMetasByChatId(1);
       expect(result).toEqual(mockMetas);

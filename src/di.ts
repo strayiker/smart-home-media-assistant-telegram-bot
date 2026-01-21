@@ -10,6 +10,8 @@ import { type SearchService } from './domain/services/SearchService.js';
 import { type TorrentService } from './domain/services/TorrentService.js';
 import { InMemoryFeatureFlagStore } from './infrastructure/featureFlags/InMemoryFeatureFlagStore.js';
 import { logger } from './logger.js';
+// Lightweight DI container to avoid external dependency on tsyringe.
+import { CommandsRegistry } from './presentation/bot/CommandsRegistry.js';
 import { DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js';
 import { FileHandler } from './presentation/bot/handlers/FileHandler.js';
 import { MediaHandler } from './presentation/bot/handlers/MediaHandler.js';
@@ -17,7 +19,7 @@ import { SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
 import { TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
 import type { SearchEngine } from './searchEngines/SearchEngine.js';
 
-// Lightweight DI container to avoid external dependency on tsyringe.
+interface CommandProvider { getCommands?: () => Array<{ command: string; descriptionKey: string; scope?: unknown }> }
 const registry = new Map<string | symbol, unknown>();
 const factories = new Map<string | symbol, () => unknown>();
 
@@ -80,36 +82,68 @@ container.registerFactory('ChatSessionService', () => {
 container.registerFactory('SearchHandler', () => {
   const svc = container.resolve<SearchService>('SearchService');
   const log = container.resolve<PinoLogger>('Logger');
-  return new SearchHandler({ searchService: svc, logger: log });
+  const inst = new SearchHandler({ searchService: svc, logger: log });
+  try {
+    const registry = container.resolve<CommandsRegistry>('CommandsRegistry');
+    const cmds = (inst as unknown as CommandProvider).getCommands?.() ?? [];
+    for (const c of cmds) registry.register(c);
+  } catch {
+    // ignore
+  }
+  return inst;
 });
 
 container.registerFactory('TorrentHandler', () => {
   const svc = container.resolve<TorrentService>('TorrentService');
   const log = container.resolve<PinoLogger>('Logger');
   const engines = container.resolve<SearchEngine[]>('SearchEngines');
-  return new TorrentHandler({
+  const inst = new TorrentHandler({
     torrentService: svc,
     logger: log,
     searchEngines: engines,
   });
+  try {
+    const registry = container.resolve<CommandsRegistry>('CommandsRegistry');
+    const cmds = (inst as unknown as CommandProvider).getCommands?.() ?? [];
+    for (const c of cmds) registry.register(c);
+  } catch {
+    // ignore
+  }
+  return inst;
 });
 
 container.registerFactory('FileHandler', () => {
   const svc = container.resolve<FileService>('FileService');
   const log = container.resolve<PinoLogger>('Logger');
-  return new FileHandler({ fileService: svc, logger: log });
+  const inst = new FileHandler({ fileService: svc, logger: log });
+  try {
+    const registry = container.resolve<CommandsRegistry>('CommandsRegistry');
+    const cmds = (inst as unknown as CommandProvider).getCommands?.() ?? [];
+    for (const c of cmds) registry.register(c);
+  } catch {
+    // ignore
+  }
+  return inst;
 });
 
 container.registerFactory('DownloadHandler', () => {
   const torrentSvc = container.resolve<TorrentService>('TorrentService');
   const mediaSvc = container.resolve<MediaService>('MediaService');
   const log = container.resolve<PinoLogger>('Logger');
-  return new DownloadHandler({
+  const inst = new DownloadHandler({
     torrentService: torrentSvc,
     mediaService: mediaSvc,
     dataPath: container.resolve<string>('BotDataPath'),
     logger: log,
   });
+  try {
+    const registry = container.resolve<CommandsRegistry>('CommandsRegistry');
+    const cmds = (inst as unknown as CommandProvider).getCommands?.() ?? [];
+    for (const c of cmds) registry.register(c);
+  } catch {
+    // ignore
+  }
+  return inst;
 });
 
 container.registerFactory('MediaService', () => {
@@ -120,7 +154,15 @@ container.registerFactory('MediaService', () => {
 container.registerFactory('MediaHandler', () => {
   const mediaSvc = container.resolve<MediaService>('MediaService');
   const log = container.resolve<PinoLogger>('Logger');
-  return new MediaHandler({ mediaService: mediaSvc, logger: log });
+  const inst = new MediaHandler({ mediaService: mediaSvc, logger: log });
+  try {
+    const registry = container.resolve<CommandsRegistry>('CommandsRegistry');
+    const cmds = (inst as unknown as CommandProvider).getCommands?.() ?? [];
+    for (const c of cmds) registry.register(c);
+  } catch {
+    // ignore
+  }
+  return inst;
 });
 
 // Feature flags (in-memory default)
@@ -131,6 +173,9 @@ container.registerInstance(
     container.resolve<FeatureFlagStore>('FeatureFlagStore'),
   ),
 );
+
+// Commands registry for aggregating bot commands
+container.registerInstance('CommandsRegistry', new CommandsRegistry());
 
 // Usage examples (replace with proper types when available):
 // import { container } from './di.js';

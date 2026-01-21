@@ -187,9 +187,7 @@ export class MediaService {
   /**
    * Get video metadata using ffprobe.
    */
-  async getVideoMetadata(
-    videoPath: string,
-  ): Promise<FfprobeData | undefined> {
+  async getVideoMetadata(videoPath: string): Promise<FfprobeData | undefined> {
     return new Promise((resolve) => {
       ffmpeg.ffprobe(videoPath, (err, metadata) => {
         if (err) {
