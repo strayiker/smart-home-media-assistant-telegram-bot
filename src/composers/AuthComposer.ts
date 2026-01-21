@@ -1,14 +1,10 @@
-import { type EntityManager } from '@mikro-orm/core';
 import { Composer, type Filter, type NextFunction } from 'grammy';
 
-import type { MyContext } from '../shared/context.js'; // Ваш расширенный контекст с сессией и EntityManager
-import { User } from '../domain/entities/User.js';
+import type { MyContext } from '../shared/context.js';
+import type { AuthService } from '../domain/services/AuthService.js';
 
 export class AuthComposer extends Composer<MyContext> {
-  constructor(
-    private em: EntityManager,
-    private secretKey: string,
-  ) {
+  constructor(private authService: AuthService) {
     super();
 
     this.use(this.checkAuth.bind(this));
@@ -23,9 +19,9 @@ export class AuthComposer extends Composer<MyContext> {
 
   private async checkAuth(ctx: MyContext, next: NextFunction) {
     const telegramId = ctx.from?.id;
-    if (!telegramId) return;
+    if (!telegramId) return next();
 
-    const existing = await this.em.findOne(User, { telegramId });
+    const existing = await this.authService.ensureUser(telegramId);
     if (existing) {
       ctx.session.awaitingSecret = false;
       return next();
@@ -40,12 +36,16 @@ export class AuthComposer extends Composer<MyContext> {
   }
 
   private async handleSecret(ctx: Filter<MyContext, 'message:text'>) {
-    const text = ctx.message.text.trim();
+    const text = ctx.message?.text?.trim() ?? '';
+    const fromId = ctx.from?.id;
 
-    if (text === this.secretKey) {
-      const user = new User();
-      user.telegramId = ctx.from.id;
-      await this.em.persistAndFlush(user);
+    if (!fromId) {
+      await ctx.reply(ctx.t('auth-fail'));
+      return;
+    }
+
+    const ok = await this.authService.validateSecret(fromId, text);
+    if (ok) {
       ctx.session.awaitingSecret = false;
       await ctx.reply(ctx.t('auth-success'));
     } else {
