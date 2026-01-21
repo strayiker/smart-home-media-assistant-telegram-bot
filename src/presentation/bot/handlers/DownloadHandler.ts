@@ -8,7 +8,7 @@ import tmp from 'tmp';
 import type { MyContext } from '../../../shared/context.js';
 import type { MediaService } from '../../../domain/services/MediaService.js';
 import type { TorrentService } from '../../../domain/services/TorrentService.js';
-import type { QBFile } from '../../../qBittorrent/models.js';
+import type { QBFile } from '../../../qbittorrent/models.js';
 import type { Logger } from '../../../shared/utils/logger.js';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2 GB

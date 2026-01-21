@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { err, ok } from '../../../shared/utils/result.js';
 import type { TorrentMeta } from '../../../domain/entities/TorrentMeta.js';
-import type { QBFile as _QBFile, QBTorrent } from '../../../qBittorrent/models.js';
+import type { QBFile as _QBFile, QBTorrent } from '../../../qbittorrent/models.js';
 import type { QBittorrentClient } from '../../../qbittorrent/qBittorrentClient.js';
 import type {
   SearchEngine,
