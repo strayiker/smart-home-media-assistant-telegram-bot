@@ -4,7 +4,7 @@ import type {
   ChatSessionService,
   SessionData,
 } from '../../domain/services/ChatSessionService.js';
-import { ChatSession } from '../../entities/ChatSession.js';
+import { ChatSession } from '../../domain/entities/ChatSession.js';
 
 export class DbSessionStore implements ChatSessionService {
   private em: EntityManager;

@@ -1,6 +1,6 @@
 import type { EntityManager } from '@mikro-orm/core';
 
-import { TorrentMeta } from '../entities/TorrentMeta.js';
+import { TorrentMeta } from '../domain/entities/TorrentMeta.js';
 
 export interface TorrentMetaCreateInput {
   hash: string;

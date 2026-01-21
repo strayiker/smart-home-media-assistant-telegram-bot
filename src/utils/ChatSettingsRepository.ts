@@ -1,6 +1,6 @@
 import type { EntityManager } from '@mikro-orm/core';
 
-import { ChatSettings } from '../entities/ChatSettings.js';
+import { ChatSettings } from '../domain/entities/ChatSettings.js';
 
 const DEFAULT_LOCALE = 'en';
 

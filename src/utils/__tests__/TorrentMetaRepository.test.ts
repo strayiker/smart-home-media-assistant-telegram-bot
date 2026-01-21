@@ -1,7 +1,7 @@
 import type { EntityManager } from '@mikro-orm/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { TorrentMeta } from '../../entities/TorrentMeta.js';
+import { TorrentMeta } from '../../domain/entities/TorrentMeta.js';
 import {
   type ITorrentMetaRepository,
   TorrentMetaRepository,

@@ -2,7 +2,7 @@ import { type EntityManager } from '@mikro-orm/core';
 import { Composer, type Filter, type NextFunction } from 'grammy';
 
 import type { MyContext } from '../Context.js'; // Ваш расширенный контекст с сессией и EntityManager
-import { User } from '../entities/User.js';
+import { User } from '../domain/entities/User.js';
 
 export class AuthComposer extends Composer<MyContext> {
   constructor(

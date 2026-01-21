@@ -1,6 +1,6 @@
 import type { MikroORM } from '@mikro-orm/core';
 
-import { ChatSession } from '../../entities/ChatSession.js';
+import { ChatSession } from '../../domain/entities/ChatSession.js';
 import { logger } from '../../logger.js';
 
 export interface CleanupHandle {
