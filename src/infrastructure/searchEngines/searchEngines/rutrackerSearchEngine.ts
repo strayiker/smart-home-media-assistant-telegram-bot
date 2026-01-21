@@ -1,7 +1,7 @@
 import * as cheerio from 'cheerio';
 
-import { type CookieStorage } from '../shared/utils/CookieStorage.js';
-import { type Logger } from '../shared/utils/logger.js';
+import { type CookieStorage } from '../../../shared/utils/CookieStorage.js';
+import { type Logger } from '../../../shared/utils/logger.js';
 import { SearchResultsSchema } from './schemas.js';
 import { SearchEngine, type SearchResult } from './searchEngine.js';
 
@@ -60,7 +60,7 @@ export class RutrackerSearchEngine extends SearchEngine {
 
   private async ensureLoggedIn() {
     const cookies = this.cookieStorage.getCookies(LOGIN_URL);
-    const hasSession = cookies.some((cookie) => cookie.key === 'bb_session');
+    const hasSession = cookies.some((cookie: any) => cookie.key === 'bb_session');
     if (!hasSession) {
       await this.login();
     }

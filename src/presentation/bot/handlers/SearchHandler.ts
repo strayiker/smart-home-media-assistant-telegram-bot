@@ -5,7 +5,7 @@ import type { SearchService } from '../../../domain/services/SearchService.js';
 import type {
   SearchEngine,
   SearchResult,
-} from '../../../searchEngines/searchEngine.js';
+} from '../../../infrastructure/searchEngines/searchEngines/searchEngine.js';
 import { formatBytes } from '../../../shared/utils/formatBytes.js';
 import type { Logger } from '../../../shared/utils/logger.js';
 
@@ -126,7 +126,7 @@ export class SearchHandler extends Composer<MyContext> {
 
     return ctx.t('search-message-line', {
       title: result.title,
-      tags: result.tags.map((tag) => `[#${tag}]`).join(', '),
+      tags: result.tags.map((tag: string) => `[#${tag}]`).join(', '),
       size,
       seeds: result.seeds ?? 0,
       peers: result.peers ?? 0,

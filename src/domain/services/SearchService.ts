@@ -1,7 +1,7 @@
 import type {
   SearchEngine,
   SearchResult,
-} from '../../searchEngines/searchEngine.js';
+} from '../../infrastructure/searchEngines/searchEngines/searchEngine.js';
 import type { Logger } from '../../shared/utils/logger.js';
 import { err, ok, type ResultT } from '../../shared/utils/result.js';
 
@@ -30,7 +30,7 @@ export class SearchService {
       const promises = this.searchEngines.map(async (searchEngine) => {
         try {
           const engineResults = await searchEngine.search(query);
-          return engineResults.map((result) => [searchEngine, result] as const);
+          return engineResults.map((result: SearchResult) => [searchEngine, result] as const);
         } catch (error) {
           this.logger.error(
             error,

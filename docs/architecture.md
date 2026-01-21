@@ -68,8 +68,8 @@ src/
 │       └── CommandsRegistry.ts
 │
 ├── application/                # Прикладной слой (композеры)
-│   └── composers/           # DI-композиция
-│       └── AuthComposer.ts
+│   └── composers/           # DI-композиция (используется редко)
+│       └── [перенесено в `presentation/bot/middleware` — middleware-based auth]
 │
 ├── bootstrap/                  # Загрузчики
 │   └── [инициализация DI, сервера]

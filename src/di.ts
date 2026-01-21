@@ -17,7 +17,9 @@ import { FileHandler } from './presentation/bot/handlers/FileHandler.js';
 import { MediaHandler } from './presentation/bot/handlers/MediaHandler.js';
 import { SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
 import { TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
-import type { SearchEngine } from './searchEngines/searchEngine.js';
+import type { SearchEngine } from './infrastructure/searchEngines/searchEngines/searchEngine.js';
+import { UserRepository } from './infrastructure/persistence/repositories/UserRepository.js';
+import { AuthService } from './domain/services/AuthService.js';
 
 interface CommandProvider {
   getCommands?: () => Array<{
@@ -169,6 +171,21 @@ container.registerFactory('MediaHandler', () => {
     // ignore
   }
   return inst;
+});
+
+// UserRepository and AuthService
+container.registerFactory('UserRepository', () => {
+  const orm = container.resolve<MikroORM>('ORM');
+  if (!orm) throw new Error('ORM not registered; UserRepository requires ORM');
+  return new UserRepository(orm.em.fork());
+});
+
+container.registerFactory('AuthService', () => {
+  const repo = container.resolve<UserRepository>('UserRepository');
+  const loggerInst = container.resolve<PinoLogger>('Logger');
+  const appConfig = container.resolve<any>('AppConfig');
+  const secretKey = appConfig?.BOT_SECRET ?? appConfig?.secretKey ?? process.env.BOT_SECRET ?? process.env.SECRET_KEY ?? '';
+  return new AuthService(repo, secretKey, loggerInst);
 });
 
 // Feature flags (in-memory default)

@@ -1,10 +1,10 @@
 import type { MyContext } from '../../shared/context.js';
-import type { QBFile, QBTorrent } from '../../qbittorrent/models.js';
-import type { QBittorrentClient } from '../../qbittorrent/qBittorrentClient.js';
+import type { QBFile, QBTorrent } from '../../infrastructure/qbittorrent/qbittorrent/models.js';
+import type { QBittorrentClient } from '../../infrastructure/qbittorrent/qbittorrent/qBittorrentClient.js';
 import type {
   SearchEngine,
   SearchResult,
-} from '../../searchEngines/searchEngine.js';
+} from '../../infrastructure/searchEngines/searchEngines/searchEngine.js';
 import type { Logger } from '../../shared/utils/logger.js';
 import { err, ok, type ResultT } from '../../shared/utils/result.js';
 import type { TorrentMetaRepository } from '../../infrastructure/persistence/repositories/TorrentMetaRepository.js';
@@ -129,7 +129,7 @@ export class TorrentService {
       const pageMetas = metas.slice(offset, offset + itemsPerPage);
       const hashes = pageMetas.map((meta) => meta.hash);
       const torrents = await this.qbittorrent.getTorrents({ hashes });
-      const torrentMap = new Map(torrents.map((t) => [t.hash, t]));
+      const torrentMap = new Map<string, QBTorrent>(torrents.map((t: QBTorrent) => [t.hash, t]));
 
       const pageItems: QBTorrent[] = pageMetas
         .map((meta) => torrentMap.get(meta.hash)!)

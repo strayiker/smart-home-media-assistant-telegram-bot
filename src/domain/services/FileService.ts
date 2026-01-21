@@ -1,7 +1,7 @@
 import path from 'node:path';
 
-import type { QBFile } from '../../qbittorrent/models.js';
-import type { QBittorrentClient } from '../../qbittorrent/qBittorrentClient.js';
+import type { QBFile } from '../../infrastructure/qbittorrent/qbittorrent/models.js';
+import type { QBittorrentClient } from '../../infrastructure/qbittorrent/qbittorrent/qBittorrentClient.js';
 import { formatBytes } from '../../shared/utils/formatBytes.js';
 import type { TorrentMetaRepository } from '../../infrastructure/persistence/repositories/TorrentMetaRepository.js';
 

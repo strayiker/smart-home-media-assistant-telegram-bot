@@ -27,7 +27,7 @@ import {
   session,
 } from 'grammy';
 
-import { AuthComposer } from './composers/AuthComposer.js';
+import { createAuthMiddleware } from './presentation/bot/middleware/authMiddleware.js';
 import {
   botApiAddress,
   botDataPath,
@@ -58,9 +58,9 @@ import { type TorrentHandler } from './presentation/bot/handlers/TorrentHandler.
 import { createDIContainerMiddleware } from './presentation/bot/middleware/diContainerMiddleware.js';
 import { errorMiddleware } from './presentation/bot/middleware/errorMiddleware.js';
 import { registerCommandsIfNeeded } from './presentation/bot/registerCommands.js';
-import { QBittorrentClient } from '../infrastructure/qbittorrent/qbittorrent/qBittorrentClient.js';
-import { RutrackerSearchEngine } from './searchEngines/rutrackerSearchEngine.js';
-import { type SearchEngine } from './searchEngines/searchEngine.js';
+import { QBittorrentClient } from './infrastructure/qbittorrent/qbittorrent/qBittorrentClient.js';
+import { RutrackerSearchEngine } from './infrastructure/searchEngines/searchEngines/rutrackerSearchEngine.js';
+import { type SearchEngine } from './infrastructure/searchEngines/searchEngines/searchEngine.js';
 import { ChatSettingsRepository } from './infrastructure/persistence/repositories/ChatSettingsRepository.js';
 import { CookieStorage } from './shared/utils/CookieStorage.js';
 import { TorrentMetaRepository } from './infrastructure/persistence/repositories/TorrentMetaRepository.js';
@@ -99,9 +99,12 @@ container.registerInstance('ORM', orm);
 // Start periodic session cleanup job (defaults to 1h interval)
 const sessionCleanup = startSessionCleanup(orm);
 
-const authComposer = new AuthComposer(orm.em.fork(), secretKey);
+// AuthComposer will be created after DI has AuthService registered; create instance from container-provided AuthService
 const chatSettingsRepository = new ChatSettingsRepository(orm.em.fork());
 const torrentMetaRepository = new TorrentMetaRepository(orm.em.fork());
+
+// Create auth middleware from AuthService in DI
+const authMiddleware = createAuthMiddleware(container.resolve('AuthService'));
 
 // Register TorrentMetaRepository in DI
 container.registerInstance('TorrentMetaRepository', torrentMetaRepository);
@@ -178,7 +181,7 @@ bot.use(
     defaultLocale: 'en',
   }),
 );
-bot.use(authComposer);
+bot.use(authMiddleware);
 
 // Register new handlers from DI
 const searchHandler = container.resolve<SearchHandler>('SearchHandler');
