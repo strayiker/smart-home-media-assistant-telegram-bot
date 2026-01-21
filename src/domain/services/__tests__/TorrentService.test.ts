@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { err, ok } from '../../../utils/result.js';
-import type { TorrentMeta } from '../../entities/TorrentMeta.js.js';
-import type { QBFile as _QBFile, QBTorrent } from '../../qBittorrent/models.js';
-import type { QBittorrentClient } from '../../qBittorrent/QBittorrentClient.js';
+import { err, ok } from '../../../shared/utils/result.js';
+import type { TorrentMeta } from '../../../domain/entities/TorrentMeta.js';
+import type { QBFile as _QBFile, QBTorrent } from '../../../qBittorrent/models.js';
+import type { QBittorrentClient } from '../../../qBittorrent/QBittorrentClient.js';
 import type {
   SearchEngine,
   SearchResult,
-} from '../../searchEngines/SearchEngine.js';
-import type { Logger } from '../../utils/Logger.js';
-import type { TorrentMetaRepository } from '../../utils/TorrentMetaRepository.js';
+} from '../../../searchEngines/SearchEngine.js';
+import type { Logger } from '../../../shared/utils/logger.js';
+import type { TorrentMetaRepository } from '../../../infrastructure/persistence/repositories/TorrentMetaRepository.js';
 import { TorrentService } from '../TorrentService.js';
 
 describe('TorrentService', () => {

@@ -3,7 +3,7 @@ import { URLSearchParams } from 'node:url';
 import parseTorrent from 'parse-torrent';
 import { CookieJar } from 'tough-cookie';
 
-import { err, ok, type ResultT } from '../utils/result.js';
+import { err, ok, type ResultT } from '../shared/utils/result.js';
 import { type QBFile, type QBTorrent } from './models.js';
 import { normalizeTorrent, QBTorrentsResponseSchema } from './schemas.js';
 import {

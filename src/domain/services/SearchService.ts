@@ -2,8 +2,8 @@ import type {
   SearchEngine,
   SearchResult,
 } from '../../searchEngines/SearchEngine.js';
-import type { Logger } from '../../utils/Logger.js';
-import { err, ok, type ResultT } from '../../utils/result.js';
+import type { Logger } from '../../shared/utils/logger.js';
+import { err, ok, type ResultT } from '../../shared/utils/result.js';
 
 export interface SearchServiceOptions {
   searchEngines: SearchEngine[];

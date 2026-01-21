@@ -2,7 +2,7 @@ import { Composer } from 'grammy';
 
 import type { MyContext } from '../../../Context.js';
 import type { MediaService } from '../../../domain/services/MediaService.js';
-import type { Logger } from '../../../utils/Logger.js';
+import type { Logger } from '../../../shared/utils/logger.js';
 
 export interface MediaHandlerOptions {
   mediaService: MediaService;

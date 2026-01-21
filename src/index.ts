@@ -61,9 +61,9 @@ import { registerCommandsIfNeeded } from './presentation/bot/registerCommands.js
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
 import { RutrackerSearchEngine } from './searchEngines/RutrackerSearchEngine.js';
 import { type SearchEngine } from './searchEngines/SearchEngine.js';
-import { ChatSettingsRepository } from './utils/ChatSettingsRepository.js';
-import { CookieStorage } from './utils/CookieStorage.js';
-import { TorrentMetaRepository } from './utils/TorrentMetaRepository.js';
+import { ChatSettingsRepository } from './infrastructure/persistence/repositories/ChatSettingsRepository.js';
+import { CookieStorage } from './shared/utils/CookieStorage.js';
+import { TorrentMetaRepository } from './infrastructure/persistence/repositories/TorrentMetaRepository.js';
 
 if (!qbtWebuiAddress || !qbtWebuiUsername || !qbtWebuiPassword) {
   throw new Error(

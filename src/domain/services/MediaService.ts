@@ -2,7 +2,7 @@ import type { FileTypeResult } from 'file-type';
 import { fileTypeFromFile } from 'file-type';
 import ffmpeg, { type FfprobeData } from 'fluent-ffmpeg';
 
-import type { Logger } from '../../utils/Logger.js';
+import type { Logger } from '../../shared/utils/logger.js';
 
 /**
  * Video bitrate limits by resolution (kbps).

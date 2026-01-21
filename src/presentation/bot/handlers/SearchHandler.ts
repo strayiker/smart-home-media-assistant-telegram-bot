@@ -6,8 +6,8 @@ import type {
   SearchEngine,
   SearchResult,
 } from '../../../searchEngines/SearchEngine.js';
-import { formatBytes } from '../../../utils/formatBytes.js';
-import type { Logger } from '../../../utils/Logger.js';
+import { formatBytes } from '../../../shared/utils/formatBytes.js';
+import type { Logger } from '../../../shared/utils/logger.js';
 
 export interface SearchHandlerOptions {
   searchService: SearchService;

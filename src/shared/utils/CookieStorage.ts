@@ -2,7 +2,7 @@ import fs from 'node:fs';
 
 import { CookieJar } from 'tough-cookie';
 
-import { type Logger } from './Logger.js';
+import { type Logger } from './logger.js';
 
 export interface CookieStorageOptions {
   filePath?: string;

@@ -1,0 +1,11 @@
+src/utils/Config.ts,src/shared/utils/Config.ts
+src/utils/ConfigEnv.ts,src/shared/utils/ConfigEnv.ts
+src/utils/CookieStorage.ts,src/shared/utils/CookieStorage.ts
+src/utils/RpcClient.ts,src/shared/utils/RpcClient.ts
+src/utils/Logger.ts,src/shared/utils/logger.ts
+src/utils/TorrentMetaRepository.ts,src/infrastructure/persistence/repositories/TorrentMetaRepository.ts
+src/utils/ChatSettingsRepository.ts,src/infrastructure/persistence/repositories/ChatSettingsRepository.ts
+src/utils/formatBytes.ts,src/shared/utils/formatBytes.ts
+src/utils/formatDuration.ts,src/shared/utils/formatDuration.ts
+src/utils/result.ts,src/shared/utils/result.ts
+src/utils/types.ts,src/shared/types/types.ts

@@ -5,7 +5,7 @@ import { TorrentMeta } from '../../domain/entities/TorrentMeta.js';
 import {
   type ITorrentMetaRepository,
   TorrentMetaRepository,
-} from '../TorrentMetaRepository.js';
+} from '../../infrastructure/persistence/repositories/TorrentMetaRepository.js';
 
 describe('TorrentMetaRepository', () => {
   let repository: ITorrentMetaRepository;
