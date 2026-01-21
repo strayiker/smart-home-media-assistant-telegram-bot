@@ -1,12 +1,12 @@
 import { Composer, InlineKeyboard } from 'grammy';
 
-import { formatBytes } from '../../../utils/formatBytes.js';
 import type { MyContext } from '../../../Context.js';
 import type { SearchService } from '../../../domain/services/SearchService.js';
 import type {
   SearchEngine,
   SearchResult,
 } from '../../../searchEngines/SearchEngine.js';
+import { formatBytes } from '../../../utils/formatBytes.js';
 import type { Logger } from '../../../utils/Logger.js';
 
 export interface SearchHandlerOptions {
@@ -75,13 +75,13 @@ export class SearchHandler extends Composer<MyContext> {
 
   private parseSearchCallback(
     data: string,
-  ): { query: string; page: number } | null {
+  ): { query: string; page: number } | undefined {
     const parsed = data.replace('search:', '');
     const [query, pageStr] = parsed.split(':');
-    const page = pageStr ? parseInt(pageStr, 10) : 0;
+    const page = pageStr ? Number.parseInt(pageStr, 10) : 0;
 
     if (Number.isNaN(page) || query === '') {
-      return null;
+      return undefined;
     }
 
     return { query, page };

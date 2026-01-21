@@ -1,12 +1,13 @@
-import { Composer, InputFile } from 'grammy';
-import ffmpeg from 'fluent-ffmpeg';
-import path from 'node:path';
 import fs from 'node:fs';
+import path from 'node:path';
+
+import ffmpeg from 'fluent-ffmpeg';
+import { Composer, InputFile } from 'grammy';
 import tmp from 'tmp';
 
 import type { MyContext } from '../../../Context.js';
-import type { TorrentService } from '../../../domain/services/TorrentService.js';
 import type { MediaService } from '../../../domain/services/MediaService.js';
+import type { TorrentService } from '../../../domain/services/TorrentService.js';
 import type { Logger } from '../../../utils/Logger.js';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2 GB
@@ -15,8 +16,8 @@ const MAX_VIDEO_BITRATE = [
   [480, 1500],
   [720, 3000],
   [1080, 6000],
-  [1440, 10000],
-  [2160, 20000],
+  [1440, 10_000],
+  [2160, 20_000],
 ] as const;
 
 export interface DownloadHandlerOptions {
@@ -79,7 +80,7 @@ export async function handleDownloadFileCommand(
     return;
   }
 
-  let qbFile: any;
+  let qbFile: QBFile | undefined;
 
   try {
     [qbFile] = await torrentService.getTorrentFiles(hash, [Number(fileIndex)]);
@@ -152,11 +153,7 @@ export async function handleDownloadFileCommand(
         );
       }
     } else {
-      if (qbFile.size <= MAX_FILE_SIZE) {
-        await ctx.replyWithDocument(file);
-      } else {
-        await ctx.reply(ctx.t('torrent-file-too-big'));
-      }
+      await (qbFile.size <= MAX_FILE_SIZE ? ctx.replyWithDocument(file) : ctx.reply(ctx.t('torrent-file-too-big')));
     }
   } catch (error) {
     logger.error(error, 'An error occurred while sending file');
@@ -167,7 +164,7 @@ export async function handleDownloadFileCommand(
 async function handleLargeVideoFile(
   ctx: MyContext,
   filePath: string,
-  videoOptions: any,
+  videoOptions: Parameters<MyContext['replyWithVideo']>[1],
   duration: number,
   videoStreamHeight: number,
   logger: Logger,

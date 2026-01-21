@@ -1,5 +1,5 @@
-import { container } from '../../../di.js';
 import type { MyContext } from '../../../Context.js';
+import { container } from '../../../di.js';
 
 /**
  * Middleware to inject DI container into the context.

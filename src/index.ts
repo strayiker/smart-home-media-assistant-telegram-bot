@@ -28,11 +28,6 @@ import {
 } from 'grammy';
 
 import { AuthComposer } from './composers/AuthComposer.js';
-import { createDIContainerMiddleware } from './presentation/bot/middleware/DIContainerMiddleware.js';
-import { SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
-import { TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
-import { DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js';
-import { errorMiddleware } from './presentation/bot/middleware/ErrorMiddleware.js';
 import {
   botApiAddress,
   botDataPath,
@@ -48,13 +43,18 @@ import {
 } from './config.js';
 import { type MyContext, type SessionData } from './Context.js';
 import { container } from './di.js';
-import { SearchService } from './domain/services/SearchService.js';
 import { FileService } from './domain/services/FileService.js';
+import { SearchService } from './domain/services/SearchService.js';
 import { TorrentService } from './domain/services/TorrentService.js';
 import { fluent } from './fluent.js';
 import { startSessionCleanup } from './infrastructure/session/cleanup.js';
 import { logger } from './logger.js';
 import { initORM } from './orm.js';
+import { type DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js';
+import { type SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
+import { type TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
+import { createDIContainerMiddleware } from './presentation/bot/middleware/diContainerMiddleware.js';
+import { errorMiddleware } from './presentation/bot/middleware/ErrorMiddleware.js';
 import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
 import { RutrackerSearchEngine } from './searchEngines/RutrackerSearchEngine.js';
 import { type SearchEngine } from './searchEngines/SearchEngine.js';

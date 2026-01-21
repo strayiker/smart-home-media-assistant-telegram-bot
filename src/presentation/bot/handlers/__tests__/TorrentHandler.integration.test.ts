@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { TorrentHandler } from '../TorrentHandler.js';
 import { container } from '../../../../di.js';
 import type { TorrentService } from '../../../../domain/services/TorrentService.js';
 import type { QBittorrentClient } from '../../../../qBittorrent/QBittorrentClient.js';
-import type { Logger } from '../../../../utils/Logger.js';
 import type { SearchEngine } from '../../../../searchEngines/SearchEngine.js';
+import type { Logger } from '../../../../utils/Logger.js';
+import { TorrentHandler } from '../TorrentHandler.js';
 
 describe('TorrentHandler Integration Tests', () => {
   let torrentHandler: TorrentHandler;
@@ -100,7 +100,7 @@ describe('TorrentHandler Integration Tests', () => {
           hash: 'hash1',
           name: 'Torrent 1',
           progress: 1,
-          size: 1000000000,
+          size: 1_000_000_000,
           dlspeed: 0,
           eta: 0,
         },
@@ -108,8 +108,8 @@ describe('TorrentHandler Integration Tests', () => {
           hash: 'hash2',
           name: 'Torrent 2',
           progress: 0.5,
-          size: 2000000000,
-          dlspeed: 1000000,
+          size: 2_000_000_000,
+          dlspeed: 1_000_000,
           eta: 600,
         },
       ] as any;

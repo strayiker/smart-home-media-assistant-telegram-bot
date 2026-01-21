@@ -1,3 +1,4 @@
+import type { MyContext } from '../../Context.js';
 import type { QBFile, QBTorrent } from '../../qBittorrent/models.js';
 import type { QBittorrentClient } from '../../qBittorrent/QBittorrentClient.js';
 import type {
@@ -178,7 +179,7 @@ export class TorrentService {
       await this.torrentMetaRepository.removeByHash(hash);
 
       this.logger.debug('A torrent was successfully deleted: %s', hash);
-      return ok<void>(undefined);
+      return ok<void>();
     } catch (error) {
       this.logger.error(error, 'An error occurred while deleting torrent');
       return err(
@@ -225,7 +226,11 @@ export class TorrentService {
   /**
    * Format a torrent file item for display in the file list.
    */
-  formatTorrentFileItem(ctx: any, uid: string, file: QBFile): string {
+  formatTorrentFileItem(
+    ctx: MyContext,
+    uid: string,
+    file: QBFile,
+  ): string {
     const dlCmd = `/dl_file_${uid}_${file.index}`;
     const fileName = `<a href="${dlCmd}">${file.name}</a>`;
     const fileSize = this.formatBytes(file.size);

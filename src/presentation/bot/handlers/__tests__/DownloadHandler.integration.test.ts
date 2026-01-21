@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { DownloadHandler } from '../DownloadHandler.js';
 import { container } from '../../../../di.js';
-import type { TorrentService } from '../../../../domain/services/TorrentService.js';
 import type { MediaService } from '../../../../domain/services/MediaService.js';
+import type { TorrentService } from '../../../../domain/services/TorrentService.js';
 import type { Logger } from '../../../../utils/Logger.js';
+import { DownloadHandler } from '../DownloadHandler.js';
 
 describe('DownloadHandler Integration Tests', () => {
   let downloadHandler: DownloadHandler;
@@ -98,7 +98,7 @@ describe('DownloadHandler Integration Tests', () => {
       mockTorrentService.getTorrentFiles = vi
         .fn()
         .mockResolvedValue([
-          { name: 'file1.mp4', size: 1000000, index: 0 },
+          { name: 'file1.mp4', size: 1_000_000, index: 0 },
         ] as any);
 
       const ctx: any = {

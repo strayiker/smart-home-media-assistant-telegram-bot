@@ -68,12 +68,7 @@ export class TorrentHandler extends Composer<MyContext> {
             await ctx.answerCallbackQuery();
             return;
           }
-          await handleTorrentFiles(
-            ctx,
-            this.torrentService,
-            parsed.uid,
-            parsed.page,
-          );
+          await handleTorrentFiles(ctx, this.torrentService, parsed.uid);
           return;
         }
         case 'remove': {
@@ -163,7 +158,7 @@ export async function handleTorrentsListCommand(
       parse_mode: 'HTML',
       reply_markup: result.keyboard,
     });
-  } catch (error) {
+  } catch {
     await ctx.reply(ctx.t('torrents-list-error'));
   }
 }
@@ -181,7 +176,7 @@ export async function handleTorrentListRefresh(
       parse_mode: 'HTML',
       reply_markup: result.keyboard,
     });
-  } catch (error) {
+  } catch {
     await ctx.editMessageText(ctx.t('torrents-list-error'));
   }
 }
@@ -190,7 +185,6 @@ export async function handleTorrentFiles(
   ctx: MyContext,
   torrentService: TorrentService,
   uid: string,
-  _page: number,
 ) {
   await ctx.answerCallbackQuery();
   const files = await torrentService.getTorrentFilesByUid(uid);
@@ -217,7 +211,7 @@ export async function handleTorrentRemove(
   try {
     await torrentService.removeTorrentByUid(uid);
     await ctx.answerCallbackQuery({ text: ctx.t('torrents-removed-success') });
-  } catch (error) {
+  } catch {
     await ctx.answerCallbackQuery({ text: ctx.t('torrents-removed-error') });
     return;
   }
@@ -229,7 +223,7 @@ export async function handleTorrentRemove(
       parse_mode: 'HTML',
       reply_markup: result.keyboard,
     });
-  } catch (error) {
+  } catch {
     // Ignore error on refresh
   }
 }

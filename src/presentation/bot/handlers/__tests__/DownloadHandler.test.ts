@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { MyContext } from '../../../Context.js';
-import type { TorrentService } from '../../../domain/services/TorrentService.js';
 import type { MediaService } from '../../../domain/services/MediaService.js';
+import type { TorrentService } from '../../../domain/services/TorrentService.js';
 import type { Logger } from '../../../utils/Logger.js';
 import { handleDownloadFileCommand } from '../DownloadHandler.js';
 

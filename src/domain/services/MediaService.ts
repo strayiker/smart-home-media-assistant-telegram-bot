@@ -49,7 +49,7 @@ export class MediaService {
     for (const [resolution, bitrate] of VIDEO_BITRATES) {
       if (width <= resolution) return bitrate;
     }
-    return VIDEO_BITRATES[VIDEO_BITRATES.length - 1][1];
+    return VIDEO_BITRATES.at(-1)[1];
   }
 
   /**
@@ -187,7 +187,9 @@ export class MediaService {
   /**
    * Get video metadata using ffprobe.
    */
-  async getVideoMetadata(videoPath: string): Promise<FfprobeData | null> {
+  async getVideoMetadata(
+    videoPath: string,
+  ): Promise<FfprobeData | undefined> {
     return new Promise((resolve) => {
       ffmpeg.ffprobe(videoPath, (err, metadata) => {
         if (err) {
@@ -195,7 +197,8 @@ export class MediaService {
             { error: err, videoPath },
             'Failed to get video metadata',
           );
-          resolve(null);
+          // eslint-disable-next-line unicorn/no-useless-undefined
+          resolve(undefined);
         } else {
           resolve(metadata);
         }
