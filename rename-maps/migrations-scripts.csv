@@ -1,0 +1,2 @@
+src/migrations/,src/infrastructure/persistence/migrations/
+src/scripts/migrate.ts,src/infrastructure/scripts/migrate.ts

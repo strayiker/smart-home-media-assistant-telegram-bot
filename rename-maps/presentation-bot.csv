@@ -1,0 +1,4 @@
+src/presentation/bot/CommandsRegistry.ts,src/presentation/bot/commandsRegistry.ts
+src/presentation/bot/handlers/*.ts,src/presentation/bot/handlers/*.ts
+src/presentation/bot/middleware/diContainerMiddleware.ts,src/presentation/bot/middleware/diContainerMiddleware.ts
+src/presentation/bot/middleware/ErrorMiddleware.ts,src/presentation/bot/middleware/errorMiddleware.ts

@@ -1,1 +1,1 @@
-export * from './config/app.config.js';
+export * from './config/appConfig.js';

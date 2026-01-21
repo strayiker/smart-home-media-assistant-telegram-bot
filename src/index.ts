@@ -3,7 +3,7 @@ import './dayjs.js';
 
 import { ZodError } from 'zod';
 
-import { loadConfig } from './config/env.schema.js';
+import { loadConfig } from './config/envSchema.js';
 
 try {
   loadConfig();
@@ -51,16 +51,16 @@ import { fluent } from './shared/fluent.js';
 import { startSessionCleanup } from './infrastructure/session/cleanup.js';
 import { logger } from './logger.js';
 import { initORM } from './orm.js';
-import type { CommandsRegistry } from './presentation/bot/CommandsRegistry.js';
+import type { CommandsRegistry } from './presentation/bot/commandsRegistry.js';
 import { type DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js';
 import { type SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
 import { type TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
 import { createDIContainerMiddleware } from './presentation/bot/middleware/diContainerMiddleware.js';
-import { errorMiddleware } from './presentation/bot/middleware/ErrorMiddleware.js';
+import { errorMiddleware } from './presentation/bot/middleware/errorMiddleware.js';
 import { registerCommandsIfNeeded } from './presentation/bot/registerCommands.js';
-import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
-import { RutrackerSearchEngine } from './searchEngines/RutrackerSearchEngine.js';
-import { type SearchEngine } from './searchEngines/SearchEngine.js';
+import { QBittorrentClient } from './qbittorrent/qBittorrentClient.js';
+import { RutrackerSearchEngine } from './searchEngines/rutrackerSearchEngine.js';
+import { type SearchEngine } from './searchEngines/searchEngine.js';
 import { ChatSettingsRepository } from './infrastructure/persistence/repositories/ChatSettingsRepository.js';
 import { CookieStorage } from './shared/utils/CookieStorage.js';
 import { TorrentMetaRepository } from './infrastructure/persistence/repositories/TorrentMetaRepository.js';

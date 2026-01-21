@@ -1,7 +1,7 @@
 import type { MikroORM } from '@mikro-orm/core';
 import type { Logger as PinoLogger } from 'pino';
 
-import { loadConfig } from './config/env.schema.js';
+import { loadConfig } from './config/envSchema.js';
 import type { FeatureFlagStore } from './domain/services/FeatureFlagService.js';
 import { FeatureFlagService } from './domain/services/FeatureFlagService.js';
 import { type FileService } from './domain/services/FileService.js';
@@ -11,13 +11,13 @@ import { type TorrentService } from './domain/services/TorrentService.js';
 import { InMemoryFeatureFlagStore } from './infrastructure/featureFlags/InMemoryFeatureFlagStore.js';
 import { logger } from './logger.js';
 // Lightweight DI container to avoid external dependency on tsyringe.
-import { CommandsRegistry } from './presentation/bot/CommandsRegistry.js';
+import { CommandsRegistry } from './presentation/bot/commandsRegistry.js';
 import { DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js';
 import { FileHandler } from './presentation/bot/handlers/FileHandler.js';
 import { MediaHandler } from './presentation/bot/handlers/MediaHandler.js';
 import { SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
 import { TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
-import type { SearchEngine } from './searchEngines/SearchEngine.js';
+import type { SearchEngine } from './searchEngines/searchEngine.js';
 
 interface CommandProvider {
   getCommands?: () => Array<{

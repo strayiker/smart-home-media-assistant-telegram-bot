@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { container } from '../../../../di.js';
 import type { TorrentService } from '../../../../domain/services/TorrentService.js';
-import type { SearchEngine } from '../../../../searchEngines/SearchEngine.js';
+import type { SearchEngine } from '../../../../searchEngines/searchEngine.js';
 import type { Logger } from '../../../../utils/Logger.js';
 import { TorrentHandler } from '../TorrentHandler.js';
 

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { CommandsRegistry } from '../CommandsRegistry.js';
+import { CommandsRegistry } from '../commandsRegistry.js';
 import { registerCommandsIfNeeded } from '../registerCommands.js';
 
 describe('registerCommandsIfNeeded', () => {

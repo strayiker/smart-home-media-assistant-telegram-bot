@@ -1,10 +1,10 @@
 import type { MyContext } from '../../shared/context.js';
 import type { QBFile, QBTorrent } from '../../qBittorrent/models.js';
-import type { QBittorrentClient } from '../../qBittorrent/QBittorrentClient.js';
+import type { QBittorrentClient } from '../../qbittorrent/qBittorrentClient.js';
 import type {
   SearchEngine,
   SearchResult,
-} from '../../searchEngines/SearchEngine.js';
+} from '../../searchEngines/searchEngine.js';
 import type { Logger } from '../../shared/utils/logger.js';
 import { err, ok, type ResultT } from '../../shared/utils/result.js';
 import type { TorrentMetaRepository } from '../../infrastructure/persistence/repositories/TorrentMetaRepository.js';

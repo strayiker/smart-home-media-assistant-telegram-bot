@@ -5,7 +5,7 @@ import type { SearchService } from '../../../domain/services/SearchService.js';
 import type {
   SearchEngine,
   SearchResult,
-} from '../../../searchEngines/SearchEngine.js';
+} from '../../../searchEngines/searchEngine.js';
 import { formatBytes } from '../../../shared/utils/formatBytes.js';
 import type { Logger } from '../../../shared/utils/logger.js';
 
