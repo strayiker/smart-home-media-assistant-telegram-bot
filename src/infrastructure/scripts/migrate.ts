@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { initORM } from '../orm.js';
+import { initORM } from '../../orm.js';
 
 try {
   console.log('Initializing ORM and running migrations...');
