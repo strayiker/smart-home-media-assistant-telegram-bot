@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type CookieStorage } from '../../utils/CookieStorage.js';
 import { type Logger } from '../../utils/Logger.js';
+import { Response } from 'undici';
 import { RutrackerSearchEngine } from '../RutrackerSearchEngine.js';
 
 const noopLogger: Logger = {
