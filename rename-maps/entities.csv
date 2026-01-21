@@ -1,4 +1,0 @@
-src/entities/ChatSession.ts,src/domain/entities/ChatSession.ts
-src/entities/ChatSettings.ts,src/domain/entities/ChatSettings.ts
-src/entities/User.ts,src/domain/entities/User.ts
-src/entities/TorrentMeta.ts,src/domain/entities/TorrentMeta.ts
