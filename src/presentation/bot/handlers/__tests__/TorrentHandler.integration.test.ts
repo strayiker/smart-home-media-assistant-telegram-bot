@@ -2,13 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { container } from '../../../../di.js';
 import type { TorrentService } from '../../../../domain/services/TorrentService.js';
-import type { QBittorrentClient } from '../../../../qBittorrent/QBittorrentClient.js';
 import type { SearchEngine } from '../../../../searchEngines/SearchEngine.js';
 import type { Logger } from '../../../../utils/Logger.js';
 import { TorrentHandler } from '../TorrentHandler.js';
 
 describe('TorrentHandler Integration Tests', () => {
-  let torrentHandler: TorrentHandler;
   let mockTorrentService: Partial<TorrentService>;
   let mockLogger: Partial<Logger>;
   let mockSearchEngines: SearchEngine[];
@@ -46,7 +44,8 @@ describe('TorrentHandler Integration Tests', () => {
     container.registerInstance('SearchEngines', mockSearchEngines);
 
     // Create TorrentHandler instance with mocks
-    torrentHandler = new TorrentHandler({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const torrentHandler = new TorrentHandler({
       torrentService: mockTorrentService as TorrentService,
       logger: mockLogger as Logger,
       searchEngines: mockSearchEngines,
@@ -121,11 +120,6 @@ describe('TorrentHandler Integration Tests', () => {
         .fn()
         .mockResolvedValue(mockTorrents);
 
-      const ctx: any = {
-        chatId: 1,
-        t: (key: string) => key,
-        reply: vi.fn(),
-      };
 
       // This would be called by the TorrentHandler
       const result = await mockTorrentService.getTorrentMetasByChatId(1);
@@ -140,12 +134,6 @@ describe('TorrentHandler Integration Tests', () => {
         .fn()
         .mockResolvedValue([]);
 
-      const ctx: any = {
-        chatId: 1,
-        t: (key: string) => key,
-        reply: vi.fn(),
-      };
-
       const result = await mockTorrentService.getTorrentMetasByChatId(1);
       expect(result).toEqual([]);
     });
@@ -159,13 +147,6 @@ describe('TorrentHandler Integration Tests', () => {
       mockTorrentService.getTorrentMetasByChatId = vi
         .fn()
         .mockResolvedValue([]);
-
-      const ctx: any = {
-        message: { text: '/rm_engine_123' },
-        reply: vi.fn(),
-        t: (key: string) => key,
-        chatId: 1,
-      };
 
       await mockTorrentService.removeTorrentByUid('engine_123');
       expect(mockTorrentService.removeTorrentByUid).toHaveBeenCalledWith(

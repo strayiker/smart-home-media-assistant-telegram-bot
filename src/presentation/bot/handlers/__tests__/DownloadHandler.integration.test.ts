@@ -7,7 +7,6 @@ import type { Logger } from '../../../../utils/Logger.js';
 import { DownloadHandler } from '../DownloadHandler.js';
 
 describe('DownloadHandler Integration Tests', () => {
-  let downloadHandler: DownloadHandler;
   let mockTorrentService: Partial<TorrentService>;
   let mockMediaService: Partial<MediaService>;
   let mockLogger: Partial<Logger>;
@@ -49,7 +48,8 @@ describe('DownloadHandler Integration Tests', () => {
     container.registerInstance('BotDataPath', '/tmp/test');
 
     // Create DownloadHandler instance with mocks
-    downloadHandler = new DownloadHandler({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const downloadHandler = new DownloadHandler({
       torrentService: mockTorrentService as TorrentService,
       mediaService: mockMediaService as MediaService,
       dataPath: '/tmp/test',
@@ -101,14 +101,8 @@ describe('DownloadHandler Integration Tests', () => {
           { name: 'file1.mp4', size: 1_000_000, index: 0 },
         ] as any);
 
-      const ctx: any = {
-        message: { text: '/dl_file_engine_123_0' },
-        reply: vi.fn(),
-        t: (key: string) => key,
-      };
-
-      // Parse the command
-      const parts = ctx.message.text.replace('/dl_file_', '').split('_');
+      // Parse command
+      const parts = '/dl_file_engine_123_0'.replace('/dl_file_', '').split('_');
       const uid = `${parts[0]}_${parts[1]}`;
 
       expect(uid).toBe('engine_123');
@@ -140,12 +134,6 @@ describe('DownloadHandler Integration Tests', () => {
       mockMediaService.getVideoMetadata = vi
         .fn()
         .mockResolvedValue(mockMetadata);
-
-      const ctx: any = {
-        message: { text: '/dl_file_engine_123_0' },
-        reply: vi.fn(),
-        t: (key: string) => key,
-      };
 
       // This would be called by DownloadHandler
       const result = await mockMediaService.getVideoMetadata(
