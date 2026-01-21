@@ -32,7 +32,7 @@ import {
   botApiAddress,
   botDataPath,
   botDataTorrentsPath,
-    botRegisterCommands,
+  botRegisterCommands,
   botToken,
   qbtSavePath,
   qbtWebuiAddress,
@@ -191,8 +191,10 @@ bot.use(downloadHandler);
 
 // Attempt to register aggregated, localized commands with Telegram API.
 try {
-  const commandsRegistry = container.resolve<CommandsRegistry>('CommandsRegistry');
-  const shouldRegister = Boolean(botRegisterCommands) && process.env.NODE_ENV !== 'test';
+  const commandsRegistry =
+    container.resolve<CommandsRegistry>('CommandsRegistry');
+  const shouldRegister =
+    Boolean(botRegisterCommands) && process.env.NODE_ENV !== 'test';
   await registerCommandsIfNeeded({
     bot,
     commandsRegistry,

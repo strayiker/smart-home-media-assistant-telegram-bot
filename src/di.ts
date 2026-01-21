@@ -19,7 +19,13 @@ import { SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
 import { TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
 import type { SearchEngine } from './searchEngines/SearchEngine.js';
 
-interface CommandProvider { getCommands?: () => Array<{ command: string; descriptionKey: string; scope?: unknown }> }
+interface CommandProvider {
+  getCommands?: () => Array<{
+    command: string;
+    descriptionKey: string;
+    scope?: unknown;
+  }>;
+}
 const registry = new Map<string | symbol, unknown>();
 const factories = new Map<string | symbol, () => unknown>();
 

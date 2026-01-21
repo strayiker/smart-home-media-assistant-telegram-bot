@@ -93,9 +93,7 @@ export class TorrentHandler extends Composer<MyContext> {
   }
 
   public getCommands(): Array<{ command: string; descriptionKey: string }> {
-    return [
-      { command: 'torrents', descriptionKey: 'commands.torrents' },
-    ];
+    return [{ command: 'torrents', descriptionKey: 'commands.torrents' }];
   }
 }
 
