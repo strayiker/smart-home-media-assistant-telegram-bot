@@ -58,7 +58,7 @@ import { type TorrentHandler } from './presentation/bot/handlers/TorrentHandler.
 import { createDIContainerMiddleware } from './presentation/bot/middleware/diContainerMiddleware.js';
 import { errorMiddleware } from './presentation/bot/middleware/errorMiddleware.js';
 import { registerCommandsIfNeeded } from './presentation/bot/registerCommands.js';
-import { QBittorrentClient } from './qBittorrent/QBittorrentClient.js';
+import { QBittorrentClient } from './qbittorrent/qBittorrentClient.js';
 import { RutrackerSearchEngine } from './searchEngines/rutrackerSearchEngine.js';
 import { type SearchEngine } from './searchEngines/searchEngine.js';
 import { ChatSettingsRepository } from './infrastructure/persistence/repositories/ChatSettingsRepository.js';

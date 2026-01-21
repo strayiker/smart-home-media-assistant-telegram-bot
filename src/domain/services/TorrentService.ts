@@ -1,6 +1,6 @@
 import type { MyContext } from '../../shared/context.js';
 import type { QBFile, QBTorrent } from '../../qBittorrent/models.js';
-import type { QBittorrentClient } from '../../qBittorrent/QBittorrentClient.js';
+import type { QBittorrentClient } from '../../qbittorrent/qBittorrentClient.js';
 import type {
   SearchEngine,
   SearchResult,
