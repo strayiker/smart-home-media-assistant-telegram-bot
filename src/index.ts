@@ -42,12 +42,12 @@ import {
   rutrackerUsername,
   secretKey,
 } from './config.js';
-import { type MyContext, type SessionData } from './Context.js';
+import { type MyContext, type SessionData } from './shared/context.js';
 import { container } from './di.js';
 import { FileService } from './domain/services/FileService.js';
 import { SearchService } from './domain/services/SearchService.js';
 import { TorrentService } from './domain/services/TorrentService.js';
-import { fluent } from './fluent.js';
+import { fluent } from './shared/fluent.js.js';
 import { startSessionCleanup } from './infrastructure/session/cleanup.js';
 import { logger } from './logger.js';
 import { initORM } from './orm.js';

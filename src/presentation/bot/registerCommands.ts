@@ -1,6 +1,6 @@
 import type { Bot } from 'grammy';
 
-import type { MyContext } from '../../Context.js';
+import type { MyContext } from '../../shared/context.js';
 import { logger } from '../../logger.js';
 import type { CommandsRegistry } from './CommandsRegistry.js';
 

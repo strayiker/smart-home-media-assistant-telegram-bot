@@ -1,4 +1,4 @@
-import { fluent } from '../../fluent.js';
+import { fluent } from '../../shared/fluent.js';
 
 interface CommandEntry {
   command: string;

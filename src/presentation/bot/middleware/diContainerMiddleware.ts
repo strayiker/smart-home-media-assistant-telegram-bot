@@ -1,4 +1,4 @@
-import type { MyContext } from '../../../Context.js';
+import type { MyContext } from '../../../shared/context.js';
 import { container } from '../../../di.js';
 
 /**

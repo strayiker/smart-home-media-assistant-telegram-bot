@@ -1,6 +1,6 @@
 import { Composer, InlineKeyboard } from 'grammy';
 
-import type { MyContext } from '../../../Context.js';
+import type { MyContext } from '../../../shared/context.js';
 import type { SearchService } from '../../../domain/services/SearchService.js';
 import type {
   SearchEngine,

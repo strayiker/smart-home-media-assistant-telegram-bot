@@ -5,7 +5,7 @@ import ffmpeg from 'fluent-ffmpeg';
 import { Composer, InputFile } from 'grammy';
 import tmp from 'tmp';
 
-import type { MyContext } from '../../../Context.js';
+import type { MyContext } from '../../../shared/context.js';
 import type { MediaService } from '../../../domain/services/MediaService.js';
 import type { TorrentService } from '../../../domain/services/TorrentService.js';
 import type { QBFile } from '../../../qBittorrent/models.js';

@@ -1,4 +1,4 @@
-import type { MyContext } from '../../Context.js';
+import type { MyContext } from '../../shared/context.js';
 import type { QBFile, QBTorrent } from '../../qBittorrent/models.js';
 import type { QBittorrentClient } from '../../qBittorrent/QBittorrentClient.js';
 import type {
