@@ -198,12 +198,6 @@ export class TorrentHandler extends Composer<MyContext> {
     }
 
     const chatId = ctx.chatId as number;
-    // Add this chat to tracking so periodic updater includes it
-    if (!this.chatTorrents.has(chatId)) {
-      this.chatTorrents.set(chatId, new Set());
-    }
-    this.chatTorrents.get(chatId)!.add(uid);
-
     // Trigger immediate update to show progress message (force refresh)
     await this.createOrUpdateTorrentsMessage(chatId, true);
   }
@@ -250,40 +244,13 @@ export class TorrentHandler extends Composer<MyContext> {
 
     let message = this.chatMessages.get(chatId);
 
-    if (
-      message &&
-      (completedTorrents.length > 0 || pendingTorrents.length === 0 || refresh)
-    ) {
+    // Delete progress message only when torrents complete (not on forced refresh)
+    if (message && completedTorrents.length > 0 && !refresh) {
       await this.deleteTorrentsMessage(message);
       message = undefined;
     }
 
-    if (completedTorrents.length > 0) {
-      const chatLocale =
-        (await this.chatSettingsRepository?.getLocale(chatId)) ?? 'en';
-      const texts = completedTorrents.map((torrent) => {
-        const meta = metaByHash.get(torrent.hash);
-        const uid = meta?.uid ?? '';
-        const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
-        const t = fluent.withLocale(chatLocale);
-        return t('torrent-message-completed', {
-          title: torrent.name ?? '',
-          progress,
-          files: `/ls_${uid}`,
-          remove: `/rm_${uid}`,
-        });
-      });
-      const text = texts.join('\n');
-      try {
-        await this.bot.api.sendMessage(chatId, text, { parse_mode: 'HTML' });
-      } catch (error) {
-        this.logger.error(
-          error,
-          'An error occured while sending completed torrents message',
-        );
-      }
-    }
-
+    // Only pending torrents trigger a progress message
     if (pendingTorrents.length > 0) {
       const hashesPending = pendingTorrents.map((t) => t.hash);
       this.chatTorrents.set(chatId, new Set(hashesPending));
