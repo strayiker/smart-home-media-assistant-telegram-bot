@@ -81,11 +81,14 @@ export class RutrackerSearchEngine extends SearchEngine {
     this.logger.debug({ query }, 'Rutracker search start');
     await this.ensureLoggedIn();
 
-    const response = await fetch(`${SEARCH_URL}?nm=${query}`, {
-      headers: {
-        Cookie: this.cookieStorage.getCookieString(LOGIN_URL),
+    const response = await fetch(
+      `${SEARCH_URL}?nm=${encodeURIComponent(query)}`,
+      {
+        headers: {
+          Cookie: this.cookieStorage.getCookieString(LOGIN_URL),
+        },
       },
-    });
+    );
 
     const arrayBuffer = await response.arrayBuffer();
     const decoder = new TextDecoder('Windows-1251');
@@ -99,7 +102,7 @@ export class RutrackerSearchEngine extends SearchEngine {
     }
 
     const results: SearchResult[] = [];
-    const rows = $('table.forumline tbody tr');
+    const rows = $('table.forumline tbody tr').toArray();
 
     for (const row of rows) {
       const tds = $(row).find('td');
@@ -115,9 +118,10 @@ export class RutrackerSearchEngine extends SearchEngine {
       }
 
       const title = tds.eq(3).find('a').text().trim();
-      const size = Number.parseInt(tds.eq(5).attr('data-ts_text') ?? '0');
-      const seeds = Number.parseInt(tds.eq(6).text().trim()) ?? 0;
-      const peers = Number.parseInt(tds.eq(7).text().trim()) ?? 0;
+      const size =
+        Number.parseInt(tds.eq(5).attr('data-ts_text') ?? '0', 10) || 0;
+      const seeds = Number.parseInt(tds.eq(6).text().trim() || '0', 10) || 0;
+      const peers = Number.parseInt(tds.eq(7).text().trim() || '0', 10) || 0;
       const publishDate = this.parseDate(tds.eq(9).attr('data-ts_text'));
       const detailsUrl = tds.eq(3).find('a').attr('href');
       const downloadUrl = tds.eq(5).find('a').attr('href');

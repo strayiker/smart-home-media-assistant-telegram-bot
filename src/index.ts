@@ -179,7 +179,14 @@ if (rutrackerUsername && rutrackerPassword) {
 // Log registered search engines and credential presence for debugging
 try {
   const engineNames = searchEngines.map((e) => e.name);
-  logger.info({ rutrackerUsername: Boolean(rutrackerUsername), rutrackerPassword: Boolean(rutrackerPassword), engineNames }, 'Search engines initialized');
+  logger.info(
+    {
+      rutrackerUsername: Boolean(rutrackerUsername),
+      rutrackerPassword: Boolean(rutrackerPassword),
+      engineNames,
+    },
+    'Search engines initialized',
+  );
 } catch (e) {
   logger.warn(e, 'Failed to log search engines');
 }
