@@ -104,10 +104,26 @@ container.registerFactory('TorrentHandler', () => {
   const svc = container.resolve<TorrentService>('TorrentService');
   const log = container.resolve<PinoLogger>('Logger');
   const engines = container.resolve<SearchEngine[]>('SearchEngines');
+  // Resolve Bot and ChatSettingsRepository instances so handler can perform background updates and use chat locale
+  // These are optional in test environments - resolve guardedly to avoid throwing when not registered
+  let bot: unknown | undefined;
+  let chatSettings: unknown | undefined;
+  try {
+    bot = container.resolve('Bot');
+  } catch {
+    bot = undefined;
+  }
+  try {
+    chatSettings = container.resolve('ChatSettingsRepository');
+  } catch {
+    chatSettings = undefined;
+  }
   const inst = new TorrentHandler({
     torrentService: svc,
     logger: log,
     searchEngines: engines,
+    bot: bot as any,
+    chatSettingsRepository: chatSettings as any,
   });
   try {
     const registry = container.resolve<CommandsRegistry>('CommandsRegistry');
