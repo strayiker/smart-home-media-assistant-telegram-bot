@@ -98,11 +98,18 @@ export class RutrackerSearchEngine extends SearchEngine {
     try {
       const headersObj = Object.fromEntries(response.headers.entries());
       this.logger.debug(
-        { status: response.status, headers: headersObj, rawHtmlSnippet: decodedHtml.slice(0, 4000) },
-        'Rutracker raw response'
+        {
+          status: response.status,
+          headers: headersObj,
+          rawHtmlSnippet: decodedHtml.slice(0, 4000),
+        },
+        'Rutracker raw response',
       );
     } catch {
-      this.logger.debug({ status: response.status }, 'Rutracker response (headers could not be serialized)');
+      this.logger.debug(
+        { status: response.status },
+        'Rutracker response (headers could not be serialized)',
+      );
     }
 
     const $ = cheerio.load(decodedHtml);
@@ -160,7 +167,10 @@ export class RutrackerSearchEngine extends SearchEngine {
 
     const finalResults = results.reverse();
     // Log parsed results preview
-    this.logger.debug({ total: finalResults.length, preview: finalResults.slice(0, 5) }, 'Parsed Rutracker results preview');
+    this.logger.debug(
+      { total: finalResults.length, preview: finalResults.slice(0, 5) },
+      'Parsed Rutracker results preview',
+    );
 
     return SearchResultsSchema.parse(finalResults);
   }
