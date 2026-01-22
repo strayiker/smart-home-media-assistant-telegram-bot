@@ -10,8 +10,9 @@ export const mikroOrmConfig = defineConfig({
   dbName: `${botDataPath}/db.sqlite`,
   extensions: [Migrator],
   migrations: {
-    path: 'dist/migrations',
-    pathTs: 'src/migrations',
+    // migrations live under infrastructure/persistence/migrations
+    path: 'dist/infrastructure/persistence/migrations',
+    pathTs: 'src/infrastructure/persistence/migrations',
   },
   // entities are defined under src/domain/entities after refactor
   entities: ['dist/domain/entities/**/*.js'],
