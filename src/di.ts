@@ -21,6 +21,7 @@ import { DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js'
 import { FileHandler } from './presentation/bot/handlers/FileHandler.js';
 import { MediaHandler } from './presentation/bot/handlers/MediaHandler.js';
 import { SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
+import type { TorrentHandlerOptions } from './presentation/bot/handlers/TorrentHandler.js';
 import { TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
 import type { MyContext } from './shared/context.js';
 
@@ -121,13 +122,22 @@ container.registerFactory('TorrentHandler', () => {
   } catch {
     chatSettings = undefined;
   }
-  const inst = new TorrentHandler({
+  const options: Partial<{
+    torrentService: TorrentService;
+    logger: PinoLogger;
+    searchEngines: SearchEngine[];
+    bot: Bot<MyContext>;
+    chatSettingsRepository: ChatSettingsRepository;
+  }> = {
     torrentService: svc,
     logger: log,
     searchEngines: engines,
-    bot: bot as Bot<MyContext> | undefined,
-    chatSettingsRepository: chatSettings as ChatSettingsRepository | undefined,
-  });
+  };
+  if (bot !== undefined) options.bot = bot as Bot<MyContext>;
+  if (chatSettings !== undefined)
+    options.chatSettingsRepository = chatSettings as ChatSettingsRepository;
+
+  const inst = new TorrentHandler(options as unknown as TorrentHandlerOptions);
   try {
     const registry = container.resolve<CommandsRegistry>('CommandsRegistry');
     const cmds = (inst as unknown as CommandProvider).getCommands?.() ?? [];

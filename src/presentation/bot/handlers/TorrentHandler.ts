@@ -187,18 +187,18 @@ export class TorrentHandler extends Composer<MyContext> {
 
     if (completedTorrents.length > 0) {
       const chatLocale =
-        (await this.chatSettingsRepository?.getLocale(chatId)) ?? 'en';
+          (await this.chatSettingsRepository?.getLocale(chatId)) ?? 'en';
       const texts = completedTorrents.map((torrent) => {
         const meta = metaByHash.get(torrent.hash);
         const uid = meta?.uid ?? '';
         const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
         const t = fluent.withLocale(chatLocale);
-        return t('torrent-message-completed', {
-          title: torrent.name,
-          progress,
-          files: `/ls_${uid}`,
-          remove: `/rm_${uid}`,
-        });
+          return t('torrent-message-completed', {
+            title: torrent.name ?? '',
+            progress,
+            files: `/ls_${uid}`,
+            remove: `/rm_${uid}`,
+          });
       });
       const text = texts.join('\n');
       try {
@@ -220,24 +220,26 @@ export class TorrentHandler extends Composer<MyContext> {
       const texts = pendingTorrents.map((torrent) => {
         const meta = metaByHash.get(torrent.hash);
         const uid = meta?.uid ?? '';
-        const speed = `${this.torrentService.formatBytes(torrent.dlspeed)}/s`;
-        const eta =
-          torrent.eta >= 8_640_000
-            ? '∞'
-            : this.torrentService.formatDuration(torrent.eta);
+          const dlspeed = torrent.dlspeed ?? 0;
+          const speed = `${this.torrentService.formatBytes(dlspeed)}/s`;
+          const etaStr = (() => {
+            if (torrent.eta === undefined) return '∞';
+            if (torrent.eta >= 8_640_000) return '∞';
+            return this.torrentService.formatDuration(torrent.eta);
+          })();
         const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
         const t = fluent.withLocale(chatLocale);
-        return t('torrent-message-in-progress', {
-          title: torrent.name,
-          seeds: torrent.num_seeds,
-          maxSeeds: torrent.num_complete,
-          peers: torrent.num_leechs,
-          maxPeers: torrent.num_incomplete,
-          speed,
-          eta,
-          progress,
-          remove: `/rm_${uid}`,
-        });
+          return t('torrent-message-in-progress', {
+            title: torrent.name ?? '',
+            seeds: torrent.num_seeds ?? 0,
+            maxSeeds: torrent.num_complete ?? 0,
+            peers: torrent.num_leechs ?? 0,
+            maxPeers: torrent.num_incomplete ?? 0,
+            speed,
+            eta: etaStr,
+            progress,
+            remove: `/rm_${uid}`,
+          });
       });
 
       const text = texts.join('\n');
