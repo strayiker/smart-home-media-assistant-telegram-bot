@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-import { loadConfig } from './envSchema.js';
+import { loadConfig } from './env.schema.js';
 
 dotenv.config({
   path: [

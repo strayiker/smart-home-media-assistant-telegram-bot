@@ -67,7 +67,7 @@ import { CookieStorage } from './shared/utils/CookieStorage.js';
 
 if (!qbtWebuiAddress || !qbtWebuiUsername || !qbtWebuiPassword) {
   throw new Error(
-    'QBT_WEBUI_ADDRESS, QBT_WEBUI_USERNAME, QBT_WEBUI_PASSWORD are required',
+    'QBT_WEB_UI_ADDRESS, QBT_WEB_UI_USERNAME, QBT_WEB_UI_PASSWORD are required',
   );
 }
 
