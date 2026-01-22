@@ -50,6 +50,6 @@ export class Migration20260123000001 extends Migration {
    * Drop chat_message_state table
    */
   override async down(): Promise<void> {
-    this.addSql('drop table \`chat_message_state\`;');
+    this.addSql('drop table "chat_message_state";');
   }
 }

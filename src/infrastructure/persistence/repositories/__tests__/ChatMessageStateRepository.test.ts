@@ -1,8 +1,7 @@
-import { MikroORM } from '@mikro-orm/better-sqlite';
 import type { EntityManager } from '@mikro-orm/core';
-import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { ChatMessageState } from '../../domain/entities/ChatMessageState.js';
+import { ChatMessageState } from '../../../../domain/entities/ChatMessageState.js';
 import { ChatMessageStateRepository } from '../ChatMessageStateRepository.js';
 
 describe('ChatMessageStateRepository', () => {
@@ -43,9 +42,11 @@ describe('ChatMessageStateRepository', () => {
       const result = await repository.saveMessageState(input);
 
       expect(mockEm.findOne).toHaveBeenCalledWith(
+        ChatMessageState,
         expect.any(Object),
       );
       expect(mockEm.create).toHaveBeenCalledWith(
+        ChatMessageState,
         expect.any(Object),
       );
       expect(mockEm.persistAndFlush).toHaveBeenCalledWith(mockState);
@@ -141,13 +142,14 @@ describe('ChatMessageStateRepository', () => {
       const result = await repository.getAllActiveTorrentProgressMessages();
 
       expect(mockEm.find).toHaveBeenCalledWith(
+        ChatMessageState,
         expect.any(Object),
         expect.any(Object),
       );
       expect(result).toHaveLength(3);
       expect(result).toEqual([
-        mockStates[1], // chatId 150
         mockStates[0], // chatId 100
+        mockStates[2], // chatId 150
         mockStates[1], // chatId 200
       ]);
     });
@@ -217,6 +219,7 @@ describe('ChatMessageStateRepository', () => {
       const result = await repository.cleanupExpiredMessages(now);
 
       expect(mockEm.find).toHaveBeenCalledWith(
+        ChatMessageState,
         expect.any(Object),
       );
       expect(mockEm.removeAndFlush).toHaveBeenCalledWith(expiredStates);
@@ -283,6 +286,7 @@ describe('ChatMessageStateRepository', () => {
       const result = await repository.deleteAllMessagesForChat(123);
 
       expect(mockEm.find).toHaveBeenCalledWith(
+        ChatMessageState,
         expect.any(Object),
       );
       expect(mockEm.removeAndFlush).toHaveBeenCalledWith(mockStates);

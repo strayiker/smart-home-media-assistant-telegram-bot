@@ -92,11 +92,15 @@ export class ChatMessageStateRepository implements IChatMessageStateRepository {
    * @returns Array of ChatMessageState records with message type 'torrent_progress'
    */
   async getAllActiveTorrentProgressMessages(): Promise<ChatMessageState[]> {
-    return this.em.find(
+    const results = await this.em.find(
       ChatMessageState,
       { messageType: 'torrent_progress' as MessageType },
       { orderBy: { chatId: 'ASC' } },
     );
+
+    // Ensure a stable ordering by chatId in case the underlying driver
+    // returns unsorted results during tests or discovery.
+    return results.slice().sort((a, b) => (a.chatId ?? 0) - (b.chatId ?? 0));
   }
 
   /**
