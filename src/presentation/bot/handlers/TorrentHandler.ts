@@ -4,6 +4,7 @@ import type { TorrentService } from '../../../domain/services/TorrentService.js'
 import type { SearchEngine } from '../../../infrastructure/searchEngines/searchEngines/searchEngine.js';
 import type { MyContext } from '../../../shared/context.js';
 import type { Logger } from '../../../shared/utils/logger.js';
+import { logger } from '../../../logger.js';
 
 const PER_PAGE = 5;
 
@@ -28,6 +29,7 @@ export class TorrentHandler extends Composer<MyContext> {
     this.on('message::bot_command', async (ctx, next) => {
       if (!ctx.message.text) return next();
       if (ctx.message.text.startsWith('/dl_')) {
+        logger.debug({ text: ctx.message.text }, 'Download command invoked');
         return handleDownloadCommand(
           ctx,
           this.torrentService,
@@ -35,12 +37,15 @@ export class TorrentHandler extends Composer<MyContext> {
         );
       }
       if (ctx.message.text.startsWith('/rm_')) {
+        logger.debug({ text: ctx.message.text }, 'Remove command invoked');
         return handleRemoveCommand(ctx, this.torrentService, this.logger);
       }
       if (ctx.message.text.startsWith('/torrents')) {
+        logger.debug('Torrents list command invoked');
         return handleTorrentsListCommand(ctx, this.torrentService);
       }
       if (ctx.message.text.startsWith('/ls_')) {
+        logger.debug({ text: ctx.message.text }, 'List files command invoked');
         return handleListFilesCommand(ctx, this.torrentService);
       }
       return next();
@@ -296,6 +301,7 @@ export async function buildTorrentsList(
   torrentService: TorrentService,
   page: number,
 ) {
+  logger.debug({ chatId: ctx.chatId, page }, 'buildTorrentsList start');
   if (ctx.chatId === undefined) {
     throw new Error('chatId is undefined');
   }

@@ -4,17 +4,20 @@ import './shared/dayjs.js';
 import { ZodError } from 'zod';
 
 import { loadConfig } from './config/envSchema.js';
+import { logger } from './logger.js';
 
 try {
   loadConfig();
 } catch (error) {
   if (error instanceof ZodError) {
-    console.error('Configuration validation failed:', error.errors);
+    logger.error({ errors: error.errors }, 'Configuration validation failed');
   } else {
-    console.error('Unknown error during configuration load', error);
+    logger.error(error, 'Unknown error during configuration load');
   }
   process.exit(1);
 }
+
+logger.info({ nodeEnv: process.env.NODE_ENV, logLevel: process.env.LOG_LEVEL ?? process.env.DEBUG }, 'Starting application');
 
 import path from 'node:path';
 
@@ -51,7 +54,6 @@ import { QBittorrentClient } from './infrastructure/qbittorrent/qbittorrent/qBit
 import { RutrackerSearchEngine } from './infrastructure/searchEngines/searchEngines/rutrackerSearchEngine.js';
 import { type SearchEngine } from './infrastructure/searchEngines/searchEngines/searchEngine.js';
 import { startSessionCleanup } from './infrastructure/session/cleanup.js';
-import { logger } from './logger.js';
 import { initORM } from './orm.js';
 import type { CommandsRegistry } from './presentation/bot/commandsRegistry.js';
 import { type DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js';
@@ -71,6 +73,11 @@ if (!qbtWebuiAddress || !qbtWebuiUsername || !qbtWebuiPassword) {
   );
 }
 
+logger.info(
+  { nodeEnv: process.env.NODE_ENV, logLevel: process.env.LOG_LEVEL ?? process.env.DEBUG },
+  'Starting application',
+);
+
 const botOptions: ConstructorParameters<typeof Bot<MyContext>>[1] =
   botApiAddress ? { client: { apiRoot: botApiAddress } } : {};
 const bot = new Bot<MyContext>(botToken, botOptions);
@@ -78,20 +85,25 @@ const cookieStorage = new CookieStorage({
   filePath: path.join(botDataPath, 'cookies.json'),
   logger,
 });
+logger.debug({ filePath: path.join(botDataPath, 'cookies.json') }, 'CookieStorage initialized');
 const qBittorrent = new QBittorrentClient({
   url: qbtWebuiAddress,
   username: qbtWebuiUsername,
   password: qbtWebuiPassword,
   savePath: qbtSavePath,
 });
+logger.info({ url: qbtWebuiAddress }, 'QBittorrent client created');
 
 // Register QBittorrentClient in DI
 container.registerInstance('QBittorrentClient', qBittorrent);
 container.registerInstance('BotDataPath', botDataPath);
 container.registerInstance('BotDataTorrentsPath', botDataTorrentsPath);
+logger.debug({ instances: ['QBittorrentClient', 'BotDataPath', 'BotDataTorrentsPath'] }, 'DI instances registered');
 
 // Initialize ORM (run migrations on startup explicitly)
+logger.info('Initializing ORM (running migrations if needed)');
 const orm = await initORM({ runMigrations: true });
+logger.info('ORM initialized');
 
 // Register ORM in DI so components can obtain repositories / EM
 container.registerInstance('ORM', orm);

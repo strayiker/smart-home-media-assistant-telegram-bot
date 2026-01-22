@@ -27,9 +27,17 @@ export class SearchService {
     query: string,
   ): Promise<ResultT<(readonly [SearchEngine, SearchResult])[], Error>> {
     try {
+      this.logger.debug({ query }, 'Starting search');
       const promises = this.searchEngines.map(async (searchEngine) => {
+        const start = Date.now();
+        this.logger.debug({ engine: searchEngine.name, query }, 'Invoking search engine');
         try {
           const engineResults = await searchEngine.search(query);
+          const took = Date.now() - start;
+          this.logger.debug(
+            { engine: searchEngine.name, count: engineResults.length, took },
+            'Search engine returned results',
+          );
           return engineResults.map(
             (result: SearchResult) => [searchEngine, result] as const,
           );
@@ -44,6 +52,8 @@ export class SearchService {
       });
 
       const awaited = await Promise.all(promises);
+      const total = awaited.reduce((acc, cur) => acc + cur.length, 0);
+      this.logger.debug({ total }, 'Aggregated search results count');
       const results: (readonly [SearchEngine, SearchResult])[] = [];
 
       for (const engineResults of awaited) {

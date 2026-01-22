@@ -1,14 +1,15 @@
 import 'reflect-metadata';
 
 import { initORM } from '../../orm.js';
+import { logger } from '../../logger.js';
 
 try {
-  console.log('Initializing ORM and running migrations...');
+  logger.info('Initializing ORM and running migrations...');
   const orm = await initORM({ runMigrations: true });
-  console.log('Migrations applied successfully');
+  logger.info('Migrations applied successfully');
   await orm.close(true);
   process.exit(0);
 } catch (error) {
-  console.error('Failed to run migrations', error);
+  logger.error(error, 'Failed to run migrations');
   process.exit(1);
 }

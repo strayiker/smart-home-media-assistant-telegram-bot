@@ -63,8 +63,7 @@ try {
 } catch {
   // If config fails to load, keep process.env as fallback to avoid breaking edits.
   // Real startup validation happens in src/index.ts; this is a defensive registration.
-
-  console.warn(
+  logger.warn(
     'AppConfig validation failed in DI registration; using process.env as fallback',
   );
   container.registerInstance('AppConfig', process.env);

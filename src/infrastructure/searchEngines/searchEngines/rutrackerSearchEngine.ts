@@ -52,7 +52,7 @@ export class RutrackerSearchEngine extends SearchEngine {
       const cookies = response.headers.getSetCookie();
       this.cookieStorage.setCookies(cookies, LOGIN_URL);
 
-      this.logger.debug('Successfully logged in');
+      this.logger.debug({ username: this.username }, 'Successfully logged in');
     } catch (error) {
       this.logger.error(error, 'An error occured while logging in');
     }
@@ -64,6 +64,7 @@ export class RutrackerSearchEngine extends SearchEngine {
       (cookie) => (cookie as { key?: string }).key === 'bb_session',
     );
     if (!hasSession) {
+      this.logger.debug('No bb_session cookie found; performing login');
       await this.login();
     }
   }
@@ -77,6 +78,7 @@ export class RutrackerSearchEngine extends SearchEngine {
   }
 
   async search(query: string): Promise<SearchResult[]> {
+    this.logger.debug({ query }, 'Rutracker search start');
     await this.ensureLoggedIn();
 
     const response = await fetch(`${SEARCH_URL}?nm=${query}`, {
@@ -105,7 +107,7 @@ export class RutrackerSearchEngine extends SearchEngine {
 
       if (!id) {
         const html = $(row).html();
-        this.logger.warn('Unable to parse RuTracker torrent id: %s', html);
+        this.logger.warn({ rowHtml: html }, 'Unable to parse RuTracker torrent id');
         continue;
       }
 
@@ -120,7 +122,7 @@ export class RutrackerSearchEngine extends SearchEngine {
       const tags = [category];
 
       if (title && downloadUrl) {
-        results.push({
+        const item = {
           id,
           title,
           tags,
@@ -130,7 +132,9 @@ export class RutrackerSearchEngine extends SearchEngine {
           publishDate: publishDate ?? new Date(),
           detailsUrl: detailsUrl && `${BASE_URL}/${detailsUrl}`,
           downloadUrl: `${BASE_URL}/${downloadUrl}`,
-        });
+        };
+        this.logger.debug({ item }, 'Parsed search result item');
+        results.push(item);
       }
     }
 

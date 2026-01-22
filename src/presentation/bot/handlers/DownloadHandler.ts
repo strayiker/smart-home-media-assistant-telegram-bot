@@ -65,6 +65,7 @@ export async function handleDownloadFileCommand(
   logger: Logger,
 ) {
   if (!ctx.message?.text) return;
+  logger.debug({ text: ctx.message.text }, 'handleDownloadFileCommand start');
 
   const [trackerName, id, fileIndex] = ctx.message.text
     .replace('/dl_file_', '')
@@ -102,6 +103,7 @@ export async function handleDownloadFileCommand(
     const file = new InputFile(filePath);
 
     const fileType = await mediaService.getFileType(filePath);
+    logger.debug({ filePath, fileSize: qbFile.size, fileType }, 'File resolved');
     if (!fileType) {
       await ctx.reply(ctx.t('torrent-file-error'));
       return;

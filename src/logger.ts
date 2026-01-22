@@ -8,7 +8,13 @@ const prettyStream = pinoPretty({
   translateTime: 'SYS:standard',
 });
 
-export const logger =
-  process.env.NODE_ENV === 'production'
-    ? pino({ level: 'info' }, prettyStream)
-    : pino({ level: 'debug' }, prettyStream);
+const level =
+  process.env.LOG_LEVEL ??
+  (process.env.DEBUG === '1' || process.env.DEBUG === 'true'
+    ? 'debug'
+    : process.env.NODE_ENV === 'production'
+    ? 'info'
+    : 'debug');
+
+export const logger = pino({ level }, prettyStream);
+

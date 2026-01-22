@@ -2,37 +2,40 @@ import 'reflect-metadata';
 import { RutrackerSearchEngine } from '../src/infrastructure/searchEngines/searchEngines/rutrackerSearchEngine.js';
 import { CookieStorage } from '../src/shared/utils/CookieStorage.js';
 
-const logger = {
-  fatal: (...args: any[]) => console.error('[FATAL]', ...args),
-  error: (...args: any[]) => console.error('[ERROR]', ...args),
-  warn: (...args: any[]) => console.warn('[WARN]', ...args),
-  info: (...args: any[]) => console.log('[INFO]', ...args),
-  debug: (...args: any[]) => console.debug('[DEBUG]', ...args),
-  trace: (...args: any[]) => console.trace('[TRACE]', ...args),
+import { logger } from '../src/logger.js';
+
+// lightweight logger wrapper for scripts
+const scriptLogger = {
+  fatal: (...args: any[]) => (logger as any).fatal?.(...args),
+  error: (...args: any[]) => (logger as any).error?.(...args),
+  warn: (...args: any[]) => (logger as any).warn?.(...args),
+  info: (...args: any[]) => (logger as any).info?.(...args),
+  debug: (...args: any[]) => (logger as any).debug?.(...args),
+  trace: (...args: any[]) => (logger as any).trace?.(...args),
   silent: () => {},
 };
 
-const cookieStorage = new CookieStorage({ filePath: './data/rutracker_cookies.json', logger });
+const cookieStorage = new CookieStorage({ filePath: './data/rutracker_cookies.json', logger: scriptLogger });
 
 async function run() {
   const username = process.env.RUTRACKER_USERNAME;
   const password = process.env.RUTRACKER_PASSWORD;
   if (!username || !password) {
-    console.error('RUTRACKER_USERNAME / RUTRACKER_PASSWORD are required in env');
+    scriptLogger.error('RUTRACKER_USERNAME / RUTRACKER_PASSWORD are required in env');
     process.exit(1);
   }
 
   const engine = new RutrackerSearchEngine({ username, password, cookieStorage, logger });
   try {
     const results = await engine.search('ubuntu');
-    console.log('Found', results.length, 'results');
-    console.log(results.slice(0, 5));
+    scriptLogger.info('Found %d results', results.length);
+    scriptLogger.debug(results.slice(0, 5));
   } catch (err) {
-    console.error('Search error', err);
+    scriptLogger.error('Search error', err);
   }
 }
 
 run().catch((e) => {
-  console.error(e);
+  scriptLogger.error(e);
   process.exit(1);
 });

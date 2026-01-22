@@ -6,6 +6,7 @@ import { CookieJar } from 'tough-cookie';
 import { err, ok, type ResultT } from '../../../shared/utils/result.js';
 import { type QBFile, type QBTorrent } from './models.js';
 import { normalizeTorrent, QBTorrentsResponseSchema } from './schemas.js';
+import { logger } from '../../../logger.js';
 import {
   type QBClientAddTorrentsOptions,
   type QBClientGetTorrentsOptions,
@@ -33,6 +34,7 @@ export class QBittorrentClient {
   }
 
   private async login() {
+    logger.debug({ apiBase: this.apiBase }, 'qBittorrent login start');
     const url = `${this.apiBase}/auth/login`;
     const data = new URLSearchParams({
       username: this.username,
@@ -47,12 +49,19 @@ export class QBittorrentClient {
       redirect: 'manual',
     });
 
-    const cookies = response.headers.getSetCookie();
+    try {
+      const cookies = response.headers.getSetCookie();
 
-    for (const cookie of cookies) {
-      this.cookieJar.setCookieSync(cookie, url);
+      for (const cookie of cookies) {
+        this.cookieJar.setCookieSync(cookie, url);
+      }
+      logger.debug('qBittorrent login successful');
+    } catch (error) {
+      logger.error(error, 'qBittorrent login failed');
+      throw error;
     }
   }
+
 
   private async ensureLoggedIn() {
     const url = `${this.apiBase}/auth/login`;
@@ -60,11 +69,13 @@ export class QBittorrentClient {
     const hasSessionId = cookies.some((cookie) => cookie.key === 'SID');
 
     if (!hasSessionId) {
+      logger.debug('No qBittorrent session found, logging in');
       await this.login();
     }
   }
 
   async performRequest(url: string, init?: RequestInit) {
+    logger.debug({ url }, 'qBittorrent performRequest');
     return fetch(url, {
       ...init,
       headers: {
@@ -80,11 +91,13 @@ export class QBittorrentClient {
     let response = await this.performRequest(url, init);
 
     if (response.status === 403) {
+      logger.debug('qBittorrent request returned 403, re-login and retry');
       await this.login();
       response = await this.performRequest(url, init);
     }
 
     if (!response.ok) {
+      logger.error({ status: response.status, statusText: response.statusText }, 'qBittorrent request failed');
       throw new Error(response.statusText);
     }
 
@@ -97,6 +110,7 @@ export class QBittorrentClient {
     savepath = this.savePath,
     ...rest
   }: QBClientAddTorrentsOptions): Promise<ResultT<string[], unknown>> {
+    logger.debug({ count: torrents.length, savepath, tags }, 'addTorrents start');
     const data = new FormData();
     const hashes: string[] = [];
 
@@ -130,6 +144,7 @@ export class QBittorrentClient {
       body: data,
     });
 
+    logger.info({ hashes }, 'addTorrents added hashes');
     return ok(hashes);
   }
 
@@ -139,6 +154,7 @@ export class QBittorrentClient {
     try {
       return await this.addTorrents(opts);
     } catch (error) {
+      logger.error(error, 'addTorrentsSafe failed');
       return err(error as unknown);
     }
   }
@@ -147,6 +163,7 @@ export class QBittorrentClient {
     hashes,
     ...rest
   }: QBClientGetTorrentsOptions): Promise<QBTorrent[]> {
+    logger.debug({ hashes }, 'getTorrents start');
     const data = new URLSearchParams();
 
     if (hashes) {
@@ -172,6 +189,7 @@ export class QBittorrentClient {
 
     const parsed = QBTorrentsResponseSchema.parse(json);
 
+    logger.debug({ count: parsed.length }, 'getTorrents parsed response');
     return parsed.map((t) => normalizeTorrent(t));
   }
 
@@ -204,6 +222,7 @@ export class QBittorrentClient {
   }
 
   async deleteTorrents(hashes: Array<string>, deleteFiles: boolean) {
+    logger.debug({ hashes, deleteFiles }, 'deleteTorrents start');
     const data = new URLSearchParams();
 
     data.append('hashes', hashes.join('|'));
@@ -216,6 +235,8 @@ export class QBittorrentClient {
       },
       body: data.toString(),
     });
+
+    logger.info({ hashes }, 'deleteTorrents completed');
   }
 
   async recheckTorrents(hashes: string[]) {
@@ -306,6 +327,7 @@ export class QBittorrentClient {
   }
 
   async getTorrentFiles(hash: string, indexes?: number[]) {
+    logger.debug({ hash, indexes }, 'getTorrentFiles start');
     const data = new URLSearchParams();
 
     data.append('hash', hash);
@@ -322,6 +344,7 @@ export class QBittorrentClient {
       body: data.toString(),
     });
 
+    logger.debug({ hash }, 'getTorrentFiles response received');
     return response.json() as Promise<QBFile[]>;
   }
 }

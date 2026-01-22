@@ -8,6 +8,7 @@ import type {
 import type { MyContext } from '../../../shared/context.js';
 import { formatBytes } from '../../../shared/utils/formatBytes.js';
 import type { Logger } from '../../../shared/utils/logger.js';
+import { logger } from '../../../logger.js';
 
 export interface SearchHandlerOptions {
   searchService: SearchService;
@@ -142,6 +143,7 @@ export async function handleSearchMessage(
   logger: Logger,
   next?: () => Promise<unknown>,
 ) {
+  logger.debug({ text: ctx.message?.text }, 'handleSearchMessage start');
   // only handle simple text queries (avoid bot commands)
   if (ctx.message?.text?.startsWith('/')) return next ? next() : undefined;
   try {

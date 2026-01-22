@@ -22,7 +22,7 @@ describe('DownloadHandler', () => {
       getTorrentByUid: vi.fn(),
       getTorrentFiles: vi.fn(),
     };
-    mockLogger = { error: vi.fn() };
+    mockLogger = { error: vi.fn(), debug: vi.fn(), info: vi.fn(), warn: vi.fn() };
 
     ctx = {
       message: { text: '/dl_file_engine_123_0' },
