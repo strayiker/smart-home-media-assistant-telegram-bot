@@ -7,7 +7,7 @@ function makeCtx(overrides: Partial<any> = {}) {
     from: { id: 42 },
     session: {},
     message: { text: 'maybe' },
-    reply: vi.fn().mockResolvedValue(undefined),
+    reply: vi.fn().mockResolvedValue(),
     t: (k: string) => k,
   };
   return Object.assign(ctx, overrides);
@@ -24,7 +24,7 @@ describe('authMiddleware', () => {
       validateSecret: vi.fn(),
     };
     middleware = createAuthMiddleware(mockAuth);
-    next = vi.fn().mockResolvedValue(undefined);
+    next = vi.fn().mockResolvedValue();
   });
 
   it('calls next when no ctx.from', async () => {

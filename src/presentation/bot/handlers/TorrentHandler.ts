@@ -1,8 +1,8 @@
 import { Composer, InlineKeyboard } from 'grammy';
 
-import type { MyContext } from '../../../shared/context.js';
 import type { TorrentService } from '../../../domain/services/TorrentService.js';
 import type { SearchEngine } from '../../../infrastructure/searchEngines/searchEngines/searchEngine.js';
+import type { MyContext } from '../../../shared/context.js';
 import type { Logger } from '../../../shared/utils/logger.js';
 
 const PER_PAGE = 5;

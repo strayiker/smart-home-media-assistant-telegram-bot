@@ -1,6 +1,7 @@
 import type { Logger } from 'pino';
-import type { User } from '../entities/User.js';
+
 import type { UserRepository } from '../../infrastructure/persistence/repositories/UserRepository.js';
+import type { User } from '../entities/User.js';
 
 export class AuthService {
   private userRepository: UserRepository;

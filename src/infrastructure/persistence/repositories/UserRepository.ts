@@ -1,4 +1,5 @@
 import type { EntityManager } from '@mikro-orm/core';
+
 import { User } from '../../../domain/entities/User.js';
 
 export class UserRepository {

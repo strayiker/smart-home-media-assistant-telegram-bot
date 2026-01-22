@@ -27,7 +27,6 @@ import {
   session,
 } from 'grammy';
 
-import { createAuthMiddleware } from './presentation/bot/middleware/authMiddleware.js';
 import {
   botApiAddress,
   botDataPath,
@@ -42,12 +41,15 @@ import {
   rutrackerUsername,
   secretKey,
 } from './config.js';
-import { type MyContext, type SessionData } from './shared/context.js';
 import { container } from './di.js';
 import { FileService } from './domain/services/FileService.js';
 import { SearchService } from './domain/services/SearchService.js';
 import { TorrentService } from './domain/services/TorrentService.js';
-import { fluent } from './shared/fluent.js';
+import { ChatSettingsRepository } from './infrastructure/persistence/repositories/ChatSettingsRepository.js';
+import { TorrentMetaRepository } from './infrastructure/persistence/repositories/TorrentMetaRepository.js';
+import { QBittorrentClient } from './infrastructure/qbittorrent/qbittorrent/qBittorrentClient.js';
+import { RutrackerSearchEngine } from './infrastructure/searchEngines/searchEngines/rutrackerSearchEngine.js';
+import { type SearchEngine } from './infrastructure/searchEngines/searchEngines/searchEngine.js';
 import { startSessionCleanup } from './infrastructure/session/cleanup.js';
 import { logger } from './logger.js';
 import { initORM } from './orm.js';
@@ -55,15 +57,13 @@ import type { CommandsRegistry } from './presentation/bot/commandsRegistry.js';
 import { type DownloadHandler } from './presentation/bot/handlers/DownloadHandler.js';
 import { type SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
 import { type TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
+import { createAuthMiddleware } from './presentation/bot/middleware/authMiddleware.js';
 import { createDIContainerMiddleware } from './presentation/bot/middleware/diContainerMiddleware.js';
 import { errorMiddleware } from './presentation/bot/middleware/errorMiddleware.js';
 import { registerCommandsIfNeeded } from './presentation/bot/registerCommands.js';
-import { QBittorrentClient } from './infrastructure/qbittorrent/qbittorrent/qBittorrentClient.js';
-import { RutrackerSearchEngine } from './infrastructure/searchEngines/searchEngines/rutrackerSearchEngine.js';
-import { type SearchEngine } from './infrastructure/searchEngines/searchEngines/searchEngine.js';
-import { ChatSettingsRepository } from './infrastructure/persistence/repositories/ChatSettingsRepository.js';
+import { type MyContext, type SessionData } from './shared/context.js';
+import { fluent } from './shared/fluent.js';
 import { CookieStorage } from './shared/utils/CookieStorage.js';
-import { TorrentMetaRepository } from './infrastructure/persistence/repositories/TorrentMetaRepository.js';
 
 if (!qbtWebuiAddress || !qbtWebuiUsername || !qbtWebuiPassword) {
   throw new Error(

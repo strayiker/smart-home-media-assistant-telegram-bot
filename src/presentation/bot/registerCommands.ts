@@ -1,7 +1,7 @@
 import type { Bot } from 'grammy';
 
-import type { MyContext } from '../../shared/context.js';
 import { logger } from '../../logger.js';
+import type { MyContext } from '../../shared/context.js';
 import type { CommandsRegistry } from './commandsRegistry.js';
 
 export async function registerCommandsIfNeeded(opts: {

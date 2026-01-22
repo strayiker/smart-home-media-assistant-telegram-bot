@@ -1,8 +1,8 @@
 import { type NextFunction } from 'grammy';
 
-import type { MyContext } from '../../../shared/context.js';
 import { AppError } from '../../../domain/errors/AppError.js';
 import { logger } from '../../../logger.js';
+import type { MyContext } from '../../../shared/context.js';
 
 /**
  * Error handling middleware for Grammy bot.

@@ -60,7 +60,7 @@ export class RutrackerSearchEngine extends SearchEngine {
 
   private async ensureLoggedIn() {
     const cookies = this.cookieStorage.getCookies(LOGIN_URL);
-    const hasSession = cookies.some((cookie: any) => cookie.key === 'bb_session');
+    const hasSession = cookies.some((cookie) => (cookie as { key?: string }).key === 'bb_session');
     if (!hasSession) {
       await this.login();
     }

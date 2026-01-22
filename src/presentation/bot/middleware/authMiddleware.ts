@@ -1,6 +1,7 @@
 import type { NextFunction } from 'grammy';
-import type { MyContext } from '../../../shared/context.js';
+
 import type { AuthService } from '../../../domain/services/AuthService.js';
+import type { MyContext } from '../../../shared/context.js';
 
 export function createAuthMiddleware(authService: AuthService) {
   return async function authMiddleware(ctx: MyContext, next: NextFunction) {
@@ -30,8 +31,8 @@ export function createAuthMiddleware(authService: AuthService) {
       await ctx.reply(ctx.t('auth-enter-secret'));
       ctx.session.awaitingSecret = true;
       return;
-    } catch (err) {
-      // On error, allow request to continue but log via reply
+    } catch {
+      // On error, allow request to continue but inform user
       await ctx.reply(ctx.t('auth-fail'));
       return;
     }

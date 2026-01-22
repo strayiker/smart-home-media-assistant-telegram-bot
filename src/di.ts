@@ -2,6 +2,7 @@ import type { MikroORM } from '@mikro-orm/core';
 import type { Logger as PinoLogger } from 'pino';
 
 import { loadConfig } from './config/envSchema.js';
+import { AuthService } from './domain/services/AuthService.js';
 import type { FeatureFlagStore } from './domain/services/FeatureFlagService.js';
 import { FeatureFlagService } from './domain/services/FeatureFlagService.js';
 import { type FileService } from './domain/services/FileService.js';
@@ -9,6 +10,8 @@ import { MediaService } from './domain/services/MediaService.js';
 import { type SearchService } from './domain/services/SearchService.js';
 import { type TorrentService } from './domain/services/TorrentService.js';
 import { InMemoryFeatureFlagStore } from './infrastructure/featureFlags/InMemoryFeatureFlagStore.js';
+import { UserRepository } from './infrastructure/persistence/repositories/UserRepository.js';
+import type { SearchEngine } from './infrastructure/searchEngines/searchEngines/searchEngine.js';
 import { logger } from './logger.js';
 // Lightweight DI container to avoid external dependency on tsyringe.
 import { CommandsRegistry } from './presentation/bot/commandsRegistry.js';
@@ -17,9 +20,6 @@ import { FileHandler } from './presentation/bot/handlers/FileHandler.js';
 import { MediaHandler } from './presentation/bot/handlers/MediaHandler.js';
 import { SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
 import { TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
-import type { SearchEngine } from './infrastructure/searchEngines/searchEngines/searchEngine.js';
-import { UserRepository } from './infrastructure/persistence/repositories/UserRepository.js';
-import { AuthService } from './domain/services/AuthService.js';
 
 interface CommandProvider {
   getCommands?: () => Array<{
@@ -183,8 +183,15 @@ container.registerFactory('UserRepository', () => {
 container.registerFactory('AuthService', () => {
   const repo = container.resolve<UserRepository>('UserRepository');
   const loggerInst = container.resolve<PinoLogger>('Logger');
-  const appConfig = container.resolve<any>('AppConfig');
-  const secretKey = appConfig?.BOT_SECRET ?? appConfig?.secretKey ?? process.env.BOT_SECRET ?? process.env.SECRET_KEY ?? '';
+  const appConfig = container.resolve<Record<string, unknown>>('AppConfig');
+  const secretKey = ((): string => {
+    const maybe = appConfig ?? {};
+    if (typeof maybe.BOT_SECRET === 'string') return maybe.BOT_SECRET;
+    if (typeof maybe.secretKey === 'string') return maybe.secretKey;
+    if (typeof process.env.BOT_SECRET === 'string') return process.env.BOT_SECRET;
+    if (typeof process.env.SECRET_KEY === 'string') return process.env.SECRET_KEY;
+    return '';
+  })();
   return new AuthService(repo, secretKey, loggerInst);
 });
 

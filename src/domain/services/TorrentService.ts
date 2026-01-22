@@ -1,13 +1,13 @@
-import type { MyContext } from '../../shared/context.js';
+import type { TorrentMetaRepository } from '../../infrastructure/persistence/repositories/TorrentMetaRepository.js';
 import type { QBFile, QBTorrent } from '../../infrastructure/qbittorrent/qbittorrent/models.js';
 import type { QBittorrentClient } from '../../infrastructure/qbittorrent/qbittorrent/qBittorrentClient.js';
 import type {
   SearchEngine,
   SearchResult,
 } from '../../infrastructure/searchEngines/searchEngines/searchEngine.js';
+import type { MyContext } from '../../shared/context.js';
 import type { Logger } from '../../shared/utils/logger.js';
 import { err, ok, type ResultT } from '../../shared/utils/result.js';
-import type { TorrentMetaRepository } from '../../infrastructure/persistence/repositories/TorrentMetaRepository.js';
 
 export interface AddTorrentOptions {
   torrent: string;

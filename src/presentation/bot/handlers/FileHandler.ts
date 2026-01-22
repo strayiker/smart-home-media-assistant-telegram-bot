@@ -1,7 +1,7 @@
 import { Composer } from 'grammy';
 
-import type { MyContext } from '../../../shared/context.js';
 import type { FileService } from '../../../domain/services/FileService.js';
+import type { MyContext } from '../../../shared/context.js';
 import type { Logger } from '../../../shared/utils/logger.js';
 
 export interface FileHandlerOptions {

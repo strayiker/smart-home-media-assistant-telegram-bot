@@ -1,5 +1,5 @@
-import type { MyContext } from '../../../shared/context.js';
 import { container } from '../../../di.js';
+import type { MyContext } from '../../../shared/context.js';
 
 /**
  * Middleware to inject DI container into the context.
