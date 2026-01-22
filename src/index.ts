@@ -40,7 +40,7 @@ import {
   rutrackerPassword,
   rutrackerUsername,
   secretKey,
-} from './config.js';
+} from './config/appConfig.js';
 import { container } from './di.js';
 import { FileService } from './domain/services/FileService.js';
 import { SearchService } from './domain/services/SearchService.js';

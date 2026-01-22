@@ -3,7 +3,7 @@ import { defineConfig } from '@mikro-orm/better-sqlite';
 import { Migrator } from '@mikro-orm/migrations';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 
-import { botDataPath } from './config.js';
+import { botDataPath } from './config/appConfig.js';
 
 export const mikroOrmConfig = defineConfig({
   debug: process.env.NODE_ENV !== 'production',
