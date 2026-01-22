@@ -59,6 +59,37 @@ export class TorrentService {
       } catch (createError) {
         this.logger.error(createError, 'Failed to persist torrent metadata');
 
+        // Handle unique constraint on uid: if metadata with same uid already exists,
+        // fetch it and return existing hash (remove the newly added torrent in qBittorrent).
+        const isUniqueUidError =
+          (createError && typeof createError === 'object' &&
+            // MikroORM / better-sqlite exposes name/code
+            ((('name' in (createError as any) && (createError as any).name === 'UniqueConstraintViolationException') ||
+              ('code' in (createError as any) && (createError as any).code === 'SQLITE_CONSTRAINT_UNIQUE')))) ||
+          // Fallback: inspect message
+          (typeof (createError as any)?.message === 'string' &&
+            (createError as any).message.includes('UNIQUE constraint failed: torrent_meta.uid'));
+
+        if (isUniqueUidError) {
+          try {
+            const existing = await this.torrentMetaRepository.getByUid(uid);
+            // Remove the newly added torrent to avoid duplicates in qBittorrent
+            try {
+              await this.qbittorrent.deleteTorrents([hash], true);
+            } catch (deleteError) {
+              this.logger.error(deleteError, 'Failed to rollback duplicate torrent creation');
+            }
+
+            if (existing) {
+              this.logger.debug('Torrent meta already exists for uid, returning existing hash: %s', existing.hash);
+              return ok(existing.hash);
+            }
+            // If for some reason record not found, fall through to return error below
+          } catch (lookupError) {
+            this.logger.error(lookupError, 'Failed to lookup existing torrent metadata after unique constraint');
+          }
+        }
+
         // Rollback: remove the torrent from qBittorrent
         try {
           await this.qbittorrent.deleteTorrents([hash], true);
