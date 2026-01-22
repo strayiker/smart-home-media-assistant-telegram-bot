@@ -19,18 +19,15 @@ This `Bot` will not help you overcome the restrictions associated with blocking 
 ## Before You Get Started
 
 1. **Create a New Bot on Telegram:**
-
    - Open the Telegram and search for the `BotFather` bot.
    - Start a chat with `BotFather` and send the command `/newbot`.
    - Follow the prompts to name your bot and create a unique username for it.
    - Once done, `BotFather` will provide you with a `TOKEN`. Keep this token safe as you'll need it later.
 
 2. **Obtain `API_ID` and `API_HASH`**
-
    - Obtain `API_ID` and `API_HASH` as described in https://core.telegram.org/api/obtaining_api_id. It will be used to run a local `API Server` to allow the `Bot` to send large files.
 
 3. **Register on Rutracker:**
-
    - Go to the Rutracker website and create an account if you don't already have one.
    - Note down your Rutracker `USERNAME` and `PASSWORD`. These credentials will be used by the bot to login and perform searches.
 
@@ -51,4 +48,5 @@ To update the `Bot` to the latest version, run the following command in the fold
 ```bash
 ./update.sh
 ```
+
 <!-- removed test markers -->
