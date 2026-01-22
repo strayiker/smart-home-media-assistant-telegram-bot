@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MikroORM } from '@mikro-orm/better-sqlite';
 import type { EntityManager } from '@mikro-orm/core';
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { ChatMessageState } from '../../domain/entities/ChatMessageState.js';
 import { ChatMessageStateRepository } from '../ChatMessageStateRepository.js';
@@ -38,7 +38,7 @@ describe('ChatMessageStateRepository', () => {
       const mockState = { id: 1, ...input };
       vi.mocked(mockEm.findOne).mockResolvedValue(null);
       vi.mocked(mockEm.create).mockReturnValue(mockState);
-      vi.mocked(mockEm.persistAndFlush).mockResolvedValue(undefined);
+      vi.mocked(mockEm.persistAndFlush).mockResolvedValue();
 
       const result = await repository.saveMessageState(input);
 
@@ -73,7 +73,7 @@ describe('ChatMessageStateRepository', () => {
       };
 
       vi.mocked(mockEm.findOne).mockResolvedValue(existing);
-      vi.mocked(mockEm.persistAndFlush).mockResolvedValue(undefined);
+      vi.mocked(mockEm.persistAndFlush).mockResolvedValue();
 
       const result = await repository.saveMessageState(input);
 
@@ -172,7 +172,7 @@ describe('ChatMessageStateRepository', () => {
       };
 
       vi.mocked(mockEm.findOne).mockResolvedValue(mockState);
-      vi.mocked(mockEm.removeAndFlush).mockResolvedValue(undefined);
+      vi.mocked(mockEm.removeAndFlush).mockResolvedValue();
 
       const result = await repository.deleteMessageState(123, 'torrent_progress');
 
@@ -212,7 +212,7 @@ describe('ChatMessageStateRepository', () => {
       ];
 
       vi.mocked(mockEm.find).mockResolvedValue(expiredStates);
-      vi.mocked(mockEm.removeAndFlush).mockResolvedValue(undefined);
+      vi.mocked(mockEm.removeAndFlush).mockResolvedValue();
 
       const result = await repository.cleanupExpiredMessages(now);
 
@@ -235,7 +235,7 @@ describe('ChatMessageStateRepository', () => {
       ];
 
       vi.mocked(mockEm.find).mockResolvedValue(expiredStates);
-      vi.mocked(mockEm.removeAndFlush).mockResolvedValue(undefined);
+      vi.mocked(mockEm.removeAndFlush).mockResolvedValue();
 
       vi.useFakeTimers();
       const fixedDate = new Date('2026-01-23T12:00:00Z');
@@ -278,7 +278,7 @@ describe('ChatMessageStateRepository', () => {
       ];
 
       vi.mocked(mockEm.find).mockResolvedValue(mockStates);
-      vi.mocked(mockEm.removeAndFlush).mockResolvedValue(undefined);
+      vi.mocked(mockEm.removeAndFlush).mockResolvedValue();
 
       const result = await repository.deleteAllMessagesForChat(123);
 
