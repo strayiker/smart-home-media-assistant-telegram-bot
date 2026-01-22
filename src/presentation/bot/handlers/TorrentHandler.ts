@@ -40,6 +40,7 @@ export class TorrentHandler extends Composer<MyContext> {
   private bot: Bot<MyContext> | undefined;
   private chatMessages = new Map<number, Message>();
   private chatTorrents = new Map<number, Set<string>>();
+  private activeUpdates = new Map<number, Promise<void>>();
   private timeout?: NodeJS.Timeout;
   private chatSettingsRepository: ChatSettingsRepository | undefined;
 
@@ -213,13 +214,36 @@ export class TorrentHandler extends Composer<MyContext> {
   ) {
     if (!this.bot) return;
 
-    const metas = await this.torrentService.getTorrentMetasByChatId(chatId);
-
-    if (metas.length === 0) {
-      this.chatMessages.delete(chatId);
-      this.chatTorrents.delete(chatId);
+    // Prevent concurrent updates for the same chat
+    const existingUpdate = this.activeUpdates.get(chatId);
+    if (existingUpdate) {
+      await existingUpdate;
       return;
     }
+
+    // Validate and fix state consistency
+    const message = this.chatMessages.get(chatId);
+    const hasTracking = this.chatTorrents.has(chatId);
+
+    // If chat is tracked but no message exists, remove from tracking
+    if (hasTracking && !message) {
+      this.chatTorrents.delete(chatId);
+    }
+
+    // If message exists but not tracked, clean up
+    if (message && !hasTracking) {
+      this.chatMessages.delete(chatId);
+    }
+
+    const updatePromise = (async () => {
+      try {
+        const metas = await this.torrentService.getTorrentMetasByChatId(chatId);
+
+        if (metas.length === 0) {
+          this.chatMessages.delete(chatId);
+          this.chatTorrents.delete(chatId);
+          return;
+        }
 
     const hashes = metas.map((m) => m.hash);
 
@@ -289,7 +313,14 @@ export class TorrentHandler extends Composer<MyContext> {
     } else {
       this.chatTorrents.delete(chatId);
     }
+  } finally {
+    this.activeUpdates.delete(chatId);
   }
+})();
+
+this.activeUpdates.set(chatId, updatePromise);
+await updatePromise;
+}
 
   private createOrUpdateTorrentsMessages() {
     for (const chatId of this.chatTorrents.keys()) {
@@ -316,9 +347,10 @@ export class TorrentHandler extends Composer<MyContext> {
   private async updateTorrentsMessage(message: Message, text: string) {
     if (!this.bot) return;
     if (message.text === text) return;
+    const chatId = message.chat.id;
     try {
       await this.bot.api.editMessageText(
-        message.chat.id,
+        chatId,
         message.message_id,
         text,
         { parse_mode: 'HTML' },
@@ -329,7 +361,10 @@ export class TorrentHandler extends Composer<MyContext> {
         error instanceof GrammyError &&
         error.description === 'Bad Request: message to edit not found'
       ) {
-        await this.sendTorrentsMessage(message.chat.id, text);
+        // Remove stale message reference
+        this.chatMessages.delete(chatId);
+        // Send new message
+        await this.sendTorrentsMessage(chatId, text);
       } else {
         this.logger.error(
           error,
@@ -341,9 +376,12 @@ export class TorrentHandler extends Composer<MyContext> {
 
   private async deleteTorrentsMessage(message: Message) {
     if (!this.bot) return;
+    const chatId = message.chat.id;
     try {
-      await this.bot.api.deleteMessage(message.chat.id, message.message_id);
-      this.chatMessages.delete(message.chat.id);
+      // Remove from tracking BEFORE deleting message to prevent race conditions
+      this.chatTorrents.delete(chatId);
+      this.chatMessages.delete(chatId);
+      await this.bot.api.deleteMessage(chatId, message.message_id);
     } catch (error) {
       this.logger.error(
         error,
