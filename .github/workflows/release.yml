@@ -37,7 +37,7 @@ jobs:
       - name: Dependencies
         run: |
           # ensure reproducible, fast installs; prefer cache and fail on mismatch
-          yarn install --immutable --immutable-cache --check-cache --non-interactive
+          yarn install --immutable --immutable-cache --check-cache
       # lint
       - name: Lint
         run: yarn lint
@@ -128,7 +128,7 @@ jobs:
       # dependencies
       - name: Dependencies
         run: |
-          yarn install --immutable --immutable-cache --check-cache --non-interactive
+          yarn install --immutable --immutable-cache --check-cache
       # release
       - id: release
         name: Release
