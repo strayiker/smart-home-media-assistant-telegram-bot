@@ -75,6 +75,7 @@ export class SearchHandler extends Composer<MyContext> {
         await ctx.editMessageText(text, {
           parse_mode: 'HTML',
           reply_markup: keyboard,
+          disable_web_page_preview: true,
         });
         await ctx.answerCallbackQuery();
       },
@@ -201,7 +202,10 @@ export async function handleSearchMessage(
           });
         })
         .join('\n');
-      await ctx.reply(text, { parse_mode: 'HTML' });
+      await ctx.reply(text, {
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+      });
     } else {
       logger.error(result.error, 'SearchService error');
       await ctx.reply(ctx.t('search-unknown-error'));

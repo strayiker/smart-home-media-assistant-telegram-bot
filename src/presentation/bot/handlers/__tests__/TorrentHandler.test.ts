@@ -61,8 +61,12 @@ describe('TorrentHandler unit tests', () => {
     // ensure ctx has callback helper by default
     (ctx as any).answerCallbackQuery = vi.fn();
     // default getTorrentMetasByChatId to avoid undefined in createOrUpdateTorrentsMessage
-    (mockTorrentService as any).getTorrentMetasByChatId = vi.fn().mockResolvedValue([]);
-    (mockTorrentService as any).getTorrentsByHash = vi.fn().mockResolvedValue([]);
+    (mockTorrentService as any).getTorrentMetasByChatId = vi
+      .fn()
+      .mockResolvedValue([]);
+    (mockTorrentService as any).getTorrentsByHash = vi
+      .fn()
+      .mockResolvedValue([]);
   });
 
   describe('handleDownloadCommand (private method)', () => {
@@ -130,19 +134,21 @@ describe('TorrentHandler unit tests', () => {
         { hash: 'hash', uid: 'engine_id_123' },
       ]);
       // ensure getTorrentsByHash returns pending torrent so createOrUpdateTorrentsMessage keeps chat tracked
-      (mockTorrentService as any).getTorrentsByHash = vi.fn().mockResolvedValue([
-        {
-          hash: 'hash',
-          progress: 0.5,
-          dlspeed: 100,
-          eta: 123,
-          name: 'test',
-          num_seeds: 1,
-          num_complete: 2,
-          num_leechs: 3,
-          size: 1000,
-        },
-      ]);
+      (mockTorrentService as any).getTorrentsByHash = vi
+        .fn()
+        .mockResolvedValue([
+          {
+            hash: 'hash',
+            progress: 0.5,
+            dlspeed: 100,
+            eta: 123,
+            name: 'test',
+            num_seeds: 1,
+            num_complete: 2,
+            num_leechs: 3,
+            size: 1000,
+          },
+        ]);
 
       await (handler as any).handleDownloadCommand(ctx);
 
@@ -161,17 +167,23 @@ describe('TorrentHandler unit tests', () => {
 
       await (handler as any).handleRemoveCommand(ctx);
 
-      expect(mockTorrentService.removeTorrentByUid).toHaveBeenCalledWith('engine_id_123');
+      expect(mockTorrentService.removeTorrentByUid).toHaveBeenCalledWith(
+        'engine_id_123',
+      );
       expect(ctx.reply).toHaveBeenCalledWith('torrents-removed-success');
     });
 
     it('replies error when remove fails', async () => {
       (ctx.message as any).text = '/rm_engine_id_123';
-      mockTorrentService.removeTorrentByUid.mockRejectedValue(new Error('remove error'));
+      mockTorrentService.removeTorrentByUid.mockRejectedValue(
+        new Error('remove error'),
+      );
 
       await (handler as any).handleRemoveCommand(ctx);
 
-      expect(mockTorrentService.removeTorrentByUid).toHaveBeenCalledWith('engine_id_123');
+      expect(mockTorrentService.removeTorrentByUid).toHaveBeenCalledWith(
+        'engine_id_123',
+      );
       expect(ctx.reply).toHaveBeenCalledWith('torrent-remove-error');
       expect(mockLogger.error).toHaveBeenCalled();
     });
@@ -184,19 +196,21 @@ describe('TorrentHandler unit tests', () => {
       ]);
 
       // ensure getTorrentsByHash returns a pending torrent so createOrUpdateTorrentsMessage will add the chat
-      (mockTorrentService as any).getTorrentsByHash = vi.fn().mockResolvedValue([
-        {
-          hash: 'hash2',
-          progress: 0.5,
-          dlspeed: 100,
-          eta: 123,
-          name: 'test',
-          num_seeds: 1,
-          num_complete: 2,
-          num_leechs: 3,
-          size: 1000,
-        },
-      ]);
+      (mockTorrentService as any).getTorrentsByHash = vi
+        .fn()
+        .mockResolvedValue([
+          {
+            hash: 'hash2',
+            progress: 0.5,
+            dlspeed: 100,
+            eta: 123,
+            name: 'test',
+            num_seeds: 1,
+            num_complete: 2,
+            num_leechs: 3,
+            size: 1000,
+          },
+        ]);
 
       await (handler as any).handleRemoveCommand(ctx);
 
@@ -209,25 +223,35 @@ describe('TorrentHandler unit tests', () => {
       mockTorrentService.removeTorrentByUid.mockResolvedValue('hash');
       mockTorrentService.getTorrentMetasByChatId.mockResolvedValue([]);
 
-      (ctx.callbackQuery = { data: 'torrents:remove:engine_id_123:1' } as any);
+      ctx.callbackQuery = { data: 'torrents:remove:engine_id_123:1' } as any;
       (ctx as any).answerCallbackQuery = vi.fn();
 
       await (handler as any).handleTorrentRemove(ctx, 'engine_id_123', 1);
 
-      expect(mockTorrentService.removeTorrentByUid).toHaveBeenCalledWith('engine_id_123');
-      expect((ctx as any).answerCallbackQuery).toHaveBeenCalledWith({ text: 'torrents-removed-success' });
+      expect(mockTorrentService.removeTorrentByUid).toHaveBeenCalledWith(
+        'engine_id_123',
+      );
+      expect((ctx as any).answerCallbackQuery).toHaveBeenCalledWith({
+        text: 'torrents-removed-success',
+      });
     });
 
     it('replies error on callback when remove fails', async () => {
-      mockTorrentService.removeTorrentByUid.mockRejectedValue(new Error('remove error'));
+      mockTorrentService.removeTorrentByUid.mockRejectedValue(
+        new Error('remove error'),
+      );
 
-      (ctx.callbackQuery = { data: 'torrents:remove:engine_id_123:1' } as any);
+      ctx.callbackQuery = { data: 'torrents:remove:engine_id_123:1' } as any;
       (ctx as any).answerCallbackQuery = vi.fn();
 
       await (handler as any).handleTorrentRemove(ctx, 'engine_id_123', 1);
 
-      expect(mockTorrentService.removeTorrentByUid).toHaveBeenCalledWith('engine_id_123');
-      expect((ctx as any).answerCallbackQuery).toHaveBeenCalledWith({ text: 'torrents-removed-error' });
+      expect(mockTorrentService.removeTorrentByUid).toHaveBeenCalledWith(
+        'engine_id_123',
+      );
+      expect((ctx as any).answerCallbackQuery).toHaveBeenCalledWith({
+        text: 'torrents-removed-error',
+      });
     });
 
     it('triggers progress update after removal', async () => {
@@ -237,21 +261,23 @@ describe('TorrentHandler unit tests', () => {
       ]);
 
       // ensure getTorrentsByHash returns a pending torrent so createOrUpdateTorrentsMessage will add the chat
-      (mockTorrentService as any).getTorrentsByHash = vi.fn().mockResolvedValue([
-        {
-          hash: 'hash2',
-          progress: 0.5,
-          dlspeed: 100,
-          eta: 123,
-          name: 'test',
-          num_seeds: 1,
-          num_complete: 2,
-          num_leechs: 3,
-          size: 1000,
-        },
-      ]);
+      (mockTorrentService as any).getTorrentsByHash = vi
+        .fn()
+        .mockResolvedValue([
+          {
+            hash: 'hash2',
+            progress: 0.5,
+            dlspeed: 100,
+            eta: 123,
+            name: 'test',
+            num_seeds: 1,
+            num_complete: 2,
+            num_leechs: 3,
+            size: 1000,
+          },
+        ]);
 
-      (ctx.callbackQuery = { data: 'torrents:remove:engine_id_123:1' } as any);
+      ctx.callbackQuery = { data: 'torrents:remove:engine_id_123:1' } as any;
 
       const spy = vi.spyOn(handler as any, 'createOrUpdateTorrentsMessage');
 
