@@ -35,11 +35,17 @@ export class TorrentService {
     try {
       const existing = await this.torrentMetaRepository.getByUid(uid);
       if (existing) {
-        this.logger.debug('Torrent meta already exists for uid, returning existing hash: %s', existing.hash);
+        this.logger.debug(
+          'Torrent meta already exists for uid, returning existing hash: %s',
+          existing.hash,
+        );
         return ok(existing.hash);
       }
     } catch (error) {
-      this.logger.error(error, 'Failed to lookup existing torrent metadata before adding');
+      this.logger.error(
+        error,
+        'Failed to lookup existing torrent metadata before adding',
+      );
       // continue — we'll attempt to add and persist; duplicate handling is covered later
     }
 
