@@ -66,6 +66,7 @@ export class SearchHandler extends Composer<MyContext> {
 
         const searchResults = results.value;
         const { text, keyboard } = this.formatSearchResultsMessage(
+          ctx,
           searchResults.slice(0, 5 * (parsed.page + 1)),
           parsed.query,
           parsed.page,
@@ -95,13 +96,14 @@ export class SearchHandler extends Composer<MyContext> {
   }
 
   private formatSearchResultsMessage(
+    ctx: MyContext,
     results: (readonly [SearchEngine, SearchResult])[],
     _query: string,
     page: number,
   ): { text: string; keyboard: InlineKeyboard } {
     const lines = results
       .slice(0, 5 * (page + 1))
-      .map(([se, result]) => this.formatSearchResultLine(se, result));
+      .map(([se, result]) => this.formatSearchResultLine(ctx, se, result));
 
     const text = lines.join('\n');
 
@@ -123,18 +125,27 @@ export class SearchHandler extends Composer<MyContext> {
   }
 
   private formatSearchResultLine(
+    ctx: MyContext,
     se: SearchEngine,
     result: SearchResult,
   ): string {
+    const uid = `${se.name}_${result.id}`;
     const size = formatBytes(result.size ?? 0);
-    const download = `/dl_${se.name}_${result.id}`;
-    const titleLink = result.detailsUrl
-      ? `<a href="${escapeHtml(result.detailsUrl)}">${escapeHtml(result.title)}</a>`
-      : escapeHtml(result.title);
+    const download = `/dl_${uid}`;
+    const tags = [
+      ...((result.tags ?? []) as string[]).map((tag) => `[${escapeHtml(tag)}]`),
+      result.detailsUrl ? `<a href="${escapeHtml(result.detailsUrl)}">[${escapeHtml(se.name)}]</a>` : ``,
+    ].join(' ');
 
-    const tags = (result.tags ?? []).map((t: string) => `#${escapeHtml(t)}`).join(' ');
-
-    return `${titleLink}\n${tags} • ${size} • seeds:${result.seeds ?? 0} peers:${result.peers ?? 0}\n<code>${escapeHtml(download)}</code>`;
+    return ctx.t('search-message', {
+      title: result.title,
+      tags,
+      size,
+      seeds: result.seeds ?? 0,
+      peers: result.peers ?? 0,
+      publishDate: result.publishDate ?? '---',
+      download,
+    });
   }
 }
 
@@ -157,12 +168,23 @@ export async function handleSearchMessage(
       const text = result.value
             .slice(0, 5)
             .map(([se, r]) => {
+              const uid = `${se.name}_${r.id}`;
               const size = formatBytes(r.size ?? 0);
-              const titleLink = r.detailsUrl
-                ? `<a href="${escapeHtml(r.detailsUrl)}">${escapeHtml(r.title)}</a>`
-                : escapeHtml(r.title);
-              const download = `/dl_${se.name}_${r.id}`;
-              return `${titleLink}\n${escapeHtml((r.tags ?? []).map((t: string) => `#${t}`).join(' '))} • ${size} • seeds:${r.seeds ?? 0} peers:${r.peers ?? 0}\n<code>${escapeHtml(download)}</code>`;
+              const download = `/dl_${uid}`;
+              const tags = [
+                ...((r.tags ?? []) as string[]).map((tag) => `[${escapeHtml(tag)}]`),
+                r.detailsUrl ? `<a href="${escapeHtml(r.detailsUrl)}">[${escapeHtml(se.name)}]</a>` : ``,
+              ].join(' ');
+
+              return ctx.t('search-message', {
+                title: r.title,
+                tags,
+                size,
+                seeds: r.seeds ?? 0,
+                peers: r.peers ?? 0,
+                publishDate: r.publishDate ?? '---',
+                download,
+              });
             })
             .join('\n\n');
           await ctx.reply(text, { parse_mode: 'HTML' });

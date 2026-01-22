@@ -41,7 +41,23 @@ export async function handleListFilesCommand(
       await ctx.reply(ctx.t('files-empty'));
       return;
     }
-    await ctx.reply(list.join('\n'));
+
+    const texts = list.map((entry) => {
+      // entry format from FileService: "{index}: {name} — {size}{note} — {download}"
+      const m = entry.match(/^(?:\d+): (.+) — (.+?) — (.+)$/);
+      if (m) {
+        const [, name, size, download] = m;
+        return ctx.t('torrent-file-message', {
+          name,
+          size,
+          download,
+        });
+      }
+
+      return entry;
+    });
+
+    await ctx.reply(texts.join('\n'), { parse_mode: 'HTML' });
   } catch (error) {
     logger.error(error, 'Failed to list files');
     await ctx.reply(ctx.t('files-error'));
