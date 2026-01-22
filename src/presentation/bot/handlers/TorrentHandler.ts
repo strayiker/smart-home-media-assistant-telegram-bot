@@ -112,10 +112,7 @@ export class TorrentHandler extends Composer<MyContext> {
             await ctx.answerCallbackQuery();
             return;
           }
-          await this.handleTorrentRemove(
-            ctx,
-            parsed.uid,
-          );
+          await this.handleTorrentRemove(ctx, parsed.uid);
           return;
         }
         default: {
@@ -152,13 +149,12 @@ export class TorrentHandler extends Composer<MyContext> {
   /**
    * Handle torrent removal from inline keyboard button (callback).
    */
-  private async handleTorrentRemove(
-    ctx: MyContext,
-    uid: string,
-  ) {
+  private async handleTorrentRemove(ctx: MyContext, uid: string) {
     try {
       await this.torrentService.removeTorrentByUid(uid);
-      await ctx.answerCallbackQuery({ text: ctx.t('torrents-removed-success') });
+      await ctx.answerCallbackQuery({
+        text: ctx.t('torrents-removed-success'),
+      });
       const chatId = ctx.chatId;
       if (chatId !== undefined) {
         await this.createOrUpdateTorrentsMessage(chatId, true);
@@ -391,10 +387,6 @@ export class TorrentHandler extends Composer<MyContext> {
   }
 }
 
-
-
-
-
 // Torrent List handlers
 export async function handleTorrentsListCommand(
   ctx: MyContext,
@@ -451,8 +443,6 @@ export async function handleTorrentFiles(
 
   await ctx.reply(text, { parse_mode: 'HTML' });
 }
-
-
 
 export async function handleListFilesCommand(
   ctx: MyContext,
