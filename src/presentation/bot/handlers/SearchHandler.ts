@@ -157,13 +157,6 @@ export async function handleSearchMessage(
       const text = result.value
             .slice(0, 5)
             .map(([se, r]) => {
-              const escapeHtml = (s: unknown) =>
-                String(s)
-                  .replaceAll('&', '&amp;')
-                  .replaceAll('<', '&lt;')
-                  .replaceAll('>', '&gt;')
-                  .replaceAll('"', '&quot;');
-
               const size = formatBytes(r.size ?? 0);
               const titleLink = r.detailsUrl
                 ? `<a href="${escapeHtml(r.detailsUrl)}">${escapeHtml(r.title)}</a>`
