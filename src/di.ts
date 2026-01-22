@@ -188,8 +188,10 @@ container.registerFactory('AuthService', () => {
     const maybe = appConfig ?? {};
     if (typeof maybe.BOT_SECRET === 'string') return maybe.BOT_SECRET;
     if (typeof maybe.secretKey === 'string') return maybe.secretKey;
-    if (typeof process.env.BOT_SECRET === 'string') return process.env.BOT_SECRET;
-    if (typeof process.env.SECRET_KEY === 'string') return process.env.SECRET_KEY;
+    if (typeof process.env.BOT_SECRET === 'string')
+      return process.env.BOT_SECRET;
+    if (typeof process.env.SECRET_KEY === 'string')
+      return process.env.SECRET_KEY;
     return '';
   })();
   return new AuthService(repo, secretKey, loggerInst);

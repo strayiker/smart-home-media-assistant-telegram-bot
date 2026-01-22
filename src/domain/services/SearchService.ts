@@ -30,7 +30,9 @@ export class SearchService {
       const promises = this.searchEngines.map(async (searchEngine) => {
         try {
           const engineResults = await searchEngine.search(query);
-          return engineResults.map((result: SearchResult) => [searchEngine, result] as const);
+          return engineResults.map(
+            (result: SearchResult) => [searchEngine, result] as const,
+          );
         } catch (error) {
           this.logger.error(
             error,

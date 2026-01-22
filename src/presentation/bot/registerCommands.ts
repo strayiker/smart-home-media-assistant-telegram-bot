@@ -14,7 +14,10 @@ export async function registerCommandsIfNeeded(opts: {
   if (!shouldRegister) return false;
 
   const raw = commandsRegistry.getCommands(locale);
-  const commands = raw.map((c) => ({ command: c.command, description: c.description }));
+  const commands = raw.map((c) => ({
+    command: c.command,
+    description: c.description,
+  }));
   if (commands.length === 0) return false;
 
   try {

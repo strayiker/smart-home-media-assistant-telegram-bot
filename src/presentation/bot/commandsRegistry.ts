@@ -24,8 +24,14 @@ export class CommandsRegistry {
    * Returns commands localized for the given locale.
    * If fluent cannot translate, falls back to descriptionKey.
    */
-  getCommands(locale = 'en'): Array<{ command: string; description: string; scope?: unknown }> {
-    const out: Array<{ command: string; description: string; scope?: unknown }> = [];
+  getCommands(
+    locale = 'en',
+  ): Array<{ command: string; description: string; scope?: unknown }> {
+    const out: Array<{
+      command: string;
+      description: string;
+      scope?: unknown;
+    }> = [];
     for (const entry of this.map.values()) {
       let description = entry.descriptionKey;
       try {
@@ -34,7 +40,12 @@ export class CommandsRegistry {
         for (const method of methods) {
           const fn = anyFluent[method];
           if (typeof fn === 'function') {
-            description = (fn as (id: string, l?: string) => string).call(fluent, entry.descriptionKey, locale) ?? description;
+            description =
+              (fn as (id: string, l?: string) => string).call(
+                fluent,
+                entry.descriptionKey,
+                locale,
+              ) ?? description;
             break;
           }
         }
@@ -43,7 +54,8 @@ export class CommandsRegistry {
       }
 
       // Telegram limits description to 256 chars
-      if (description.length > 256) description = description.slice(0, 253) + '...';
+      if (description.length > 256)
+        description = description.slice(0, 253) + '...';
 
       out.push({ command: entry.command, description, scope: entry.scope });
     }
