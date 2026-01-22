@@ -398,7 +398,12 @@ install_bot_systemd() {
   rm -f "$tmp_unit"
 
   sudo systemctl daemon-reload
-  sudo systemctl enable --now "$unit_name"
+  # Enable the unit and restart it to ensure ExecStart runs even when the
+  # unit was previously active (oneshot + RemainAfterExit). Using
+  # `enable --now` may not re-run ExecStart if the unit is already active,
+  # so explicitly restart (or start) the unit here.
+  sudo systemctl enable "$unit_name"
+  sudo systemctl restart "$unit_name" || sudo systemctl start "$unit_name"
 }
 
 print_summary() {
