@@ -14,6 +14,8 @@ This `Bot` is created for a personal usage, so it might have some bugs or not wo
 
 This `Bot` will not help you overcome the restrictions associated with blocking torrent trackers, since it runs locally on your PC.
 
+<!-- test commit for husky pre-commit hook -->
+
 ## Before You Get Started
 
 1. **Create a New Bot on Telegram:**
@@ -49,3 +51,4 @@ To update the `Bot` to the latest version, run the following command in the fold
 ```bash
 ./update.sh
 ```
+<!-- removed test markers -->

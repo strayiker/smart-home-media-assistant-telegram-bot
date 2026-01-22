@@ -187,8 +187,8 @@ try {
     },
     'Search engines initialized',
   );
-} catch (e) {
-  logger.warn(e, 'Failed to log search engines');
+} catch (error) {
+  logger.warn(error, 'Failed to log search engines');
 }
 
 // Update SearchService with actual search engines
