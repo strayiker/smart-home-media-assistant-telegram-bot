@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import './dayjs.js';
+import './shared/dayjs.js';
 
 import { ZodError } from 'zod';
 
