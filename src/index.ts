@@ -194,6 +194,8 @@ try {
 // Update SearchService with actual search engines
 const searchService = container.resolve('SearchService') as SearchService;
 searchService.setSearchEngines(searchEngines);
+// Register the configured SearchService instance so later resolves return the same instance
+container.registerInstance('SearchService', searchService);
 
 // Register SearchEngines in DI after initialization
 container.registerInstance('SearchEngines', searchEngines);
