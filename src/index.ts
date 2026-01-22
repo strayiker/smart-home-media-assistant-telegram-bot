@@ -110,6 +110,8 @@ logger.info({ url: qbtWebuiAddress }, 'QBittorrent client created');
 container.registerInstance('QBittorrentClient', qBittorrent);
 container.registerInstance('BotDataPath', botDataPath);
 container.registerInstance('BotDataTorrentsPath', botDataTorrentsPath);
+// Register Bot instance in DI so handlers can use it for background updates
+container.registerInstance('Bot', bot);
 logger.debug(
   { instances: ['QBittorrentClient', 'BotDataPath', 'BotDataTorrentsPath'] },
   'DI instances registered',
@@ -129,6 +131,9 @@ const sessionCleanup = startSessionCleanup(orm);
 // AuthComposer will be created after DI has AuthService registered; create instance from container-provided AuthService
 const chatSettingsRepository = new ChatSettingsRepository(orm.em.fork());
 const torrentMetaRepository = new TorrentMetaRepository(orm.em.fork());
+
+// Register ChatSettingsRepository in DI for handlers that need chat-level locale
+container.registerInstance('ChatSettingsRepository', chatSettingsRepository);
 
 // Create auth middleware from AuthService in DI
 const authMiddleware = createAuthMiddleware(container.resolve('AuthService'));

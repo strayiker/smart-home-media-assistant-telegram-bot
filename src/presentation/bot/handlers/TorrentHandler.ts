@@ -1,29 +1,64 @@
-import { Composer, InlineKeyboard } from 'grammy';
+import { type Bot, Composer, GrammyError,InlineKeyboard } from 'grammy';
+import type { Message } from 'grammy/types';
 
 import type { TorrentService } from '../../../domain/services/TorrentService.js';
+import type { ChatSettingsRepository } from '../../../infrastructure/persistence/repositories/ChatSettingsRepository.js';
 import type { SearchEngine } from '../../../infrastructure/searchEngines/searchEngines/searchEngine.js';
 import { logger } from '../../../logger.js';
 import type { MyContext } from '../../../shared/context.js';
+import { fluent } from '../../../shared/fluent.js';
 import type { Logger } from '../../../shared/utils/logger.js';
 
 const PER_PAGE = 5;
+
+// Minimal shape of torrent object returned by QBittorrent client used here
+interface QBittorrentTorrent {
+  hash: string;
+  progress: number;
+  dlspeed?: number;
+  eta?: number;
+  name?: string;
+  num_seeds?: number;
+  num_complete?: number;
+  num_leechs?: number;
+  num_incomplete?: number;
+  size?: number;
+}
 
 export interface TorrentHandlerOptions {
   torrentService: TorrentService;
   logger: Logger;
   searchEngines: SearchEngine[];
+  bot?: Bot<MyContext>;
+  chatSettingsRepository?: ChatSettingsRepository;
 }
 
 export class TorrentHandler extends Composer<MyContext> {
   private torrentService: TorrentService;
   private logger: Logger;
   private searchEngines: SearchEngine[];
+  private bot: Bot<MyContext> | undefined;
+  private chatMessages = new Map<number, Message>();
+  private chatTorrents = new Map<number, Set<string>>();
+  private timeout?: NodeJS.Timeout;
+  private chatSettingsRepository: ChatSettingsRepository | undefined;
 
   constructor(options: TorrentHandlerOptions) {
     super();
     this.torrentService = options.torrentService;
     this.logger = options.logger;
     this.searchEngines = options.searchEngines;
+    this.bot = options.bot;
+    this.chatSettingsRepository = options.chatSettingsRepository;
+
+    if (this.bot) {
+      this.timeout = setInterval(() => {
+        void this.createOrUpdateTorrentsMessages();
+      }, 5 * 1000);
+    }
+
+    // ensure we can cleanup the interval when application stops
+    this.dispose = this.dispose.bind(this);
 
     // Command handlers
     this.on('message::bot_command', async (ctx, next) => {
@@ -97,8 +132,183 @@ export class TorrentHandler extends Composer<MyContext> {
     });
   }
 
+  public dispose() {
+    if (this.timeout) clearInterval(this.timeout);
+  }
+
   public getCommands(): Array<{ command: string; descriptionKey: string }> {
     return [{ command: 'torrents', descriptionKey: 'commands.torrents' }];
+  }
+
+  // Periodic updater: create or update per-chat torrents message
+  private async createOrUpdateTorrentsMessage(
+    chatId: number,
+    refresh: boolean = false,
+  ) {
+    if (!this.bot) return;
+
+    const metas = await this.torrentService.getTorrentMetasByChatId(chatId);
+
+    if (metas.length === 0) {
+      this.chatMessages.delete(chatId);
+      this.chatTorrents.delete(chatId);
+      return;
+    }
+
+
+    const hashes = metas.map((m) => m.hash);
+
+    let torrents: QBittorrentTorrent[];
+    try {
+      torrents = (await this.torrentService.getTorrentsByHash(hashes)) as QBittorrentTorrent[];
+    } catch {
+      return;
+    }
+
+    const metaByHash = new Map(hashes.map((h, i) => [h, metas[i]]));
+
+    const completedTorrents: QBittorrentTorrent[] = [];
+    const pendingTorrents: QBittorrentTorrent[] = [];
+
+    for (const torrent of torrents) {
+      if (torrent.progress < 1) pendingTorrents.push(torrent);
+      else completedTorrents.push(torrent);
+    }
+
+    let message = this.chatMessages.get(chatId);
+
+    if (
+      message &&
+      (completedTorrents.length > 0 || pendingTorrents.length === 0 || refresh)
+    ) {
+      await this.deleteTorrentsMessage(message);
+      message = undefined;
+    }
+
+    if (completedTorrents.length > 0) {
+      const chatLocale =
+        (await this.chatSettingsRepository?.getLocale(chatId)) ?? 'en';
+      const texts = completedTorrents.map((torrent) => {
+        const meta = metaByHash.get(torrent.hash);
+        const uid = meta?.uid ?? '';
+        const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
+        const t = fluent.withLocale(chatLocale);
+        return t('torrent-message-completed', {
+          title: torrent.name,
+          progress,
+          files: `/ls_${uid}`,
+          remove: `/rm_${uid}`,
+        });
+      });
+      const text = texts.join('\n');
+      try {
+        await this.bot.api.sendMessage(chatId, text, { parse_mode: 'HTML' });
+      } catch (error) {
+        this.logger.error(
+          error,
+          'An error occured while sending completed torrents message',
+        );
+      }
+    }
+
+    if (pendingTorrents.length > 0) {
+      const hashesPending = pendingTorrents.map((t) => t.hash);
+      this.chatTorrents.set(chatId, new Set(hashesPending));
+
+      const chatLocale =
+        (await this.chatSettingsRepository?.getLocale(chatId)) ?? 'en';
+      const texts = pendingTorrents.map((torrent) => {
+        const meta = metaByHash.get(torrent.hash);
+        const uid = meta?.uid ?? '';
+        const speed = `${this.torrentService.formatBytes(torrent.dlspeed)}/s`;
+        const eta =
+          torrent.eta >= 8_640_000
+            ? '∞'
+            : this.torrentService.formatDuration(torrent.eta);
+        const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
+        const t = fluent.withLocale(chatLocale);
+        return t('torrent-message-in-progress', {
+          title: torrent.name,
+          seeds: torrent.num_seeds,
+          maxSeeds: torrent.num_complete,
+          peers: torrent.num_leechs,
+          maxPeers: torrent.num_incomplete,
+          speed,
+          eta,
+          progress,
+          remove: `/rm_${uid}`,
+        });
+      });
+
+      const text = texts.join('\n');
+      await (message
+        ? this.updateTorrentsMessage(message, text)
+        : this.sendTorrentsMessage(chatId, text));
+    } else {
+      this.chatTorrents.delete(chatId);
+    }
+  }
+
+  private createOrUpdateTorrentsMessages() {
+    for (const chatId of this.chatTorrents.keys()) {
+      void this.createOrUpdateTorrentsMessage(chatId);
+    }
+  }
+
+  private async sendTorrentsMessage(chatId: number, text: string) {
+    if (!this.bot) return;
+    try {
+      const message = await this.bot.api.sendMessage(chatId, text, {
+        parse_mode: 'HTML',
+      });
+      // store message for future edits
+      this.chatMessages.set(chatId, message as Message);
+    } catch (error) {
+      this.logger.error(
+        error,
+        'An error occured while sending torrents message',
+      );
+    }
+  }
+
+  private async updateTorrentsMessage(message: Message, text: string) {
+    if (!this.bot) return;
+    if (message.text === text) return;
+    try {
+      await this.bot.api.editMessageText(
+        message.chat.id,
+        message.message_id,
+        text,
+        { parse_mode: 'HTML' },
+      );
+      message.text = text;
+    } catch (error) {
+      if (
+        error instanceof GrammyError &&
+        error.description === 'Bad Request: message to edit not found'
+      ) {
+        await this.sendTorrentsMessage(message.chat.id, text);
+      } else {
+        this.logger.error(
+          error,
+          'An error occured while updating torrents message',
+        );
+      }
+    }
+  }
+
+  private async deleteTorrentsMessage(message: Message) {
+    if (!this.bot) return;
+    try {
+      await this.bot.api.deleteMessage(message.chat.id, message.message_id);
+    } catch (error) {
+      this.logger.error(
+        error,
+        'An error occured while deleting torrent message',
+      );
+    } finally {
+      this.chatMessages.delete(message.chat.id);
+    }
   }
 }
 

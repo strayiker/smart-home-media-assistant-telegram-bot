@@ -1,4 +1,5 @@
 import type { MikroORM } from '@mikro-orm/core';
+import type { Bot } from 'grammy';
 import type { Logger as PinoLogger } from 'pino';
 
 import { loadConfig } from './config/envSchema.js';
@@ -10,6 +11,7 @@ import { MediaService } from './domain/services/MediaService.js';
 import { type SearchService } from './domain/services/SearchService.js';
 import { type TorrentService } from './domain/services/TorrentService.js';
 import { InMemoryFeatureFlagStore } from './infrastructure/featureFlags/InMemoryFeatureFlagStore.js';
+import type { ChatSettingsRepository } from './infrastructure/persistence/repositories/ChatSettingsRepository.js';
 import { UserRepository } from './infrastructure/persistence/repositories/UserRepository.js';
 import type { SearchEngine } from './infrastructure/searchEngines/searchEngines/searchEngine.js';
 import { logger } from './logger.js';
@@ -20,6 +22,7 @@ import { FileHandler } from './presentation/bot/handlers/FileHandler.js';
 import { MediaHandler } from './presentation/bot/handlers/MediaHandler.js';
 import { SearchHandler } from './presentation/bot/handlers/SearchHandler.js';
 import { TorrentHandler } from './presentation/bot/handlers/TorrentHandler.js';
+import type { MyContext } from './shared/context.js';
 
 interface CommandProvider {
   getCommands?: () => Array<{
@@ -122,8 +125,8 @@ container.registerFactory('TorrentHandler', () => {
     torrentService: svc,
     logger: log,
     searchEngines: engines,
-    bot: bot as any,
-    chatSettingsRepository: chatSettings as any,
+    bot: bot as Bot<MyContext> | undefined,
+    chatSettingsRepository: chatSettings as ChatSettingsRepository | undefined,
   });
   try {
     const registry = container.resolve<CommandsRegistry>('CommandsRegistry');
