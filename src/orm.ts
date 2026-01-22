@@ -13,8 +13,9 @@ export const mikroOrmConfig = defineConfig({
     path: 'dist/migrations',
     pathTs: 'src/migrations',
   },
-  entities: ['dist/entities/**/*.js'],
-  entitiesTs: ['src/entities/**/*.ts'],
+  // entities are defined under src/domain/entities after refactor
+  entities: ['dist/domain/entities/**/*.js'],
+  entitiesTs: ['src/domain/entities/**/*.ts'],
   forceUndefined: true,
   ignoreUndefinedInQuery: true,
   metadataProvider: TsMorphMetadataProvider,
