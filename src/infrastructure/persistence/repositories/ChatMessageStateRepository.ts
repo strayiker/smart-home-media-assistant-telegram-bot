@@ -12,10 +12,18 @@ export interface ChatMessageStateCreateInput {
 }
 
 export interface IChatMessageStateRepository {
-  saveMessageState(input: ChatMessageStateCreateInput): Promise<ChatMessageState>;
-  getMessageState(chatId: number, messageType: MessageType): Promise<ChatMessageState | null>;
+  saveMessageState(
+    input: ChatMessageStateCreateInput,
+  ): Promise<ChatMessageState>;
+  getMessageState(
+    chatId: number,
+    messageType: MessageType,
+  ): Promise<ChatMessageState | null>;
   getAllActiveTorrentProgressMessages(): Promise<ChatMessageState[]>;
-  deleteMessageState(chatId: number, messageType: MessageType): Promise<boolean>;
+  deleteMessageState(
+    chatId: number,
+    messageType: MessageType,
+  ): Promise<boolean>;
   cleanupExpiredMessages(beforeDate?: Date): Promise<number>;
   deleteAllMessagesForChat(chatId: number): Promise<number>;
 }
@@ -35,11 +43,16 @@ export class ChatMessageStateRepository implements IChatMessageStateRepository {
    * @param input - The message state data
    * @returns The saved/updated ChatMessageState entity
    */
-  async saveMessageState(input: ChatMessageStateCreateInput): Promise<ChatMessageState> {
+  async saveMessageState(
+    input: ChatMessageStateCreateInput,
+  ): Promise<ChatMessageState> {
     const { chatId, messageType, messageId, data, expiresAt } = input;
 
     // Check if a record exists for this chat and message type
-    const existing = await this.em.findOne(ChatMessageState, { chatId, messageType });
+    const existing = await this.em.findOne(ChatMessageState, {
+      chatId,
+      messageType,
+    });
 
     if (existing) {
       // Update existing record
@@ -100,7 +113,7 @@ export class ChatMessageStateRepository implements IChatMessageStateRepository {
 
     // Ensure a stable ordering by chatId in case the underlying driver
     // returns unsorted results during tests or discovery.
-    return results.slice().sort((a, b) => (a.chatId ?? 0) - (b.chatId ?? 0));
+    return [...results].sort((a, b) => (a.chatId ?? 0) - (b.chatId ?? 0));
   }
 
   /**
@@ -114,7 +127,10 @@ export class ChatMessageStateRepository implements IChatMessageStateRepository {
     chatId: number,
     messageType: MessageType,
   ): Promise<boolean> {
-    const state = await this.em.findOne(ChatMessageState, { chatId, messageType });
+    const state = await this.em.findOne(ChatMessageState, {
+      chatId,
+      messageType,
+    });
     if (!state) {
       return false;
     }
@@ -131,13 +147,16 @@ export class ChatMessageStateRepository implements IChatMessageStateRepository {
    */
   async cleanupExpiredMessages(beforeDate?: Date): Promise<number> {
     const cutoff = beforeDate || new Date();
-    const expiredRecords = await this.em.find(ChatMessageState, { expiresAt: { $lte: cutoff } });
+    // eslint-disable-next-line unicorn/no-array-method-this-argument
+    const expiredRecords = await this.em.find(ChatMessageState, {
+      expiresAt: { $lte: cutoff },
+    });
     const count = expiredRecords.length;
-    
+
     if (count > 0) {
       await this.em.removeAndFlush(expiredRecords);
     }
-    
+
     return count;
   }
 
@@ -149,13 +168,14 @@ export class ChatMessageStateRepository implements IChatMessageStateRepository {
    * @returns The number of deleted records
    */
   async deleteAllMessagesForChat(chatId: number): Promise<number> {
+    // eslint-disable-next-line unicorn/no-array-method-this-argument
     const states = await this.em.find(ChatMessageState, { chatId });
     const count = states.length;
-    
+
     if (count > 0) {
       await this.em.removeAndFlush(states);
     }
-    
+
     return count;
   }
 }
