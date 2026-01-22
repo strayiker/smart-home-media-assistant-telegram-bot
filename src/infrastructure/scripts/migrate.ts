@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
-import { initORM } from '../../orm.js';
 import { logger } from '../../logger.js';
+import { initORM } from '../../orm.js';
 
 try {
   logger.info('Initializing ORM and running migrations...');

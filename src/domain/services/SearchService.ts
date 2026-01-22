@@ -30,7 +30,10 @@ export class SearchService {
       this.logger.debug({ query }, 'Starting search');
       const promises = this.searchEngines.map(async (searchEngine) => {
         const start = Date.now();
-        this.logger.debug({ engine: searchEngine.name, query }, 'Invoking search engine');
+        this.logger.debug(
+          { engine: searchEngine.name, query },
+          'Invoking search engine',
+        );
         try {
           const engineResults = await searchEngine.search(query);
           const took = Date.now() - start;

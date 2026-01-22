@@ -103,7 +103,10 @@ export async function handleDownloadFileCommand(
     const file = new InputFile(filePath);
 
     const fileType = await mediaService.getFileType(filePath);
-    logger.debug({ filePath, fileSize: qbFile.size, fileType }, 'File resolved');
+    logger.debug(
+      { filePath, fileSize: qbFile.size, fileType },
+      'File resolved',
+    );
     if (!fileType) {
       await ctx.reply(ctx.t('torrent-file-error'));
       return;

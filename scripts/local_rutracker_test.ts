@@ -15,17 +15,27 @@ const scriptLogger = {
   silent: () => {},
 };
 
-const cookieStorage = new CookieStorage({ filePath: './data/rutracker_cookies.json', logger: scriptLogger });
+const cookieStorage = new CookieStorage({
+  filePath: './data/rutracker_cookies.json',
+  logger: scriptLogger,
+});
 
 async function run() {
   const username = process.env.RUTRACKER_USERNAME;
   const password = process.env.RUTRACKER_PASSWORD;
   if (!username || !password) {
-    scriptLogger.error('RUTRACKER_USERNAME / RUTRACKER_PASSWORD are required in env');
+    scriptLogger.error(
+      'RUTRACKER_USERNAME / RUTRACKER_PASSWORD are required in env',
+    );
     process.exit(1);
   }
 
-  const engine = new RutrackerSearchEngine({ username, password, cookieStorage, logger });
+  const engine = new RutrackerSearchEngine({
+    username,
+    password,
+    cookieStorage,
+    logger,
+  });
   try {
     const results = await engine.search('ubuntu');
     scriptLogger.info('Found %d results', results.length);

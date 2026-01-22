@@ -9,7 +9,12 @@ describe('SearchHandler', () => {
 
   beforeEach(() => {
     mockSearchService = { search: vi.fn() };
-    mockLogger = { error: vi.fn(), debug: vi.fn(), info: vi.fn(), warn: vi.fn() };
+    mockLogger = {
+      error: vi.fn(),
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+    };
 
     ctx = {
       message: { text: 'query' },

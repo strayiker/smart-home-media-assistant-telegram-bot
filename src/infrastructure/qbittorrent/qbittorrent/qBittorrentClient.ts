@@ -3,10 +3,10 @@ import { URLSearchParams } from 'node:url';
 import parseTorrent from 'parse-torrent';
 import { CookieJar } from 'tough-cookie';
 
+import { logger } from '../../../logger.js';
 import { err, ok, type ResultT } from '../../../shared/utils/result.js';
 import { type QBFile, type QBTorrent } from './models.js';
 import { normalizeTorrent, QBTorrentsResponseSchema } from './schemas.js';
-import { logger } from '../../../logger.js';
 import {
   type QBClientAddTorrentsOptions,
   type QBClientGetTorrentsOptions,
@@ -62,7 +62,6 @@ export class QBittorrentClient {
     }
   }
 
-
   private async ensureLoggedIn() {
     const url = `${this.apiBase}/auth/login`;
     const cookies = this.cookieJar.getCookiesSync(url);
@@ -97,7 +96,10 @@ export class QBittorrentClient {
     }
 
     if (!response.ok) {
-      logger.error({ status: response.status, statusText: response.statusText }, 'qBittorrent request failed');
+      logger.error(
+        { status: response.status, statusText: response.statusText },
+        'qBittorrent request failed',
+      );
       throw new Error(response.statusText);
     }
 
@@ -110,7 +112,10 @@ export class QBittorrentClient {
     savepath = this.savePath,
     ...rest
   }: QBClientAddTorrentsOptions): Promise<ResultT<string[], unknown>> {
-    logger.debug({ count: torrents.length, savepath, tags }, 'addTorrents start');
+    logger.debug(
+      { count: torrents.length, savepath, tags },
+      'addTorrents start',
+    );
     const data = new FormData();
     const hashes: string[] = [];
 

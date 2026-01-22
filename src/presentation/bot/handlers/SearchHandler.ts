@@ -8,7 +8,6 @@ import type {
 import type { MyContext } from '../../../shared/context.js';
 import { formatBytes } from '../../../shared/utils/formatBytes.js';
 import type { Logger } from '../../../shared/utils/logger.js';
-import { logger } from '../../../logger.js';
 
 export interface SearchHandlerOptions {
   searchService: SearchService;

@@ -17,7 +17,13 @@ try {
   process.exit(1);
 }
 
-logger.info({ nodeEnv: process.env.NODE_ENV, logLevel: process.env.LOG_LEVEL ?? process.env.DEBUG }, 'Starting application');
+logger.info(
+  {
+    nodeEnv: process.env.NODE_ENV,
+    logLevel: process.env.LOG_LEVEL ?? process.env.DEBUG,
+  },
+  'Starting application',
+);
 
 import path from 'node:path';
 
@@ -74,7 +80,10 @@ if (!qbtWebuiAddress || !qbtWebuiUsername || !qbtWebuiPassword) {
 }
 
 logger.info(
-  { nodeEnv: process.env.NODE_ENV, logLevel: process.env.LOG_LEVEL ?? process.env.DEBUG },
+  {
+    nodeEnv: process.env.NODE_ENV,
+    logLevel: process.env.LOG_LEVEL ?? process.env.DEBUG,
+  },
   'Starting application',
 );
 
@@ -85,7 +94,10 @@ const cookieStorage = new CookieStorage({
   filePath: path.join(botDataPath, 'cookies.json'),
   logger,
 });
-logger.debug({ filePath: path.join(botDataPath, 'cookies.json') }, 'CookieStorage initialized');
+logger.debug(
+  { filePath: path.join(botDataPath, 'cookies.json') },
+  'CookieStorage initialized',
+);
 const qBittorrent = new QBittorrentClient({
   url: qbtWebuiAddress,
   username: qbtWebuiUsername,
@@ -98,7 +110,10 @@ logger.info({ url: qbtWebuiAddress }, 'QBittorrent client created');
 container.registerInstance('QBittorrentClient', qBittorrent);
 container.registerInstance('BotDataPath', botDataPath);
 container.registerInstance('BotDataTorrentsPath', botDataTorrentsPath);
-logger.debug({ instances: ['QBittorrentClient', 'BotDataPath', 'BotDataTorrentsPath'] }, 'DI instances registered');
+logger.debug(
+  { instances: ['QBittorrentClient', 'BotDataPath', 'BotDataTorrentsPath'] },
+  'DI instances registered',
+);
 
 // Initialize ORM (run migrations on startup explicitly)
 logger.info('Initializing ORM (running migrations if needed)');

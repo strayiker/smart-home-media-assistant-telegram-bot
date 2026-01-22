@@ -107,7 +107,10 @@ export class RutrackerSearchEngine extends SearchEngine {
 
       if (!id) {
         const html = $(row).html();
-        this.logger.warn({ rowHtml: html }, 'Unable to parse RuTracker torrent id');
+        this.logger.warn(
+          { rowHtml: html },
+          'Unable to parse RuTracker torrent id',
+        );
         continue;
       }
 
