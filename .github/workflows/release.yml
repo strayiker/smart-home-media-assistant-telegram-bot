@@ -28,12 +28,16 @@ jobs:
             .yarn/install-state.gz
             .yarn/releases
             .yarn/plugins
+            .yarn/unplugged
+            .yarn/virtual
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
       # dependencies
       - name: Dependencies
-        run: yarn install --immutable
+        run: |
+          # ensure reproducible, fast installs; prefer cache and fail on mismatch
+          yarn install --immutable --immutable-cache --check-cache --non-interactive
       # lint
       - name: Lint
         run: yarn lint
@@ -116,12 +120,15 @@ jobs:
             .yarn/install-state.gz
             .yarn/releases
             .yarn/plugins
+            .yarn/unplugged
+            .yarn/virtual
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
       # dependencies
       - name: Dependencies
-        run: yarn install --immutable
+        run: |
+          yarn install --immutable --immutable-cache --check-cache --non-interactive
       # release
       - id: release
         name: Release
