@@ -6,10 +6,42 @@ REPO_RAW_URL="${REPO_RAW_URL:-$REPO_RAW_URL_DEFAULT}"
 
 INSTALL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-tmpfile=$(mktemp)
-curl -fsSL "$REPO_RAW_URL/scripts/install-linux.sh" -o "$tmpfile"
-chmod +x "$tmpfile"
+# Determine version from repository (fallback to latest)
+VERSION=$(curl -fsSL "$REPO_RAW_URL/package.json" 2>/dev/null | sed -nE 's/.*"version": "([^"]+)".*/\1/p' | head -n1 || true)
+if [[ -z "${VERSION:-}" ]]; then
+	VERSION="latest"
+fi
 
-INSTALL_DIR="$INSTALL_DIR" REPO_RAW_URL="$REPO_RAW_URL" bash "$tmpfile"
+IMAGE="ghcr.io/strayiker/smart-home-media-assistant-telegram-bot:${VERSION}"
 
-rm -f "$tmpfile"
+echo "Updating bot image to ${IMAGE}"
+docker pull "$IMAGE" || true
+
+# Stop systemd-managed service (if present) to avoid races
+if sudo systemctl list-unit-files --full --no-legend | grep -q '^smart-home-media-assistant-telegram-bot.service'; then
+	echo "Stopping systemd service smart-home-media-assistant-telegram-bot.service"
+	sudo systemctl stop smart-home-media-assistant-telegram-bot.service || true
+fi
+
+# Remove existing container (keeps volumes)
+if docker container inspect smart-home-media-assistant-telegram-bot >/dev/null 2>&1; then
+	echo "Removing existing container smart-home-media-assistant-telegram-bot"
+	sudo docker rm -f smart-home-media-assistant-telegram-bot || true
+fi
+
+# Start the bot using the packaged start script (will use the pulled image tag)
+if [[ -x "$INSTALL_DIR/start.sh" ]]; then
+	echo "Starting bot via $INSTALL_DIR/start.sh"
+	(cd "$INSTALL_DIR" && ./start.sh)
+else
+	echo "start.sh not found or not executable in $INSTALL_DIR; run it manually" >&2
+fi
+
+# If systemd unit exists, ensure it's enabled and running (executes start.sh via unit)
+if sudo systemctl list-unit-files --full --no-legend | grep -q '^smart-home-media-assistant-telegram-bot.service'; then
+	echo "Ensuring systemd service is enabled and active"
+	sudo systemctl daemon-reload || true
+	sudo systemctl enable --now smart-home-media-assistant-telegram-bot.service || true
+fi
+
+echo "Update complete (version: ${VERSION})."
