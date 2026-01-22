@@ -452,6 +452,25 @@ main() {
   generate_scripts
   write_env_files
 
+  # Pull docker images for bot (and api) to ensure latest version is available
+  echo "Fetching container images..."
+  version=$(detect_version)
+  IMAGE="ghcr.io/strayiker/smart-home-media-assistant-telegram-bot:${version:-latest}"
+  echo "Pulling bot image: ${IMAGE}"
+  sudo docker pull "${IMAGE}" || true
+  echo "Pulling bot-api image: aiogram/telegram-bot-api:latest"
+  sudo docker pull aiogram/telegram-bot-api:latest || true
+
+  # Remove existing containers if present so systemd/start script will recreate them
+  if sudo docker container inspect smart-home-media-assistant-telegram-bot >/dev/null 2>&1; then
+    echo "Removing existing container: smart-home-media-assistant-telegram-bot"
+    sudo docker rm -f smart-home-media-assistant-telegram-bot || true
+  fi
+  if sudo docker container inspect smart-home-media-assistant-telegram-bot-api >/dev/null 2>&1; then
+    echo "Removing existing container: smart-home-media-assistant-telegram-bot-api"
+    sudo docker rm -f smart-home-media-assistant-telegram-bot-api || true
+  fi
+
   echo "Starting bot via systemd..."
   install_bot_systemd
 
