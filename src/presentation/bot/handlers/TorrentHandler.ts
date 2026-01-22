@@ -343,13 +343,12 @@ export class TorrentHandler extends Composer<MyContext> {
     if (!this.bot) return;
     try {
       await this.bot.api.deleteMessage(message.chat.id, message.message_id);
+      this.chatMessages.delete(message.chat.id);
     } catch (error) {
       this.logger.error(
         error,
         'An error occured while deleting torrent message',
       );
-    } finally {
-      this.chatMessages.delete(message.chat.id);
     }
   }
 }
