@@ -2,6 +2,7 @@ import { type Bot, Composer, GrammyError, InlineKeyboard } from 'grammy';
 import type { Message } from 'grammy/types';
 
 import type { TorrentService } from '../../../domain/services/TorrentService.js';
+import type { ChatMessageStateRepository } from '../../../infrastructure/persistence/repositories/ChatMessageStateRepository.js';
 import type { ChatSettingsRepository } from '../../../infrastructure/persistence/repositories/ChatSettingsRepository.js';
 import type { SearchEngine } from '../../../infrastructure/searchEngines/searchEngines/searchEngine.js';
 import { logger } from '../../../logger.js';
@@ -31,6 +32,7 @@ export interface TorrentHandlerOptions {
   searchEngines: SearchEngine[];
   bot?: Bot<MyContext>;
   chatSettingsRepository?: ChatSettingsRepository;
+  chatMessageStateRepository?: ChatMessageStateRepository;
 }
 
 export class TorrentHandler extends Composer<MyContext> {
@@ -43,6 +45,8 @@ export class TorrentHandler extends Composer<MyContext> {
   private activeUpdates = new Map<number, Promise<void>>();
   private timeout?: NodeJS.Timeout;
   private chatSettingsRepository: ChatSettingsRepository | undefined;
+  private chatMessageStateRepository: ChatMessageStateRepository | undefined;
+  private cleanupTimeout?: NodeJS.Timeout;
 
   constructor(options: TorrentHandlerOptions) {
     super();
@@ -51,11 +55,20 @@ export class TorrentHandler extends Composer<MyContext> {
     this.searchEngines = options.searchEngines;
     this.bot = options.bot;
     this.chatSettingsRepository = options.chatSettingsRepository;
+    this.chatMessageStateRepository = options.chatMessageStateRepository;
 
     if (this.bot) {
       this.timeout = setInterval(() => {
         void this.createOrUpdateTorrentsMessages();
       }, 5 * 1000);
+      
+      // Initialize state from database after a short delay
+      setTimeout(() => {
+        void this.initialize();
+      }, 1000);
+      
+      // Start periodic cleanup of expired states
+      this.startCleanup();
     }
 
     // ensure we can cleanup the interval when application stops
@@ -126,6 +139,7 @@ export class TorrentHandler extends Composer<MyContext> {
 
   public dispose() {
     if (this.timeout) clearInterval(this.timeout);
+    if (this.cleanupTimeout) clearInterval(this.cleanupTimeout);
   }
 
   /**
@@ -245,82 +259,82 @@ export class TorrentHandler extends Composer<MyContext> {
           return;
         }
 
-    const hashes = metas.map((m) => m.hash);
+        const hashes = metas.map((m) => m.hash);
 
-    let torrents: QBittorrentTorrent[];
-    try {
-      torrents = (await this.torrentService.getTorrentsByHash(
-        hashes,
-      )) as QBittorrentTorrent[];
-    } catch {
-      return;
-    }
+        let torrents: QBittorrentTorrent[];
+        try {
+          torrents = (await this.torrentService.getTorrentsByHash(
+            hashes,
+          )) as QBittorrentTorrent[];
+        } catch {
+          return;
+        }
 
-    const metaByHash = new Map(hashes.map((h, i) => [h, metas[i]]));
+        const metaByHash = new Map(hashes.map((h, i) => [h, metas[i]]));
 
-    const completedTorrents: QBittorrentTorrent[] = [];
-    const pendingTorrents: QBittorrentTorrent[] = [];
+        const completedTorrents: QBittorrentTorrent[] = [];
+        const pendingTorrents: QBittorrentTorrent[] = [];
 
-    for (const torrent of torrents) {
-      if (torrent.progress < 1) pendingTorrents.push(torrent);
-      else completedTorrents.push(torrent);
-    }
+        for (const torrent of torrents) {
+          if (torrent.progress < 1) pendingTorrents.push(torrent);
+          else completedTorrents.push(torrent);
+        }
 
-    let message = this.chatMessages.get(chatId);
+        let message = this.chatMessages.get(chatId);
 
-    // Delete progress message only when torrents complete (not on forced refresh)
-    if (message && completedTorrents.length > 0 && !refresh) {
-      await this.deleteTorrentsMessage(message);
-      message = undefined;
-    }
+        // Delete progress message only when torrents complete (not on forced refresh)
+        if (message && completedTorrents.length > 0 && !refresh) {
+          await this.deleteTorrentsMessage(message);
+          message = undefined;
+        }
 
-    // Only pending torrents trigger a progress message
-    if (pendingTorrents.length > 0) {
-      const hashesPending = pendingTorrents.map((t) => t.hash);
-      this.chatTorrents.set(chatId, new Set(hashesPending));
+        // Only pending torrents trigger a progress message
+        if (pendingTorrents.length > 0) {
+          const hashesPending = pendingTorrents.map((t) => t.hash);
+          this.chatTorrents.set(chatId, new Set(hashesPending));
 
-      const chatLocale =
-        (await this.chatSettingsRepository?.getLocale(chatId)) ?? 'en';
-      const texts = pendingTorrents.map((torrent) => {
-        const meta = metaByHash.get(torrent.hash);
-        const uid = meta?.uid ?? '';
-        const dlspeed = torrent.dlspeed ?? 0;
-        const speed = `${this.torrentService.formatBytes(dlspeed)}/s`;
-        const etaStr = (() => {
-          if (torrent.eta === undefined) return '∞';
-          if (torrent.eta >= 8_640_000) return '∞';
-          return this.torrentService.formatDuration(torrent.eta);
-        })();
-        const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
-        const t = fluent.withLocale(chatLocale);
-        return t('torrent-message-in-progress', {
-          title: torrent.name ?? '',
-          seeds: torrent.num_seeds ?? 0,
-          maxSeeds: torrent.num_complete ?? 0,
-          peers: torrent.num_leechs ?? 0,
-          maxPeers: torrent.num_incomplete ?? 0,
-          speed,
-          eta: etaStr,
-          progress,
-          remove: `/rm_${uid}`,
-        });
-      });
+          const chatLocale =
+            (await this.chatSettingsRepository?.getLocale(chatId)) ?? 'en';
+          const texts = pendingTorrents.map((torrent) => {
+            const meta = metaByHash.get(torrent.hash);
+            const uid = meta?.uid ?? '';
+            const dlspeed = torrent.dlspeed ?? 0;
+            const speed = `${this.torrentService.formatBytes(dlspeed)}/s`;
+            const etaStr = (() => {
+              if (torrent.eta === undefined) return '∞';
+              if (torrent.eta >= 8_640_000) return '∞';
+              return this.torrentService.formatDuration(torrent.eta);
+            })();
+            const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
+            const t = fluent.withLocale(chatLocale);
+            return t('torrent-message-in-progress', {
+              title: torrent.name ?? '',
+              seeds: torrent.num_seeds ?? 0,
+              maxSeeds: torrent.num_complete ?? 0,
+              peers: torrent.num_leechs ?? 0,
+              maxPeers: torrent.num_incomplete ?? 0,
+              speed,
+              eta: etaStr,
+              progress,
+              remove: `/rm_${uid}`,
+            });
+          });
 
-      const text = texts.join('\n');
-      await (message
-        ? this.updateTorrentsMessage(message, text)
-        : this.sendTorrentsMessage(chatId, text));
-    } else {
-      this.chatTorrents.delete(chatId);
-    }
-  } finally {
-    this.activeUpdates.delete(chatId);
+          const text = texts.join('\n');
+          await (message
+            ? this.updateTorrentsMessage(message, text, hashesPending)
+            : this.sendTorrentsMessage(chatId, text, hashesPending));
+        } else {
+          this.chatTorrents.delete(chatId);
+        }
+      } finally {
+        this.activeUpdates.delete(chatId);
+      }
+    })();
+
+    this.activeUpdates.set(chatId, updatePromise);
+    await updatePromise;
   }
-})();
-
-this.activeUpdates.set(chatId, updatePromise);
-await updatePromise;
-}
 
   private createOrUpdateTorrentsMessages() {
     for (const chatId of this.chatTorrents.keys()) {
@@ -328,7 +342,11 @@ await updatePromise;
     }
   }
 
-  private async sendTorrentsMessage(chatId: number, text: string) {
+  private async sendTorrentsMessage(
+    chatId: number,
+    text: string,
+    torrentUids: string[] = [],
+  ) {
     if (!this.bot) return;
     try {
       const message = await this.bot.api.sendMessage(chatId, text, {
@@ -336,6 +354,8 @@ await updatePromise;
       });
       // store message for future edits
       this.chatMessages.set(chatId, message as Message);
+      // Save to database for persistence
+      await this.saveMessageState(chatId, message.message_id, torrentUids);
     } catch (error) {
       this.logger.error(
         error,
@@ -344,18 +364,21 @@ await updatePromise;
     }
   }
 
-  private async updateTorrentsMessage(message: Message, text: string) {
+  private async updateTorrentsMessage(
+    message: Message,
+    text: string,
+    torrentUids: string[] = [],
+  ) {
     if (!this.bot) return;
     if (message.text === text) return;
     const chatId = message.chat.id;
     try {
-      await this.bot.api.editMessageText(
-        chatId,
-        message.message_id,
-        text,
-        { parse_mode: 'HTML' },
-      );
+      await this.bot.api.editMessageText(chatId, message.message_id, text, {
+        parse_mode: 'HTML',
+      });
       message.text = text;
+      // Save updated state to database
+      await this.saveMessageState(chatId, message.message_id, torrentUids);
     } catch (error) {
       if (
         error instanceof GrammyError &&
@@ -363,14 +386,44 @@ await updatePromise;
       ) {
         // Remove stale message reference
         this.chatMessages.delete(chatId);
+        // Remove from database
+        await this.chatMessageStateRepository?.deleteMessageState(
+          chatId,
+          'torrent_progress',
+        );
         // Send new message
-        await this.sendTorrentsMessage(chatId, text);
+        await this.sendTorrentsMessage(chatId, text, torrentUids);
       } else {
         this.logger.error(
           error,
           'An error occured while updating torrents message',
         );
       }
+    }
+  }
+
+  /**
+   * Save message state to database for persistence.
+   */
+  private async saveMessageState(
+    chatId: number,
+    messageId: number,
+    torrentUids: string[],
+  ): Promise<void> {
+    if (!this.chatMessageStateRepository) return;
+
+    try {
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+      await this.chatMessageStateRepository.saveMessageState({
+        chatId,
+        messageType: 'torrent_progress',
+        messageId,
+        data: { uids: torrentUids },
+        expiresAt,
+      });
+    } catch (error) {
+      // Log but don't fail - message state is non-critical
+      this.logger.error(error, 'Failed to save message state to database');
     }
   }
 
@@ -381,6 +434,13 @@ await updatePromise;
       // Remove from tracking BEFORE deleting message to prevent race conditions
       this.chatTorrents.delete(chatId);
       this.chatMessages.delete(chatId);
+      
+      // Delete from database
+      await this.chatMessageStateRepository?.deleteMessageState(
+        chatId,
+        'torrent_progress',
+      );
+      
       await this.bot.api.deleteMessage(chatId, message.message_id);
     } catch (error) {
       this.logger.error(
@@ -388,6 +448,72 @@ await updatePromise;
         'An error occured while deleting torrent message',
       );
     }
+  }
+
+  /**
+   * Initialize state from database after bot restart.
+   * Restores chatMessages and chatTorrents maps from persisted state.
+   */
+  public async initialize(): Promise<void> {
+    if (!this.chatMessageStateRepository) {
+      this.logger.debug(
+        'ChatMessageStateRepository not available, skipping initialization',
+      );
+      return;
+    }
+
+    try {
+      const states =
+        await this.chatMessageStateRepository.getAllActiveTorrentProgressMessages();
+
+      this.logger.info(
+        { count: states.length },
+        'Restoring torrent progress messages from database',
+      );
+
+      for (const state of states) {
+        const { chatId, messageId, data } = state;
+        const uids = (data as { uids?: string[] })?.uids || [];
+
+        // Restore in-memory tracking
+        this.chatMessages.set(chatId, {
+          chat: { id: chatId },
+          message_id: messageId,
+        } as Message);
+        this.chatTorrents.set(chatId, new Set(uids));
+      }
+
+      this.logger.info(
+        { count: states.length },
+        'Successfully restored torrent progress messages',
+      );
+    } catch (error) {
+      this.logger.error(error, 'Failed to initialize torrent message state');
+    }
+  }
+
+  /**
+   * Start periodic cleanup of expired message states.
+   * Runs every hour by default.
+   */
+  private startCleanup(): void {
+    const cleanupInterval = 60 * 60 * 1000; // 1 hour
+
+    this.cleanupTimeout = setInterval(async () => {
+      if (!this.chatMessageStateRepository) return;
+
+      try {
+        const count =
+          await this.chatMessageStateRepository.cleanupExpiredMessages();
+        if (count > 0) {
+          this.logger.debug({ count }, 'Cleaned up expired message states');
+        }
+      } catch (error) {
+        this.logger.error(error, 'Failed to cleanup expired message states');
+      }
+    }, cleanupInterval);
+
+    this.logger.debug('Started periodic cleanup of expired message states');
   }
 }
 

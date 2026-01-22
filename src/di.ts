@@ -11,6 +11,7 @@ import { MediaService } from './domain/services/MediaService.js';
 import { type SearchService } from './domain/services/SearchService.js';
 import { type TorrentService } from './domain/services/TorrentService.js';
 import { InMemoryFeatureFlagStore } from './infrastructure/featureFlags/InMemoryFeatureFlagStore.js';
+import { ChatMessageStateRepository } from './infrastructure/persistence/repositories/ChatMessageStateRepository.js';
 import type { ChatSettingsRepository } from './infrastructure/persistence/repositories/ChatSettingsRepository.js';
 import { UserRepository } from './infrastructure/persistence/repositories/UserRepository.js';
 import type { SearchEngine } from './infrastructure/searchEngines/searchEngines/searchEngine.js';
@@ -112,6 +113,7 @@ container.registerFactory('TorrentHandler', () => {
   // These are optional in test environments - resolve guardedly to avoid throwing when not registered
   let bot: unknown | undefined;
   let chatSettings: unknown | undefined;
+  let chatMessageState: unknown | undefined;
   try {
     bot = container.resolve('Bot');
   } catch {
@@ -122,12 +124,18 @@ container.registerFactory('TorrentHandler', () => {
   } catch {
     chatSettings = undefined;
   }
+  try {
+    chatMessageState = container.resolve('ChatMessageStateRepository');
+  } catch {
+    chatMessageState = undefined;
+  }
   const options: Partial<{
     torrentService: TorrentService;
     logger: PinoLogger;
     searchEngines: SearchEngine[];
     bot: Bot<MyContext>;
     chatSettingsRepository: ChatSettingsRepository;
+    chatMessageStateRepository: ChatMessageStateRepository;
   }> = {
     torrentService: svc,
     logger: log,
@@ -136,6 +144,8 @@ container.registerFactory('TorrentHandler', () => {
   if (bot !== undefined) options.bot = bot as Bot<MyContext>;
   if (chatSettings !== undefined)
     options.chatSettingsRepository = chatSettings as ChatSettingsRepository;
+  if (chatMessageState !== undefined)
+    options.chatMessageStateRepository = chatMessageState as ChatMessageStateRepository;
 
   const inst = new TorrentHandler(options as unknown as TorrentHandlerOptions);
   try {
@@ -206,6 +216,12 @@ container.registerFactory('UserRepository', () => {
   const orm = container.resolve<MikroORM>('ORM');
   if (!orm) throw new Error('ORM not registered; UserRepository requires ORM');
   return new UserRepository(orm.em.fork());
+});
+
+container.registerFactory('ChatMessageStateRepository', () => {
+  const orm = container.resolve<MikroORM>('ORM');
+  if (!orm) throw new Error('ORM not registered; ChatMessageStateRepository requires ORM');
+  return new ChatMessageStateRepository(orm.em.fork());
 });
 
 container.registerFactory('AuthService', () => {
