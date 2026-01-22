@@ -28,6 +28,10 @@ torrent-message-completed =
     Удалить: {$remove}</blockquote>
 torrent-unsupported-tracker-error = Трекер не поддерживается
 torrent-download-error = Произошла ошибка при добавлении торрента
+torrent-download-success = ✅ Торрент добавлен
+    ---
+    Файлы: /ls_{$uid}
+    Удалить: /rm_{$uid}
 torrent-remove-error = Произошла ошибка при удалении торрента
 torrent-file-message =
     <blockquote><b>{$name}</b>

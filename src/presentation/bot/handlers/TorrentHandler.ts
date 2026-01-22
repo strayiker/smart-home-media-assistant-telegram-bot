@@ -135,7 +135,7 @@ export async function handleDownloadCommand(
     return;
   }
 
-  await ctx.reply(ctx.t('torrent-download-success'));
+  await ctx.reply(ctx.t('torrent-download-success', { uid }));
 }
 
 export async function handleRemoveCommand(
