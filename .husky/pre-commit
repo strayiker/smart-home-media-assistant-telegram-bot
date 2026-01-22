@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/h"
+
+# Run lint, build and tests before allowing commit
+echo "Running pre-commit checks: lint -> build -> test"
+
+yarn lint
+
+yarn build
+
+yarn test --run
+
