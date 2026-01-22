@@ -134,7 +134,9 @@ export class SearchHandler extends Composer<MyContext> {
     const download = `/dl_${uid}`;
     const tags = [
       ...((result.tags ?? []) as string[]).map((tag) => `[${escapeHtml(tag)}]`),
-      result.detailsUrl ? `<a href="${escapeHtml(result.detailsUrl)}">[${escapeHtml(se.name)}]</a>` : ``,
+      result.detailsUrl
+        ? `<a href="${escapeHtml(result.detailsUrl)}">[${escapeHtml(se.name)}]</a>`
+        : ``,
     ].join(' ');
 
     return ctx.t('search-message', {
@@ -166,28 +168,32 @@ export async function handleSearchMessage(
         return;
       }
       const text = result.value
-            .slice(0, 5)
-            .map(([se, r]) => {
-              const uid = `${se.name}_${r.id}`;
-              const size = formatBytes(r.size ?? 0);
-              const download = `/dl_${uid}`;
-              const tags = [
-                ...((r.tags ?? []) as string[]).map((tag) => `[${escapeHtml(tag)}]`),
-                r.detailsUrl ? `<a href="${escapeHtml(r.detailsUrl)}">[${escapeHtml(se.name)}]</a>` : ``,
-              ].join(' ');
+        .slice(0, 5)
+        .map(([se, r]) => {
+          const uid = `${se.name}_${r.id}`;
+          const size = formatBytes(r.size ?? 0);
+          const download = `/dl_${uid}`;
+          const tags = [
+            ...((r.tags ?? []) as string[]).map(
+              (tag) => `[${escapeHtml(tag)}]`,
+            ),
+            r.detailsUrl
+              ? `<a href="${escapeHtml(r.detailsUrl)}">[${escapeHtml(se.name)}]</a>`
+              : ``,
+          ].join(' ');
 
-              return ctx.t('search-message', {
-                title: r.title,
-                tags,
-                size,
-                seeds: r.seeds ?? 0,
-                peers: r.peers ?? 0,
-                publishDate: r.publishDate ?? '---',
-                download,
-              });
-            })
-            .join('\n\n');
-          await ctx.reply(text, { parse_mode: 'HTML' });
+          return ctx.t('search-message', {
+            title: r.title,
+            tags,
+            size,
+            seeds: r.seeds ?? 0,
+            peers: r.peers ?? 0,
+            publishDate: r.publishDate ?? '---',
+            download,
+          });
+        })
+        .join('\n\n');
+      await ctx.reply(text, { parse_mode: 'HTML' });
     } else {
       logger.error(result.error, 'SearchService error');
       await ctx.reply(ctx.t('search-unknown-error'));
