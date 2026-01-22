@@ -39,17 +39,17 @@ export const container = {
     factories.set(key, factory);
   },
   resolve<T = unknown>(key: string | symbol): T {
-    // Check if there's a factory for this key
+    // Prefer registered instances so callers can override factories with singletons
+    if (registry.has(key)) {
+      return registry.get(key) as T;
+    }
+    // Otherwise, if there's a factory for this key, invoke it
     if (factories.has(key)) {
       const factory = factories.get(key)!;
       const instance = factory();
       return instance as T;
     }
-    // Otherwise, look for a registered instance
-    if (!registry.has(key)) {
-      throw new Error(`Dependency not found in container: ${String(key)}`);
-    }
-    return registry.get(key) as T;
+    throw new Error(`Dependency not found in container: ${String(key)}`);
   },
 };
 
