@@ -124,15 +124,20 @@ export class SearchHandler extends Composer<MyContext> {
     const size = formatBytes(result.size ?? 0);
     const download = `/dl_${se.name}_${result.id}`;
 
-    return ctx.t('search-message-line', {
-      title: result.title,
-      tags: result.tags.map((tag: string) => `[#${tag}]`).join(', '),
-      size,
-      seeds: result.seeds ?? 0,
-      peers: result.peers ?? 0,
-      publishDate: result.publishDate ?? '---',
-      download,
-    });
+    const escapeHtml = (s: unknown) =>
+      String(s)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;');
+
+    const titleLink = result.detailsUrl
+      ? `<a href="${escapeHtml(result.detailsUrl)}">${escapeHtml(result.title)}</a>`
+      : escapeHtml(result.title);
+
+    const tags = (result.tags ?? []).map((t: string) => `#${escapeHtml(t)}`).join(' ');
+
+    return `${titleLink}\n${tags} • ${size} • seeds:${result.seeds ?? 0} peers:${result.peers ?? 0}\n<code>${escapeHtml(download)}</code>`;
   }
 }
 
@@ -153,10 +158,24 @@ export async function handleSearchMessage(
         return;
       }
       const text = result.value
-        .slice(0, 5)
-        .map(([se, r]) => `${r.title} (${se.name}) — ${r.size} bytes`)
-        .join('\n');
-      await ctx.reply(text);
+            .slice(0, 5)
+            .map(([se, r]) => {
+              const escapeHtml = (s: unknown) =>
+                String(s)
+                  .replaceAll('&', '&amp;')
+                  .replaceAll('<', '&lt;')
+                  .replaceAll('>', '&gt;')
+                  .replaceAll('"', '&quot;');
+
+              const size = formatBytes(r.size ?? 0);
+              const titleLink = r.detailsUrl
+                ? `<a href="${escapeHtml(r.detailsUrl)}">${escapeHtml(r.title)}</a>`
+                : escapeHtml(r.title);
+              const download = `/dl_${se.name}_${r.id}`;
+              return `${titleLink}\n${escapeHtml((r.tags ?? []).map((t: string) => `#${t}`).join(' '))} • ${size} • seeds:${r.seeds ?? 0} peers:${r.peers ?? 0}\n<code>${escapeHtml(download)}</code>`;
+            })
+            .join('\n\n');
+          await ctx.reply(text, { parse_mode: 'HTML' });
     } else {
       logger.error(result.error, 'SearchService error');
       await ctx.reply(ctx.t('search-unknown-error'));
