@@ -135,7 +135,13 @@ export async function handleDownloadCommand(
     return;
   }
 
+  // Inform user and show current torrents list (stats, files/remove links)
   await ctx.reply(ctx.t('torrent-download-success', { uid }));
+  try {
+    await handleTorrentsListCommand(ctx, torrentService);
+  } catch {
+    // ignore errors while building list, user already got success reply
+  }
 }
 
 export async function handleRemoveCommand(
