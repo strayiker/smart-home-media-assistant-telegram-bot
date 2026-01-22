@@ -132,12 +132,13 @@ export class SearchHandler extends Composer<MyContext> {
     const uid = `${se.name}_${result.id}`;
     const size = formatBytes(result.size ?? 0);
     const download = `/dl_${uid}`;
+    const trackerLink = result.detailsUrl && se.name
+      ? `<a href="${escapeHtml(result.detailsUrl)}">[${escapeHtml(se.name)}]</a>`
+      : '';
     const tags = [
       ...((result.tags ?? []) as string[]).map((tag) => `[${escapeHtml(tag)}]`),
-      result.detailsUrl
-        ? `<a href="${escapeHtml(result.detailsUrl)}">[${escapeHtml(se.name)}]</a>`
-        : ``,
-    ].join(' ');
+      trackerLink,
+    ].filter(Boolean).join(' ');
 
     return ctx.t('search-message', {
       title: result.title,
@@ -173,14 +174,15 @@ export async function handleSearchMessage(
           const uid = `${se.name}_${r.id}`;
           const size = formatBytes(r.size ?? 0);
           const download = `/dl_${uid}`;
+          const trackerLink = r.detailsUrl && se.name
+            ? `<a href="${escapeHtml(r.detailsUrl)}">[${escapeHtml(se.name)}]</a>`
+            : '';
           const tags = [
             ...((r.tags ?? []) as string[]).map(
               (tag) => `[${escapeHtml(tag)}]`,
             ),
-            r.detailsUrl
-              ? `<a href="${escapeHtml(r.detailsUrl)}">[${escapeHtml(se.name)}]</a>`
-              : ``,
-          ].join(' ');
+            trackerLink,
+          ].filter(Boolean).join(' ');
 
           return ctx.t('search-message', {
             title: r.title,
@@ -192,7 +194,7 @@ export async function handleSearchMessage(
             download,
           });
         })
-        .join('\n\n');
+        .join('\n');
       await ctx.reply(text, { parse_mode: 'HTML' });
     } else {
       logger.error(result.error, 'SearchService error');
