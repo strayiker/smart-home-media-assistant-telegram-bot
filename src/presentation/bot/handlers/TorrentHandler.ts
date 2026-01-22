@@ -1,4 +1,4 @@
-import { type Bot, Composer, GrammyError,InlineKeyboard } from 'grammy';
+import { type Bot, Composer, GrammyError, InlineKeyboard } from 'grammy';
 import type { Message } from 'grammy/types';
 
 import type { TorrentService } from '../../../domain/services/TorrentService.js';
@@ -65,15 +65,11 @@ export class TorrentHandler extends Composer<MyContext> {
       if (!ctx.message.text) return next();
       if (ctx.message.text.startsWith('/dl_')) {
         logger.debug({ text: ctx.message.text }, 'Download command invoked');
-        return handleDownloadCommand(
-          ctx,
-          this.torrentService,
-          this.searchEngines,
-        );
+        return this.handleDownloadCommand(ctx);
       }
       if (ctx.message.text.startsWith('/rm_')) {
         logger.debug({ text: ctx.message.text }, 'Remove command invoked');
-        return handleRemoveCommand(ctx, this.torrentService, this.logger);
+        return this.handleRemoveCommand(ctx);
       }
       if (ctx.message.text.startsWith('/torrents')) {
         logger.debug('Torrents list command invoked');
@@ -116,11 +112,9 @@ export class TorrentHandler extends Composer<MyContext> {
             await ctx.answerCallbackQuery();
             return;
           }
-          await handleTorrentRemove(
+          await this.handleTorrentRemove(
             ctx,
-            this.torrentService,
             parsed.uid,
-            parsed.page,
           );
           return;
         }
@@ -134,6 +128,88 @@ export class TorrentHandler extends Composer<MyContext> {
 
   public dispose() {
     if (this.timeout) clearInterval(this.timeout);
+  }
+
+  /**
+   * Handle /rm_ command: remove torrent and refresh progress message.
+   */
+  private async handleRemoveCommand(ctx: MyContext) {
+    if (!ctx.message?.text) return;
+    const uid = ctx.message.text.replace('/rm_', '');
+    try {
+      await this.torrentService.removeTorrentByUid(uid);
+      await ctx.reply(ctx.t('torrents-removed-success'));
+      const chatId = ctx.chatId;
+      if (chatId !== undefined) {
+        await this.createOrUpdateTorrentsMessage(chatId, true);
+      }
+    } catch (error) {
+      this.logger.error(error, 'Failed to remove torrent');
+      await ctx.reply(ctx.t('torrent-remove-error'));
+    }
+  }
+
+  /**
+   * Handle torrent removal from inline keyboard button (callback).
+   */
+  private async handleTorrentRemove(
+    ctx: MyContext,
+    uid: string,
+  ) {
+    try {
+      await this.torrentService.removeTorrentByUid(uid);
+      await ctx.answerCallbackQuery({ text: ctx.t('torrents-removed-success') });
+      const chatId = ctx.chatId;
+      if (chatId !== undefined) {
+        await this.createOrUpdateTorrentsMessage(chatId, true);
+      }
+    } catch {
+      await ctx.answerCallbackQuery({ text: ctx.t('torrents-removed-error') });
+      return;
+    }
+  }
+
+  /**
+   * Handle /dl_ command: download and add torrent, then trigger progress update.
+   */
+  private async handleDownloadCommand(ctx: MyContext) {
+    if (!ctx.message?.text) return;
+
+    const uid = ctx.message.text.replace('/dl_', '');
+    const [seName, id] = uid.split('_');
+
+    const downloadResult = await this.torrentService.downloadTorrentFile(
+      seName,
+      id,
+      this.searchEngines,
+    );
+    if (!downloadResult.ok) {
+      await ctx.reply(ctx.t('torrent-download-error'));
+      return;
+    }
+
+    const addResult = await this.torrentService.addTorrent({
+      torrent: downloadResult.value,
+      uid,
+      chatId: ctx.chatId as number,
+      searchEngine: seName,
+      trackerId: id,
+    });
+
+    if (!addResult.ok) {
+      await ctx.reply(ctx.t('torrent-download-error'));
+      return;
+    }
+
+    const chatId = ctx.chatId as number;
+    // Add this chat to tracking so periodic updater includes it
+    if (!this.chatTorrents.has(chatId)) {
+      this.chatTorrents.set(chatId, new Set());
+    }
+    this.chatTorrents.get(chatId)!.add(uid);
+
+    // Trigger immediate update to show progress message (force refresh)
+    await this.createOrUpdateTorrentsMessage(chatId, true);
   }
 
   public getCommands(): Array<{ command: string; descriptionKey: string }> {
@@ -155,12 +231,13 @@ export class TorrentHandler extends Composer<MyContext> {
       return;
     }
 
-
     const hashes = metas.map((m) => m.hash);
 
     let torrents: QBittorrentTorrent[];
     try {
-      torrents = (await this.torrentService.getTorrentsByHash(hashes)) as QBittorrentTorrent[];
+      torrents = (await this.torrentService.getTorrentsByHash(
+        hashes,
+      )) as QBittorrentTorrent[];
     } catch {
       return;
     }
@@ -187,18 +264,18 @@ export class TorrentHandler extends Composer<MyContext> {
 
     if (completedTorrents.length > 0) {
       const chatLocale =
-          (await this.chatSettingsRepository?.getLocale(chatId)) ?? 'en';
+        (await this.chatSettingsRepository?.getLocale(chatId)) ?? 'en';
       const texts = completedTorrents.map((torrent) => {
         const meta = metaByHash.get(torrent.hash);
         const uid = meta?.uid ?? '';
         const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
         const t = fluent.withLocale(chatLocale);
-          return t('torrent-message-completed', {
-            title: torrent.name ?? '',
-            progress,
-            files: `/ls_${uid}`,
-            remove: `/rm_${uid}`,
-          });
+        return t('torrent-message-completed', {
+          title: torrent.name ?? '',
+          progress,
+          files: `/ls_${uid}`,
+          remove: `/rm_${uid}`,
+        });
       });
       const text = texts.join('\n');
       try {
@@ -220,26 +297,26 @@ export class TorrentHandler extends Composer<MyContext> {
       const texts = pendingTorrents.map((torrent) => {
         const meta = metaByHash.get(torrent.hash);
         const uid = meta?.uid ?? '';
-          const dlspeed = torrent.dlspeed ?? 0;
-          const speed = `${this.torrentService.formatBytes(dlspeed)}/s`;
-          const etaStr = (() => {
-            if (torrent.eta === undefined) return '∞';
-            if (torrent.eta >= 8_640_000) return '∞';
-            return this.torrentService.formatDuration(torrent.eta);
-          })();
+        const dlspeed = torrent.dlspeed ?? 0;
+        const speed = `${this.torrentService.formatBytes(dlspeed)}/s`;
+        const etaStr = (() => {
+          if (torrent.eta === undefined) return '∞';
+          if (torrent.eta >= 8_640_000) return '∞';
+          return this.torrentService.formatDuration(torrent.eta);
+        })();
         const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
         const t = fluent.withLocale(chatLocale);
-          return t('torrent-message-in-progress', {
-            title: torrent.name ?? '',
-            seeds: torrent.num_seeds ?? 0,
-            maxSeeds: torrent.num_complete ?? 0,
-            peers: torrent.num_leechs ?? 0,
-            maxPeers: torrent.num_incomplete ?? 0,
-            speed,
-            eta: etaStr,
-            progress,
-            remove: `/rm_${uid}`,
-          });
+        return t('torrent-message-in-progress', {
+          title: torrent.name ?? '',
+          seeds: torrent.num_seeds ?? 0,
+          maxSeeds: torrent.num_complete ?? 0,
+          peers: torrent.num_leechs ?? 0,
+          maxPeers: torrent.num_incomplete ?? 0,
+          speed,
+          eta: etaStr,
+          progress,
+          remove: `/rm_${uid}`,
+        });
       });
 
       const text = texts.join('\n');
@@ -314,63 +391,9 @@ export class TorrentHandler extends Composer<MyContext> {
   }
 }
 
-export async function handleDownloadCommand(
-  ctx: MyContext,
-  torrentService: TorrentService,
-  searchEngines: SearchEngine[],
-) {
-  if (!ctx.message?.text) return;
 
-  const uid = ctx.message.text.replace('/dl_', '');
-  const [seName, id] = uid.split('_');
 
-  const downloadResult = await torrentService.downloadTorrentFile(
-    seName,
-    id,
-    searchEngines,
-  );
-  if (!downloadResult.ok) {
-    await ctx.reply(ctx.t('torrent-download-error'));
-    return;
-  }
 
-  const addResult = await torrentService.addTorrent({
-    torrent: downloadResult.value,
-    uid,
-    chatId: ctx.chatId as number,
-    searchEngine: seName,
-    trackerId: id,
-  });
-
-  if (!addResult.ok) {
-    await ctx.reply(ctx.t('torrent-download-error'));
-    return;
-  }
-
-  // Inform user and show current torrents list (stats, files/remove links)
-  await ctx.reply(ctx.t('torrent-download-success', { uid }));
-  try {
-    await handleTorrentsListCommand(ctx, torrentService);
-  } catch {
-    // ignore errors while building list, user already got success reply
-  }
-}
-
-export async function handleRemoveCommand(
-  ctx: MyContext,
-  torrentService: TorrentService,
-  logger: Logger,
-) {
-  if (!ctx.message?.text) return;
-  const uid = ctx.message.text.replace('/rm_', '');
-  try {
-    await torrentService.removeTorrentByUid(uid);
-    await ctx.reply(ctx.t('torrents-removed-success'));
-  } catch (error) {
-    logger.error(error, 'Failed to remove torrent');
-    await ctx.reply(ctx.t('torrent-remove-error'));
-  }
-}
 
 // Torrent List handlers
 export async function handleTorrentsListCommand(
@@ -429,31 +452,7 @@ export async function handleTorrentFiles(
   await ctx.reply(text, { parse_mode: 'HTML' });
 }
 
-export async function handleTorrentRemove(
-  ctx: MyContext,
-  torrentService: TorrentService,
-  uid: string,
-  page: number,
-) {
-  try {
-    await torrentService.removeTorrentByUid(uid);
-    await ctx.answerCallbackQuery({ text: ctx.t('torrents-removed-success') });
-  } catch {
-    await ctx.answerCallbackQuery({ text: ctx.t('torrents-removed-error') });
-    return;
-  }
 
-  if (ctx.chatId === undefined) return;
-  try {
-    const result = await buildTorrentsList(ctx, torrentService, page);
-    await ctx.editMessageText(result.text, {
-      parse_mode: 'HTML',
-      reply_markup: result.keyboard,
-    });
-  } catch {
-    // Ignore error on refresh
-  }
-}
 
 export async function handleListFilesCommand(
   ctx: MyContext,
