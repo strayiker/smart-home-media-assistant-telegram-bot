@@ -145,7 +145,8 @@ container.registerFactory('TorrentHandler', () => {
   if (chatSettings !== undefined)
     options.chatSettingsRepository = chatSettings as ChatSettingsRepository;
   if (chatMessageState !== undefined)
-    options.chatMessageStateRepository = chatMessageState as ChatMessageStateRepository;
+    options.chatMessageStateRepository =
+      chatMessageState as ChatMessageStateRepository;
 
   const inst = new TorrentHandler(options as unknown as TorrentHandlerOptions);
   try {
@@ -220,7 +221,10 @@ container.registerFactory('UserRepository', () => {
 
 container.registerFactory('ChatMessageStateRepository', () => {
   const orm = container.resolve<MikroORM>('ORM');
-  if (!orm) throw new Error('ORM not registered; ChatMessageStateRepository requires ORM');
+  if (!orm)
+    throw new Error(
+      'ORM not registered; ChatMessageStateRepository requires ORM',
+    );
   return new ChatMessageStateRepository(orm.em.fork());
 });
 

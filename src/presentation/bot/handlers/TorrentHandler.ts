@@ -46,7 +46,6 @@ export class TorrentHandler extends Composer<MyContext> {
   private timeout?: NodeJS.Timeout;
   private chatSettingsRepository: ChatSettingsRepository | undefined;
   private chatMessageStateRepository: ChatMessageStateRepository | undefined;
-  private cleanupTimeout?: NodeJS.Timeout;
 
   constructor(options: TorrentHandlerOptions) {
     super();
@@ -61,14 +60,11 @@ export class TorrentHandler extends Composer<MyContext> {
       this.timeout = setInterval(() => {
         void this.createOrUpdateTorrentsMessages();
       }, 5 * 1000);
-      
+
       // Initialize state from database after a short delay
       setTimeout(() => {
         void this.initialize();
       }, 1000);
-      
-      // Start periodic cleanup of expired states
-      this.startCleanup();
     }
 
     // ensure we can cleanup the interval when application stops
@@ -139,7 +135,6 @@ export class TorrentHandler extends Composer<MyContext> {
 
   public dispose() {
     if (this.timeout) clearInterval(this.timeout);
-    if (this.cleanupTimeout) clearInterval(this.cleanupTimeout);
   }
 
   /**
@@ -434,13 +429,13 @@ export class TorrentHandler extends Composer<MyContext> {
       // Remove from tracking BEFORE deleting message to prevent race conditions
       this.chatTorrents.delete(chatId);
       this.chatMessages.delete(chatId);
-      
+
       // Delete from database
       await this.chatMessageStateRepository?.deleteMessageState(
         chatId,
         'torrent_progress',
       );
-      
+
       await this.bot.api.deleteMessage(chatId, message.message_id);
     } catch (error) {
       this.logger.error(
@@ -463,6 +458,23 @@ export class TorrentHandler extends Composer<MyContext> {
     }
 
     try {
+      // Remove expired records immediately on initialization
+      try {
+        const removed =
+          await this.chatMessageStateRepository.cleanupExpiredMessages();
+        if (removed > 0) {
+          this.logger.debug(
+            { count: removed },
+            'Removed expired message states on init',
+          );
+        }
+      } catch (error) {
+        this.logger.error(
+          error,
+          'Failed to cleanup expired message states on init',
+        );
+      }
+
       const states =
         await this.chatMessageStateRepository.getAllActiveTorrentProgressMessages();
 
@@ -490,30 +502,6 @@ export class TorrentHandler extends Composer<MyContext> {
     } catch (error) {
       this.logger.error(error, 'Failed to initialize torrent message state');
     }
-  }
-
-  /**
-   * Start periodic cleanup of expired message states.
-   * Runs every hour by default.
-   */
-  private startCleanup(): void {
-    const cleanupInterval = 60 * 60 * 1000; // 1 hour
-
-    this.cleanupTimeout = setInterval(async () => {
-      if (!this.chatMessageStateRepository) return;
-
-      try {
-        const count =
-          await this.chatMessageStateRepository.cleanupExpiredMessages();
-        if (count > 0) {
-          this.logger.debug({ count }, 'Cleaned up expired message states');
-        }
-      } catch (error) {
-        this.logger.error(error, 'Failed to cleanup expired message states');
-      }
-    }, cleanupInterval);
-
-    this.logger.debug('Started periodic cleanup of expired message states');
   }
 }
 
