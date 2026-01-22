@@ -9,6 +9,14 @@ import type { MyContext } from '../../../shared/context.js';
 import { formatBytes } from '../../../shared/utils/formatBytes.js';
 import type { Logger } from '../../../shared/utils/logger.js';
 
+// simple HTML escaper for Telegram HTML parse_mode
+const escapeHtml = (s: unknown) =>
+  String(s)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+
 export interface SearchHandlerOptions {
   searchService: SearchService;
   logger: Logger;
@@ -58,7 +66,6 @@ export class SearchHandler extends Composer<MyContext> {
 
         const searchResults = results.value;
         const { text, keyboard } = this.formatSearchResultsMessage(
-          ctx,
           searchResults.slice(0, 5 * (parsed.page + 1)),
           parsed.query,
           parsed.page,
@@ -88,14 +95,13 @@ export class SearchHandler extends Composer<MyContext> {
   }
 
   private formatSearchResultsMessage(
-    ctx: MyContext,
     results: (readonly [SearchEngine, SearchResult])[],
     _query: string,
     page: number,
   ): { text: string; keyboard: InlineKeyboard } {
     const lines = results
       .slice(0, 5 * (page + 1))
-      .map(([se, result]) => this.formatSearchResultLine(ctx, se, result));
+      .map(([se, result]) => this.formatSearchResultLine(se, result));
 
     const text = lines.join('\n');
 
@@ -117,20 +123,11 @@ export class SearchHandler extends Composer<MyContext> {
   }
 
   private formatSearchResultLine(
-    ctx: MyContext,
     se: SearchEngine,
     result: SearchResult,
   ): string {
     const size = formatBytes(result.size ?? 0);
     const download = `/dl_${se.name}_${result.id}`;
-
-    const escapeHtml = (s: unknown) =>
-      String(s)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;');
-
     const titleLink = result.detailsUrl
       ? `<a href="${escapeHtml(result.detailsUrl)}">${escapeHtml(result.title)}</a>`
       : escapeHtml(result.title);
