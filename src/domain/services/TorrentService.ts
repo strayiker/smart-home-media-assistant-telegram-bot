@@ -61,14 +61,14 @@ export class TorrentService {
 
         // Handle unique constraint on uid: if metadata with same uid already exists,
         // fetch it and return existing hash (remove the newly added torrent in qBittorrent).
+        const ce = createError as unknown as { name?: string; code?: string; message?: string };
         const isUniqueUidError =
-          (createError && typeof createError === 'object' &&
+          (ce && typeof ce === 'object' &&
             // MikroORM / better-sqlite exposes name/code
-            ((('name' in (createError as any) && (createError as any).name === 'UniqueConstraintViolationException') ||
-              ('code' in (createError as any) && (createError as any).code === 'SQLITE_CONSTRAINT_UNIQUE')))) ||
+            ((ce.name === 'UniqueConstraintViolationException') || (ce.code === 'SQLITE_CONSTRAINT_UNIQUE'))) ||
           // Fallback: inspect message
-          (typeof (createError as any)?.message === 'string' &&
-            (createError as any).message.includes('UNIQUE constraint failed: torrent_meta.uid'));
+          (typeof ce?.message === 'string' &&
+            ce.message.includes('UNIQUE constraint failed: torrent_meta.uid'));
 
         if (isUniqueUidError) {
           try {
