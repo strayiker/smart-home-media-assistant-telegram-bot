@@ -753,7 +753,7 @@ export async function buildTorrentsList(
   const items: string[] = [];
   const keyboard = new InlineKeyboard();
 
-  for (const meta of pageMetas) {
+    for (const meta of pageMetas) {
     const torrent = torrentByHash.get(meta.hash);
     if (!torrent) continue;
 
@@ -764,12 +764,18 @@ export async function buildTorrentsList(
         : torrentService.formatDuration(torrent.eta);
 
     if (torrent.progress < 1) {
+      // Use the same detailed in-progress template as progress messages
       items.push(
-        ctx.t('torrents-item-downloading', {
-          title: torrent.name,
-          progress,
+        ctx.t('torrent-message-in-progress', {
+          title: torrent.name ?? '',
+          seeds: torrent.num_seeds ?? 0,
+          maxSeeds: torrent.num_complete ?? 0,
+          peers: torrent.num_leechs ?? 0,
+          maxPeers: torrent.num_incomplete ?? 0,
           speed: `${torrentService.formatBytes(torrent.dlspeed)}/s`,
           eta,
+          progress,
+          remove: `/rm_${meta.uid}`,
         }),
       );
       keyboard
@@ -779,11 +785,13 @@ export async function buildTorrentsList(
         )
         .row();
     } else {
+      // Use the same completed template as progress messages for parity
       items.push(
-        ctx.t('torrents-item-completed', {
-          title: torrent.name,
+        ctx.t('torrent-message-completed', {
+          title: torrent.name ?? '',
           progress,
-          size: torrentService.formatBytes(torrent.size),
+          files: `/ls_${meta.uid}`,
+          remove: `/rm_${meta.uid}`,
         }),
       );
       keyboard

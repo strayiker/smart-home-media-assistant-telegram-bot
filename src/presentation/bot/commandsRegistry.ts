@@ -43,7 +43,9 @@ export class CommandsRegistry {
         if (typeof withLocale === 'function') {
           const t = withLocale.call(fluent, locale) as unknown;
           if (typeof t === 'function') {
-            description = (t as (id: string) => string)(entry.descriptionKey) ?? description;
+            description =
+              (t as (id: string) => string)(entry.descriptionKey) ??
+              description;
           }
         } else {
           // Fallback to common method names
