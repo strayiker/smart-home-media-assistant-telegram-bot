@@ -775,12 +775,6 @@ export async function buildTorrentsList(
           remove: `/rm_${meta.uid}`,
         }),
       );
-      keyboard
-        .text(
-          ctx.t('torrents-btn-remove'),
-          `torrents:remove:${meta.uid}:${safePage}`,
-        )
-        .row();
     } else {
       // Use the same completed template as progress messages for parity
       items.push(
@@ -791,16 +785,6 @@ export async function buildTorrentsList(
           remove: `/rm_${meta.uid}`,
         }),
       );
-      keyboard
-        .text(
-          ctx.t('torrents-btn-files'),
-          `torrents:files:${meta.uid}:${safePage}`,
-        )
-        .text(
-          ctx.t('torrents-btn-remove'),
-          `torrents:remove:${meta.uid}:${safePage}`,
-        )
-        .row();
     }
   }
 
@@ -829,7 +813,7 @@ export async function buildTorrentsList(
   }
 
   return {
-    text: `${ctx.t('torrents-list-title', { page: safePage, totalPages })}\n\n${items.join('\n\n')}`,
+    text: `${ctx.t('torrents-list-title', { page: safePage, totalPages })}\n${items.join('\n')}`,
     keyboard,
   };
 }
