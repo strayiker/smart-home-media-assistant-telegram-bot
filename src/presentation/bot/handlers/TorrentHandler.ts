@@ -730,10 +730,7 @@ export async function buildTorrentsList(
   const metas = await torrentService.getTorrentMetasByChatId(ctx.chatId);
 
   if (metas.length === 0) {
-    const keyboard = new InlineKeyboard().text(
-      ctx.t('torrents-btn-refresh'),
-      'torrents:refresh:1',
-    );
+    const keyboard = new InlineKeyboard();
     return {
       text: `${ctx.t('torrents-list-empty')}\n${ctx.t('torrents-list-empty-hint')}`,
       keyboard,
@@ -808,10 +805,7 @@ export async function buildTorrentsList(
   }
 
   if (items.length === 0) {
-    const emptyKeyboard = new InlineKeyboard().text(
-      ctx.t('torrents-btn-refresh'),
-      `torrents:refresh:${safePage}`,
-    );
+    const emptyKeyboard = new InlineKeyboard();
     return {
       text: `${ctx.t('torrents-list-empty')}\n${ctx.t('torrents-list-empty-hint')}`,
       keyboard: emptyKeyboard,
@@ -825,10 +819,6 @@ export async function buildTorrentsList(
         `torrents:page:${safePage - 1}`,
       );
     }
-    keyboard.text(
-      ctx.t('torrents-btn-refresh'),
-      `torrents:refresh:${safePage}`,
-    );
     if (safePage < totalPages) {
       keyboard.text(
         ctx.t('torrents-btn-next'),
@@ -836,11 +826,6 @@ export async function buildTorrentsList(
       );
     }
     keyboard.row();
-  } else {
-    keyboard.text(
-      ctx.t('torrents-btn-refresh'),
-      `torrents:refresh:${safePage}`,
-    );
   }
 
   return {
