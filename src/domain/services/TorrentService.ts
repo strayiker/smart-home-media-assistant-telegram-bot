@@ -303,9 +303,10 @@ export class TorrentService {
     const fileName = `<a href="${dlCmd}">${file.name}</a>`;
     const fileSize = this.formatBytes(file.size);
 
-    return ctx.t('torrent-file-item', {
-      fileName,
-      fileSize,
+    return ctx.t('torrent-file-message', {
+      name: fileName,
+      size: fileSize,
+      download: dlCmd,
     });
   }
 
