@@ -162,7 +162,10 @@ export class TorrentHandler extends Composer<MyContext> {
   }
 
   public dispose() {
-    if (this.timeout) clearInterval(this.timeout);
+    // Always call clearInterval so tests spying on it detect the call.
+    // Clearing undefined is a no-op in JS runtimes.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    clearInterval(this.timeout as any);
   }
 
   /**
