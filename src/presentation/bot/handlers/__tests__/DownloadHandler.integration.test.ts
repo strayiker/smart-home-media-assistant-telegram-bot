@@ -45,7 +45,7 @@ describe('DownloadHandler Integration Tests', () => {
       mockMediaService as MediaService,
     );
     container.registerInstance('Logger', mockLogger as Logger);
-    container.registerInstance('BotDataPath', '/tmp/test');
+    container.registerInstance('BotDataTorrentsPath', '/tmp/test');
 
     // Create DownloadHandler instance with mocks
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -79,7 +79,7 @@ describe('DownloadHandler Integration Tests', () => {
       expect(handler).toBeDefined();
     });
 
-    it('should use BotDataPath from DI container', () => {
+    it('should use BotDataTorrentsPath from DI container', () => {
       const handler = container.resolve<DownloadHandler>('DownloadHandler');
       expect(handler).toBeDefined();
     });

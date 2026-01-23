@@ -159,7 +159,7 @@ container.registerFactory('DownloadHandler', () => {
   const inst = new DownloadHandler({
     torrentService: torrentSvc,
     mediaService: mediaSvc,
-    dataPath: container.resolve<string>('BotDataPath'),
+    dataPath: container.resolve<string>('BotDataTorrentsPath'),
     logger: log,
   });
   try {

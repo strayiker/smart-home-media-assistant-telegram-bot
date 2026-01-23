@@ -97,7 +97,7 @@ export async function handleDownloadFileCommand(
     return;
   }
 
-  const filePath = path.resolve(path.join(dataPath, qbFile.name));
+  let filePath = path.resolve(path.join(dataPath, qbFile.name));
   // If file is missing on disk, reply with a clear message and log details.
   if (!fs.existsSync(filePath)) {
     logger.error(
@@ -106,6 +106,53 @@ export async function handleDownloadFileCommand(
     );
     // Don't return here — let the normal error path handle missing files
     // (tests mock file type and metadata, so returning would break tests).
+  }
+
+  // Try to get torrent details (save_path) from qBittorrent and probe alternative paths.
+  try {
+    const torrents = await torrentService.getTorrentsByHash([hash]);
+    const torrent = torrents && torrents.length > 0 ? torrents[0] : undefined;
+    const candidates: string[] = [filePath];
+    if (torrent?.save_path) {
+      candidates.unshift(
+        path.resolve(path.join(torrent.save_path, qbFile.name)),
+      );
+      // also try save_path + basename (in case qbFile.name contains subfolders)
+      candidates.push(
+        path.resolve(path.join(torrent.save_path, path.basename(qbFile.name))),
+      );
+    }
+    // Also try dataPath + basename
+    candidates.push(
+      path.resolve(path.join(dataPath, path.basename(qbFile.name))),
+    );
+
+    // Probe candidates and pick first existing one
+    for (const cand of candidates) {
+      try {
+        if (fs.existsSync(cand)) {
+          // prefer first existing candidate
+          // override filePath so downstream code uses the resolved path
+           
+          // (we intentionally shadow the const variable by reassigning the local)
+          // To allow reassignment, declare a new variable would require broader change —
+          // instead we rebind via this trick: create a new variable and then use it below.
+          // But simpler: use a let for filePath earlier. Replace declaration.
+          // (We'll change the original declaration to `let filePath` below.)
+          filePath = cand;
+          logger.debug({ cand }, 'Found torrent file candidate');
+          break;
+        }
+      } catch (error) {
+        logger.debug({ err: error, cand }, 'Error probing candidate path');
+      }
+    }
+    logger.debug(
+      { candidates, chosen: filePath },
+      'Torrent file path resolution',
+    );
+  } catch (error) {
+    logger.debug({ err: error }, 'Failed to resolve torrent save_path');
   }
 
   try {
@@ -227,13 +274,10 @@ async function handleLargeVideoFile(
             progressMessage.message_id,
             text,
           );
-          progressMessage.text = text;
         } catch {
-          /* empty */
+          // ignore edit errors
         }
       }
-    })
-    .on('end', async () => {
       try {
         await ctx.api.editMessageText(
           progressMessage.chat.id,
