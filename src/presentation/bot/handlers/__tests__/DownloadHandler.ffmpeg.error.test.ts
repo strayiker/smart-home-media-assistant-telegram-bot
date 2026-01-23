@@ -1,15 +1,16 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fs from 'node:fs';
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock fluent-ffmpeg before importing the handler
 vi.mock('fluent-ffmpeg', () => {
   return {
-    default: (filePath) => {
+    default: (_filePath: string) => {
       const events = new Map();
       const emitter: any = {
         outputOptions: () => emitter,
         outputFormat: () => emitter,
-        on: (ev: string, cb: Function) => {
+        on: (ev: string, cb: (...args: any[]) => void) => {
           events.set(ev, cb);
           return emitter;
         },

@@ -1,14 +1,14 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 // Mock fluent-ffmpeg before importing the handler
 vi.mock('fluent-ffmpeg', () => {
   return {
-    default: (filePath) => {
-      const events = new Map<string, Function>();
+    default: (_filePath: string) => {
+      const events = new Map<string, (...args: any[]) => void>();
       const emitter: any = {
         outputOptions: () => emitter,
         outputFormat: () => emitter,
-        on: (ev: string, cb: Function) => {
+        on: (ev: string, cb: (...args: any[]) => void) => {
           events.set(ev, cb);
           return emitter;
         },
@@ -28,6 +28,7 @@ vi.mock('fluent-ffmpeg', () => {
 });
 
 import fs from 'node:fs';
+
 import { handleDownloadFileCommand } from '../DownloadHandler.js';
 
 describe('DownloadHandler ffmpeg flow', () => {
@@ -74,7 +75,7 @@ describe('DownloadHandler ffmpeg flow', () => {
     // Spy on fs.rmSync to ensure cleanup called
     const rmSpy = vi
       .spyOn(fs, 'rmSync')
-      .mockImplementation(() => undefined as any);
+      .mockImplementation(() => undefined);
 
     // Start the flow (this will start ffmpeg via our mock and return)
     await handleDownloadFileCommand(

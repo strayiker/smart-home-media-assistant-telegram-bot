@@ -237,7 +237,7 @@ async function handleLargeVideoFile(
   // Choose vMaxBitrate: pick smallest tier >= videoStreamHeight, otherwise use highest tier
   const vMaxBitrate =
     MAX_VIDEO_BITRATE.find(([height]) => videoStreamHeight <= height)?.[1] ??
-    MAX_VIDEO_BITRATE[MAX_VIDEO_BITRATE.length - 1][1];
+    MAX_VIDEO_BITRATE.at(-1)[1];
   const vBitrate = Math.min(
     Math.floor((MAX_FILE_SIZE_KB * 8) / duration - aBitrate),
     vMaxBitrate ?? Infinity,
@@ -251,8 +251,8 @@ async function handleLargeVideoFile(
     );
     try {
       await ctx.reply(ctx.t('torrent-file-error'));
-    } catch (e) {
-      logger.debug({ e }, 'Failed to notify user about low bitrate');
+    } catch (error) {
+      logger.debug({ e: error }, 'Failed to notify user about low bitrate');
     }
     return;
   }
@@ -276,8 +276,8 @@ async function handleLargeVideoFile(
   const cleanupTmp = (file: string) => {
     try {
       fs.rmSync(file, { force: true });
-    } catch (err) {
-      logger.debug({ err, file }, 'Failed to remove tmp file');
+    } catch (error) {
+      logger.debug({ err: error, file }, 'Failed to remove tmp file');
     }
   };
 
@@ -317,11 +317,11 @@ async function handleLargeVideoFile(
               text,
             );
           }
-        } catch (err) {
-          logger.debug({ err }, 'Failed to edit progress message');
+        } catch (error) {
+          logger.debug({ err: error }, 'Failed to edit progress message');
         }
-      } catch (err) {
-        logger.debug({ err }, 'Error in progress handler');
+      } catch (error) {
+        logger.debug({ err: error }, 'Error in progress handler');
       }
     })
     .on('end', async () => {
@@ -336,18 +336,18 @@ async function handleLargeVideoFile(
               progressMessage.message_id,
               ctx.t('torrent-file-uploading'),
             );
-          } catch (err) {
+          } catch {
             // ignore edit errors
           }
         }
 
         await ctx.replyWithVideo(new InputFile(tmpFile), videoOptions);
-      } catch (err) {
-        logger.error(err, 'An error occurred while sending file');
+      } catch (error) {
+        logger.error(error, 'An error occurred while sending file');
         try {
           await ctx.reply(ctx.t('torrent-file-error'));
-        } catch (e) {
-          logger.debug({ e }, 'Failed to notify user about send error');
+        } catch (error) {
+          logger.debug({ e: error }, 'Failed to notify user about send error');
         }
       } finally {
         cleanupTmp(tmpFile);
@@ -357,8 +357,8 @@ async function handleLargeVideoFile(
       logger.error(error, 'An error occurred while compressing file');
       try {
         await ctx.reply(ctx.t('torrent-file-error'));
-      } catch (e) {
-        logger.debug({ e }, 'Failed to notify user about compression error');
+      } catch (error_) {
+        logger.debug({ e: error_ }, 'Failed to notify user about compression error');
       }
       cleanupTmp(tmpFile);
     })
