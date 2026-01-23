@@ -53,7 +53,7 @@ describe('DownloadHandler ffmpeg flow', () => {
     const mockLogger: any = { debug: vi.fn(), error: vi.fn(), warn: vi.fn() };
 
     // Build ctx with promise-resolvable replyWithVideo
-    let resolveSend: Function | null = null;
+    let resolveSend: (() => void) | null = null;
     const sendPromise = new Promise<void>((res) => {
       resolveSend = res;
     });

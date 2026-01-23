@@ -235,9 +235,10 @@ async function handleLargeVideoFile(
 ) {
   const aBitrate = 192;
   // Choose vMaxBitrate: pick smallest tier >= videoStreamHeight, otherwise use highest tier
+
   const vMaxBitrate =
     MAX_VIDEO_BITRATE.find(([height]) => videoStreamHeight <= height)?.[1] ??
-    MAX_VIDEO_BITRATE.at(-1)[1];
+    MAX_VIDEO_BITRATE.at(-1)?.[1];
   const vBitrate = Math.min(
     Math.floor((MAX_FILE_SIZE_KB * 8) / duration - aBitrate),
     vMaxBitrate ?? Infinity,
@@ -358,7 +359,10 @@ async function handleLargeVideoFile(
       try {
         await ctx.reply(ctx.t('torrent-file-error'));
       } catch (error_) {
-        logger.debug({ e: error_ }, 'Failed to notify user about compression error');
+        logger.debug(
+          { e: error_ },
+          'Failed to notify user about compression error',
+        );
       }
       cleanupTmp(tmpFile);
     })
