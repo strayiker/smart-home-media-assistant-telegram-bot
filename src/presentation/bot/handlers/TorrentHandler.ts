@@ -46,7 +46,7 @@ export class TorrentHandler extends Composer<MyContext> {
   private activeUpdates = new Map<number, Promise<void>>();
   // Per-chat lock queue to prevent concurrent send/update/delete races
   private chatLocks = new Map<number, Promise<void>>();
-  private timeout: NodeJS.Timeout;
+  private timeout?: NodeJS.Timeout;
   private chatSettingsRepository: ChatSettingsRepository;
   private chatMessageStateRepository: ChatMessageStateRepository;
 
@@ -59,14 +59,14 @@ export class TorrentHandler extends Composer<MyContext> {
     this.chatSettingsRepository = options.chatSettingsRepository;
     this.chatMessageStateRepository = options.chatMessageStateRepository;
 
-    this.timeout = setInterval(() => {
-      void this.createOrUpdateTorrentsMessages();
-    }, 5 * 1000);
-
-    // Initialize state from database after a short delay
-    setTimeout(() => {
-      void this.initialize();
-    }, 1000);
+    // Initialize state from database first, then start periodic updater.
+    // This prevents races where the periodic updater runs before we restore
+    // persisted message state into memory.
+    void this.initialize().then(() => {
+      this.timeout = setInterval(() => {
+        void this.createOrUpdateTorrentsMessages();
+      }, 5 * 1000);
+    });
 
     // ensure we can cleanup the interval when application stops
     this.dispose = this.dispose.bind(this);
@@ -162,7 +162,7 @@ export class TorrentHandler extends Composer<MyContext> {
   }
 
   public dispose() {
-    clearInterval(this.timeout);
+    if (this.timeout) clearInterval(this.timeout);
   }
 
   /**
@@ -305,8 +305,9 @@ export class TorrentHandler extends Composer<MyContext> {
 
         let message = this.chatMessages.get(chatId);
 
-        // Delete progress message only when torrents complete (not on forced refresh)
-        if (message && completedTorrents.length > 0 && !refresh) {
+        // Delete progress message only when there are no pending torrents
+        // (i.e. all torrents are completed) and this is not a forced refresh.
+        if (message && pendingTorrents.length === 0 && !refresh) {
           await this.deleteTorrentsMessage(message);
           message = undefined;
         }
