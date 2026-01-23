@@ -74,6 +74,8 @@ export class TorrentHandler extends Composer<MyContext> {
     // Command handlers
     this.on('message::bot_command', async (ctx, next) => {
       if (!ctx.message.text) return next();
+      // Let more specific `/dl_file_...` commands be handled by `DownloadHandler`.
+      if (ctx.message.text.startsWith('/dl_file_')) return next();
       if (ctx.message.text.startsWith('/dl_')) {
         logger.debug({ text: ctx.message.text }, 'Download command invoked');
         return this.handleDownloadCommand(ctx);
