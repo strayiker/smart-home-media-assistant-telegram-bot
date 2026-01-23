@@ -73,9 +73,7 @@ describe('DownloadHandler ffmpeg flow', () => {
     };
 
     // Spy on fs.rmSync to ensure cleanup called
-    const rmSpy = vi
-      .spyOn(fs, 'rmSync')
-      .mockImplementation(() => undefined);
+    const rmSpy = vi.spyOn(fs, 'rmSync').mockImplementation(() => {});
 
     // Start the flow (this will start ffmpeg via our mock and return)
     await handleDownloadFileCommand(
