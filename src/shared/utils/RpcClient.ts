@@ -17,7 +17,10 @@ export class RpcClient {
     private url: string,
     private username?: string,
     private password?: string,
-  ) {}
+  ) {
+    this.username = username ?? undefined;
+    this.password = password ?? undefined;
+  }
 
   async sendRequest<T, R>(request: RpcRequest<T>): Promise<RpcResponse<R>> {
     const headers: HeadersInit = {

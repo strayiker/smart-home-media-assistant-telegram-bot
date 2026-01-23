@@ -6,9 +6,9 @@ import type { User } from '../entities/User.js';
 export class AuthService {
   private userRepository: UserRepository;
   private secretKey: string;
-  private logger: Logger | undefined;
+  private logger: Logger;
 
-  constructor(userRepository: UserRepository, secretKey: string, logger?: Logger) {
+  constructor(userRepository: UserRepository, secretKey: string, logger: Logger) {
     this.userRepository = userRepository;
     this.secretKey = secretKey;
     this.logger = logger;
@@ -30,10 +30,10 @@ export class AuthService {
       const existing = await this.userRepository.findByTelegramId(telegramId);
       if (existing) return true;
       await this.userRepository.create(telegramId);
-      this.logger?.info({ telegramId }, 'User created via secret onboarding');
+      this.logger.info({ telegramId }, 'User created via secret onboarding');
       return true;
     } catch (error) {
-      this.logger?.error(error, 'Failed to create user during secret validation');
+      this.logger.error(error, 'Failed to create user during secret validation');
       return false;
     }
   }

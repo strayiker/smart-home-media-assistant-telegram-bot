@@ -43,13 +43,20 @@ describe('TorrentHandler Integration Tests', () => {
     container.registerInstance('Logger', mockLogger as Logger);
     container.registerInstance('SearchEngines', mockSearchEngines);
 
-    // Create TorrentHandler instance with mocks
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const torrentHandler = new TorrentHandler({
-      torrentService: mockTorrentService as TorrentService,
-      logger: mockLogger as Logger,
-      searchEngines: mockSearchEngines,
-    });
+    // Register minimal Bot and repository instances required by DI
+    container.registerInstance('Bot', {} as any);
+    container.registerInstance(
+      'ChatSettingsRepository',
+      { getLocale: vi.fn().mockResolvedValue('en') } as any,
+    );
+    container.registerInstance(
+      'ChatMessageStateRepository',
+      {
+        getAllActiveTorrentProgressMessages: vi.fn().mockResolvedValue([]),
+        cleanupExpiredMessages: vi.fn().mockResolvedValue(0),
+      } as any,
+    );
+    // TorrentHandler will be resolved from DI during tests
   });
 
   describe('DI Container Integration', () => {

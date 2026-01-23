@@ -109,46 +109,21 @@ container.registerFactory('TorrentHandler', () => {
   const svc = container.resolve<TorrentService>('TorrentService');
   const log = container.resolve<PinoLogger>('Logger');
   const engines = container.resolve<SearchEngine[]>('SearchEngines');
-  // Resolve Bot and ChatSettingsRepository instances so handler can perform background updates and use chat locale
-  // These are optional in test environments - resolve guardedly to avoid throwing when not registered
-  let bot: unknown | undefined;
-  let chatSettings: unknown | undefined;
-  let chatMessageState: unknown | undefined;
-  try {
-    bot = container.resolve('Bot');
-  } catch {
-    bot = undefined;
-  }
-  try {
-    chatSettings = container.resolve('ChatSettingsRepository');
-  } catch {
-    chatSettings = undefined;
-  }
-  try {
-    chatMessageState = container.resolve('ChatMessageStateRepository');
-  } catch {
-    chatMessageState = undefined;
-  }
-  const options: Partial<{
-    torrentService: TorrentService;
-    logger: PinoLogger;
-    searchEngines: SearchEngine[];
-    bot: Bot<MyContext>;
-    chatSettingsRepository: ChatSettingsRepository;
-    chatMessageStateRepository: ChatMessageStateRepository;
-  }> = {
+  // Resolve Bot and repositories; these must be registered in DI
+  const bot = container.resolve<Bot<MyContext>>('Bot');
+  const chatSettings = container.resolve<ChatSettingsRepository>('ChatSettingsRepository');
+  const chatMessageState = container.resolve<ChatMessageStateRepository>('ChatMessageStateRepository');
+
+  const options: TorrentHandlerOptions = {
     torrentService: svc,
     logger: log,
     searchEngines: engines,
+    bot,
+    chatSettingsRepository: chatSettings,
+    chatMessageStateRepository: chatMessageState,
   };
-  if (bot !== undefined) options.bot = bot as Bot<MyContext>;
-  if (chatSettings !== undefined)
-    options.chatSettingsRepository = chatSettings as ChatSettingsRepository;
-  if (chatMessageState !== undefined)
-    options.chatMessageStateRepository =
-      chatMessageState as ChatMessageStateRepository;
 
-  const inst = new TorrentHandler(options as unknown as TorrentHandlerOptions);
+  const inst = new TorrentHandler(options);
   try {
     const registry = container.resolve<CommandsRegistry>('CommandsRegistry');
     const cmds = (inst as unknown as CommandProvider).getCommands?.() ?? [];

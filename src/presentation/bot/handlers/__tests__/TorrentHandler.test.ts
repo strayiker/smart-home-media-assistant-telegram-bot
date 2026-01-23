@@ -12,6 +12,7 @@ describe('TorrentHandler unit tests', () => {
   let mockTorrentService: TorrentService;
   let mockLogger: Logger;
   let mockChatSettings: ChatSettingsRepository;
+  let mockChatMessageState: any;
   let mockBot: Bot<MyContext> | undefined;
   let handler: TorrentHandler;
   let ctx: MyContext;
@@ -35,6 +36,14 @@ describe('TorrentHandler unit tests', () => {
       getLocale: vi.fn(),
     } as unknown as ChatSettingsRepository;
 
+    mockChatMessageState = {
+      getMessageState: vi.fn(),
+      saveMessageState: vi.fn(),
+      deleteMessageState: vi.fn(),
+      getAllActiveTorrentProgressMessages: vi.fn().mockResolvedValue([]),
+      cleanupExpiredMessages: vi.fn().mockResolvedValue(0),
+    };
+
     mockBot = {} as Bot<MyContext> | undefined;
 
     mockMessage = {
@@ -56,6 +65,7 @@ describe('TorrentHandler unit tests', () => {
       searchEngines: [],
       bot: mockBot,
       chatSettingsRepository: mockChatSettings,
+      chatMessageStateRepository: mockChatMessageState,
     });
 
     // ensure ctx has callback helper by default

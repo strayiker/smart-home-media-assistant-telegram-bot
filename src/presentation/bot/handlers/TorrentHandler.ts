@@ -9,6 +9,7 @@ import { logger } from '../../../logger.js';
 import type { MyContext } from '../../../shared/context.js';
 import { fluent } from '../../../shared/fluent.js';
 import type { Logger } from '../../../shared/utils/logger.js';
+import { retryAsync } from '../../../shared/utils/retry.js';
 
 const PER_PAGE = 5;
 
@@ -30,24 +31,24 @@ export interface TorrentHandlerOptions {
   torrentService: TorrentService;
   logger: Logger;
   searchEngines: SearchEngine[];
-  bot?: Bot<MyContext>;
-  chatSettingsRepository?: ChatSettingsRepository;
-  chatMessageStateRepository?: ChatMessageStateRepository;
+  bot: Bot<MyContext>;
+  chatSettingsRepository: ChatSettingsRepository;
+  chatMessageStateRepository: ChatMessageStateRepository;
 }
 
 export class TorrentHandler extends Composer<MyContext> {
   private torrentService: TorrentService;
   private logger: Logger;
   private searchEngines: SearchEngine[];
-  private bot: Bot<MyContext> | undefined;
+  private bot: Bot<MyContext>;
   private chatMessages = new Map<number, Message>();
   private chatTorrents = new Map<number, Set<string>>();
   private activeUpdates = new Map<number, Promise<void>>();
   // Per-chat lock queue to prevent concurrent send/update/delete races
   private chatLocks = new Map<number, Promise<void>>();
-  private timeout?: NodeJS.Timeout;
-  private chatSettingsRepository: ChatSettingsRepository | undefined;
-  private chatMessageStateRepository: ChatMessageStateRepository | undefined;
+  private timeout: NodeJS.Timeout;
+  private chatSettingsRepository: ChatSettingsRepository;
+  private chatMessageStateRepository: ChatMessageStateRepository;
 
   constructor(options: TorrentHandlerOptions) {
     super();
@@ -58,16 +59,14 @@ export class TorrentHandler extends Composer<MyContext> {
     this.chatSettingsRepository = options.chatSettingsRepository;
     this.chatMessageStateRepository = options.chatMessageStateRepository;
 
-    if (this.bot) {
-      this.timeout = setInterval(() => {
-        void this.createOrUpdateTorrentsMessages();
-      }, 5 * 1000);
+    this.timeout = setInterval(() => {
+      void this.createOrUpdateTorrentsMessages();
+    }, 5 * 1000);
 
-      // Initialize state from database after a short delay
-      setTimeout(() => {
-        void this.initialize();
-      }, 1000);
-    }
+    // Initialize state from database after a short delay
+    setTimeout(() => {
+      void this.initialize();
+    }, 1000);
 
     // ensure we can cleanup the interval when application stops
     this.dispose = this.dispose.bind(this);
@@ -136,14 +135,20 @@ export class TorrentHandler extends Composer<MyContext> {
   }
 
   // Helper to run a function under a per-chat lock
-  private async withChatLock<T>(chatId: number, fn: () => Promise<T>): Promise<T> {
+  private async withChatLock<T>(
+    chatId: number,
+    fn: () => Promise<T>,
+  ): Promise<T> {
     const tail = this.chatLocks.get(chatId) ?? Promise.resolve();
     let release!: () => void;
     const next = new Promise<void>((res) => {
       release = res;
     });
     // chain the lock
-    this.chatLocks.set(chatId, tail.then(() => next));
+    this.chatLocks.set(
+      chatId,
+      tail.then(() => next),
+    );
     try {
       // wait for previous ops
       await tail;
@@ -157,7 +162,7 @@ export class TorrentHandler extends Composer<MyContext> {
   }
 
   public dispose() {
-    if (this.timeout) clearInterval(this.timeout);
+    clearInterval(this.timeout);
   }
 
   /**
@@ -244,7 +249,7 @@ export class TorrentHandler extends Composer<MyContext> {
     chatId: number,
     refresh: boolean = false,
   ) {
-    if (!this.bot) return;
+    // bot is required
 
     // Prevent concurrent updates for the same chat
     const existingUpdate = this.activeUpdates.get(chatId);
@@ -311,8 +316,7 @@ export class TorrentHandler extends Composer<MyContext> {
           const hashesPending = pendingTorrents.map((t) => t.hash);
           this.chatTorrents.set(chatId, new Set(hashesPending));
 
-          const chatLocale =
-            (await this.chatSettingsRepository?.getLocale(chatId)) ?? 'en';
+          const chatLocale = (await this.chatSettingsRepository.getLocale(chatId)) ?? 'en';
           const texts = pendingTorrents.map((torrent) => {
             const meta = metaByHash.get(torrent.hash);
             const uid = meta?.uid ?? '';
@@ -365,10 +369,9 @@ export class TorrentHandler extends Composer<MyContext> {
     text: string,
     torrentUids: string[] = [],
   ) {
-    if (!this.bot) return;
     return this.withChatLock(chatId, async () => {
       try {
-        const message = await this.bot!.api.sendMessage(chatId, text, {
+        const message = await this.bot.api.sendMessage(chatId, text, {
           parse_mode: 'HTML',
         });
         // store message for future edits
@@ -376,18 +379,27 @@ export class TorrentHandler extends Composer<MyContext> {
 
         // Debug: previous saved state (if any)
         try {
-          const prev = await this.chatMessageStateRepository?.getMessageState(
+          const prev = await this.chatMessageStateRepository.getMessageState(
             chatId,
             'torrent_progress',
           );
-          this.logger.debug({ chatId, prevMessageId: prev?.messageId }, 'Sending new torrents message');
+          this.logger.debug(
+            { chatId, prevMessageId: prev?.messageId },
+            'Sending new torrents message',
+          );
         } catch (error) {
-          this.logger.debug({ error }, 'Failed to fetch previous message state before send');
+          this.logger.debug(
+            { error },
+            'Failed to fetch previous message state before send',
+          );
         }
 
         // Save to database for persistence (upsert)
         await this.saveMessageState(chatId, message.message_id, torrentUids);
-        this.logger.debug({ chatId, messageId: message.message_id }, 'Saved message state after send');
+        this.logger.debug(
+          { chatId, messageId: message.message_id },
+          'Saved message state after send',
+        );
       } catch (error) {
         this.logger.error(
           error,
@@ -402,50 +414,50 @@ export class TorrentHandler extends Composer<MyContext> {
     text: string,
     torrentUids: string[] = [],
   ) {
-    if (!this.bot) return;
     if (message.text === text) return;
     const chatId = message.chat.id;
     return this.withChatLock(chatId, async () => {
       try {
-        await this.bot!.api.editMessageText(chatId, message.message_id, text, {
-          parse_mode: 'HTML',
-        });
+        await retryAsync(
+            () => this.bot.api.editMessageText(chatId, message.message_id, text, {
+              parse_mode: 'HTML',
+            }),
+          {
+            retries: 1,
+            delayMs: 200,
+            retryIf: (err) =>
+              err instanceof GrammyError &&
+              err.description === 'Bad Request: message to edit not found',
+            onRetry: () =>
+              this.logger.debug(
+                { chatId, messageId: message.message_id },
+                'Edit failed: message not found; retrying after 200ms',
+              ),
+          },
+        );
+
         message.text = text;
         // Save updated state to database
         await this.saveMessageState(chatId, message.message_id, torrentUids);
-        this.logger.debug({ chatId, messageId: message.message_id }, 'Updated torrents message');
+        this.logger.debug(
+          { chatId, messageId: message.message_id },
+          'Updated torrents message',
+        );
         return;
       } catch (error) {
         if (
           error instanceof GrammyError &&
           error.description === 'Bad Request: message to edit not found'
         ) {
-          this.logger.debug({ chatId, messageId: message.message_id }, 'Edit failed: message not found; retrying after 200ms');
-          // single retry after short delay
-          await new Promise((res) => setTimeout(res, 200));
-          try {
-            await this.bot!.api.editMessageText(chatId, message.message_id, text, {
-              parse_mode: 'HTML',
-            });
-            message.text = text;
-            await this.saveMessageState(chatId, message.message_id, torrentUids);
-            this.logger.debug({ chatId, messageId: message.message_id }, 'Edit succeeded on retry');
-            return;
-          } catch (error_) {
-            if (
-              error_ instanceof GrammyError &&
-              error_.description === 'Bad Request: message to edit not found'
-            ) {
-              this.logger.debug({ chatId, messageId: message.message_id }, 'Edit retry failed; recreating message');
-              // remove stale in-memory ref
-              this.chatMessages.delete(chatId);
-              // Do not delete DB record here — saveMessageState will upsert new id
-              await this.sendTorrentsMessage(chatId, text, torrentUids);
-              return;
-            }
-            this.logger.error(error_, 'Failed on retry while updating torrents message');
-            return;
-          }
+          this.logger.debug(
+            { chatId, messageId: message.message_id },
+            'Edit retry failed; recreating message',
+          );
+          // remove stale in-memory ref
+          this.chatMessages.delete(chatId);
+          // Do not delete DB record here — saveMessageState will upsert new id
+          await this.sendTorrentsMessage(chatId, text, torrentUids);
+          return;
         }
         this.logger.error(
           error,
@@ -463,7 +475,7 @@ export class TorrentHandler extends Composer<MyContext> {
     messageId: number,
     torrentUids: string[],
   ): Promise<void> {
-    if (!this.chatMessageStateRepository) return;
+    // repository is required
 
     try {
       const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
@@ -481,19 +493,21 @@ export class TorrentHandler extends Composer<MyContext> {
   }
 
   private async deleteTorrentsMessage(message: Message) {
-    if (!this.bot) return;
     const chatId = message.chat.id;
     return this.withChatLock(chatId, async () => {
       try {
         // Attempt delete in Telegram first
-        await this.bot!.api.deleteMessage(chatId, message.message_id);
+        await this.bot.api.deleteMessage(chatId, message.message_id);
       } catch (error) {
         if (
           error instanceof GrammyError &&
           error.description === 'Bad Request: message to delete not found'
         ) {
           // Message already gone externally — continue to cleanup
-          this.logger.debug({ chatId, messageId: message.message_id }, 'Message already deleted on Telegram');
+          this.logger.debug(
+            { chatId, messageId: message.message_id },
+            'Message already deleted on Telegram',
+          );
         } else {
           this.logger.error(
             error,
@@ -507,12 +521,15 @@ export class TorrentHandler extends Composer<MyContext> {
         this.chatMessages.delete(chatId);
         // Remove from database regardless (we no longer depend on DB record after delete)
         try {
-          await this.chatMessageStateRepository?.deleteMessageState(
+          await this.chatMessageStateRepository.deleteMessageState(
             chatId,
             'torrent_progress',
           );
         } catch (error) {
-          this.logger.error(error, 'Failed to delete message state from DB after delete');
+          this.logger.error(
+            error,
+            'Failed to delete message state from DB after delete',
+          );
         }
       }
     });

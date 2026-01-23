@@ -22,14 +22,14 @@ interface QBClientOptions {
 export class QBittorrentClient {
   private username: string;
   private password: string;
-  private savePath: string | undefined;
+  private savePath: string;
   private cookieJar: CookieJar = new CookieJar();
   private apiBase: string;
 
   constructor(options: QBClientOptions) {
     this.username = options.username;
     this.password = options.password;
-    this.savePath = options.savePath;
+    this.savePath = options.savePath ?? '';
     this.apiBase = `${options.url}/api/v2`;
   }
 

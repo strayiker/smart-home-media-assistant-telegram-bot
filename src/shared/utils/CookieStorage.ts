@@ -5,7 +5,7 @@ import { CookieJar } from 'tough-cookie';
 import { type Logger } from './logger.js';
 
 export interface CookieStorageOptions {
-  filePath?: string;
+  filePath: string;
   logger: Logger;
 }
 
@@ -15,7 +15,7 @@ export class CookieStorage {
   private cookieJar: CookieJar = new CookieJar();
 
   constructor(options: CookieStorageOptions) {
-    this.filePath = options.filePath ?? './cookies.json';
+    this.filePath = options.filePath;
     this.logger = options.logger;
     this.loadFromFs();
   }
