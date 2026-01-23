@@ -133,7 +133,7 @@ export async function handleDownloadFileCommand(
         if (fs.existsSync(cand)) {
           // prefer first existing candidate
           // override filePath so downstream code uses the resolved path
-           
+
           // (we intentionally shadow the const variable by reassigning the local)
           // To allow reassignment, declare a new variable would require broader change —
           // instead we rebind via this trick: create a new variable and then use it below.
@@ -234,13 +234,28 @@ async function handleLargeVideoFile(
   logger: Logger,
 ) {
   const aBitrate = 192;
-  const vMaxBitrate = MAX_VIDEO_BITRATE.find(
-    ([height]) => height > videoStreamHeight,
-  )?.[1];
+  // Choose vMaxBitrate: pick smallest tier >= videoStreamHeight, otherwise use highest tier
+  const vMaxBitrate =
+    MAX_VIDEO_BITRATE.find(([height]) => videoStreamHeight <= height)?.[1] ??
+    MAX_VIDEO_BITRATE[MAX_VIDEO_BITRATE.length - 1][1];
   const vBitrate = Math.min(
     Math.floor((MAX_FILE_SIZE_KB * 8) / duration - aBitrate),
     vMaxBitrate ?? Infinity,
   );
+
+  // Validate computed bitrate; if it's invalid or too low, abort to avoid useless transcode
+  if (!Number.isFinite(vBitrate) || vBitrate <= 200) {
+    logger.warn(
+      { vBitrate, duration, videoStreamHeight },
+      'Computed video bitrate is too low or invalid',
+    );
+    try {
+      await ctx.reply(ctx.t('torrent-file-error'));
+    } catch (e) {
+      logger.debug({ e }, 'Failed to notify user about low bitrate');
+    }
+    return;
+  }
 
   logger.debug('Duration: %s', duration);
   logger.debug('Video bitrate: %s', vBitrate);
@@ -248,8 +263,29 @@ async function handleLargeVideoFile(
 
   const tmpFile = tmp.tmpNameSync({ postfix: '.mp4' });
 
+  // Create progress message BEFORE starting ffmpeg so progress handler can reference it safely
+  const progressMessage = await ctx.reply(
+    ctx.t('torrent-file-compressing', { progress: 0 }),
+  );
+
+  let sent = false; // guard to ensure we send only once
+  let lastPercent = -1;
+  let lastUpdateAt = 0;
+
+  // Helper cleanup to remove tmp file safely
+  const cleanupTmp = (file: string) => {
+    try {
+      fs.rmSync(file, { force: true });
+    } catch (err) {
+      logger.debug({ err, file }, 'Failed to remove tmp file');
+    }
+  };
+
+  // Choose audio codec with safe fallback; prefer libfdk_aac if available, but default to 'aac'
+  const audioCodec = 'aac';
+
   ffmpeg(filePath)
-    .outputOptions('-c:a', 'libfdk_aac')
+    .outputOptions('-c:a', audioCodec)
     .outputOptions('-c:v', 'libx264')
     .outputOptions('-b:a', `${aBitrate}k`)
     .outputOptions('-b:v', `${vBitrate}k`)
@@ -264,46 +300,69 @@ async function handleLargeVideoFile(
       logger.debug(cmd);
     })
     .on('progress', async (progress) => {
-      const text = ctx.t('torrent-file-compressing', {
-        progress: Math.round(progress.percent || 0),
-      });
-      if (text !== progressMessage.text) {
-        try {
-          await ctx.api.editMessageText(
-            progressMessage.chat.id,
-            progressMessage.message_id,
-            text,
-          );
-        } catch {
-          // ignore edit errors
-        }
-      }
       try {
-        await ctx.api.editMessageText(
-          progressMessage.chat.id,
-          progressMessage.message_id,
-          ctx.t('torrent-file-uploading'),
-        );
-        await ctx.replyWithVideo(new InputFile(tmpFile), videoOptions);
-      } catch (error) {
-        logger.error(error, 'An error occurred while sending file');
-      } finally {
-        fs.rmSync(tmpFile, {
-          force: true,
-        });
+        const percent = Math.round(progress.percent || 0);
+        const now = Date.now();
+        // Debounce updates to at most once per 1.5s and only on percent change
+        if (percent === lastPercent || now - lastUpdateAt < 1500) return;
+        lastPercent = percent;
+        lastUpdateAt = now;
+
+        const text = ctx.t('torrent-file-compressing', { progress: percent });
+        try {
+          if (progressMessage?.chat && progressMessage?.message_id) {
+            await ctx.api.editMessageText(
+              progressMessage.chat.id,
+              progressMessage.message_id,
+              text,
+            );
+          }
+        } catch (err) {
+          logger.debug({ err }, 'Failed to edit progress message');
+        }
+      } catch (err) {
+        logger.debug({ err }, 'Error in progress handler');
       }
     })
-    .on('error', (error) => {
-      logger.error(error, 'An error occurred while sending file');
-      fs.rmSync(tmpFile, {
-        force: true,
-      });
+    .on('end', async () => {
+      if (sent) return;
+      sent = true;
+      try {
+        // Notify user that upload is starting
+        if (progressMessage?.chat && progressMessage?.message_id) {
+          try {
+            await ctx.api.editMessageText(
+              progressMessage.chat.id,
+              progressMessage.message_id,
+              ctx.t('torrent-file-uploading'),
+            );
+          } catch (err) {
+            // ignore edit errors
+          }
+        }
+
+        await ctx.replyWithVideo(new InputFile(tmpFile), videoOptions);
+      } catch (err) {
+        logger.error(err, 'An error occurred while sending file');
+        try {
+          await ctx.reply(ctx.t('torrent-file-error'));
+        } catch (e) {
+          logger.debug({ e }, 'Failed to notify user about send error');
+        }
+      } finally {
+        cleanupTmp(tmpFile);
+      }
+    })
+    .on('error', async (error) => {
+      logger.error(error, 'An error occurred while compressing file');
+      try {
+        await ctx.reply(ctx.t('torrent-file-error'));
+      } catch (e) {
+        logger.debug({ e }, 'Failed to notify user about compression error');
+      }
+      cleanupTmp(tmpFile);
     })
     .saveToFile(tmpFile);
-
-  const progressMessage = await ctx.reply(
-    ctx.t('torrent-file-compressing', { progress: 0 }),
-  );
 }
 
 export default DownloadHandler;
