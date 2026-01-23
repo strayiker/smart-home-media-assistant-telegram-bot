@@ -24,7 +24,7 @@ export async function retryAsync<T>(
       if (options.onRetry) {
         try {
           // attempt number is 1-based for callbacks
-          await options.onRetry(error, attempt + 1);
+          await options.onRetry(error_, attempt + 1);
         } catch {
           // ignore callback errors
         }
