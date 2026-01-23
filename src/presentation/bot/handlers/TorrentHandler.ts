@@ -316,7 +316,8 @@ export class TorrentHandler extends Composer<MyContext> {
           const hashesPending = pendingTorrents.map((t) => t.hash);
           this.chatTorrents.set(chatId, new Set(hashesPending));
 
-          const chatLocale = (await this.chatSettingsRepository.getLocale(chatId)) ?? 'en';
+          const chatLocale =
+            (await this.chatSettingsRepository.getLocale(chatId)) ?? 'en';
           const texts = pendingTorrents.map((torrent) => {
             const meta = metaByHash.get(torrent.hash);
             const uid = meta?.uid ?? '';
@@ -419,7 +420,8 @@ export class TorrentHandler extends Composer<MyContext> {
     return this.withChatLock(chatId, async () => {
       try {
         await retryAsync(
-            () => this.bot.api.editMessageText(chatId, message.message_id, text, {
+          () =>
+            this.bot.api.editMessageText(chatId, message.message_id, text, {
               parse_mode: 'HTML',
             }),
           {

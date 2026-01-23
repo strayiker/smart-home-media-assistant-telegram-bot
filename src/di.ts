@@ -111,8 +111,12 @@ container.registerFactory('TorrentHandler', () => {
   const engines = container.resolve<SearchEngine[]>('SearchEngines');
   // Resolve Bot and repositories; these must be registered in DI
   const bot = container.resolve<Bot<MyContext>>('Bot');
-  const chatSettings = container.resolve<ChatSettingsRepository>('ChatSettingsRepository');
-  const chatMessageState = container.resolve<ChatMessageStateRepository>('ChatMessageStateRepository');
+  const chatSettings = container.resolve<ChatSettingsRepository>(
+    'ChatSettingsRepository',
+  );
+  const chatMessageState = container.resolve<ChatMessageStateRepository>(
+    'ChatMessageStateRepository',
+  );
 
   const options: TorrentHandlerOptions = {
     torrentService: svc,

@@ -8,7 +8,11 @@ export class AuthService {
   private secretKey: string;
   private logger: Logger;
 
-  constructor(userRepository: UserRepository, secretKey: string, logger: Logger) {
+  constructor(
+    userRepository: UserRepository,
+    secretKey: string,
+    logger: Logger,
+  ) {
     this.userRepository = userRepository;
     this.secretKey = secretKey;
     this.logger = logger;
@@ -33,7 +37,10 @@ export class AuthService {
       this.logger.info({ telegramId }, 'User created via secret onboarding');
       return true;
     } catch (error) {
-      this.logger.error(error, 'Failed to create user during secret validation');
+      this.logger.error(
+        error,
+        'Failed to create user during secret validation',
+      );
       return false;
     }
   }

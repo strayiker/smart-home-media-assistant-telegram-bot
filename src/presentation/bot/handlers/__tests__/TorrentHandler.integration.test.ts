@@ -45,17 +45,13 @@ describe('TorrentHandler Integration Tests', () => {
 
     // Register minimal Bot and repository instances required by DI
     container.registerInstance('Bot', {} as any);
-    container.registerInstance(
-      'ChatSettingsRepository',
-      { getLocale: vi.fn().mockResolvedValue('en') } as any,
-    );
-    container.registerInstance(
-      'ChatMessageStateRepository',
-      {
-        getAllActiveTorrentProgressMessages: vi.fn().mockResolvedValue([]),
-        cleanupExpiredMessages: vi.fn().mockResolvedValue(0),
-      } as any,
-    );
+    container.registerInstance('ChatSettingsRepository', {
+      getLocale: vi.fn().mockResolvedValue('en'),
+    } as any);
+    container.registerInstance('ChatMessageStateRepository', {
+      getAllActiveTorrentProgressMessages: vi.fn().mockResolvedValue([]),
+      cleanupExpiredMessages: vi.fn().mockResolvedValue(0),
+    } as any);
     // TorrentHandler will be resolved from DI during tests
   });
 
