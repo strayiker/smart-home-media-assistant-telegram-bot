@@ -284,11 +284,15 @@ export class TorrentService {
   /**
    * Format bytes in human-readable format (KB, MB, GB).
    */
-  formatBytes(bytes: number): string {
+  formatBytes(bytes?: number): string {
+    const b = Number(bytes) || 0;
+    if (b === 0) return '0 B';
+
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const size = Math.floor(Math.log(bytes) / Math.log(1024));
-    const value = bytes / Math.pow(1024, size);
-    return `${value.toFixed(1)} ${units[size]}`;
+    const i = Math.floor(Math.log(b) / Math.log(1024));
+    const idx = Number.isFinite(i) && i > 0 ? Math.min(i, units.length - 1) : 0;
+    const value = b / Math.pow(1024, idx);
+    return `${value.toFixed(1)} ${units[idx]}`;
   }
 
   /**
