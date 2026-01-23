@@ -750,7 +750,7 @@ export async function buildTorrentsList(
   const items: string[] = [];
   const keyboard = new InlineKeyboard();
 
-    for (const meta of pageMetas) {
+  for (const meta of pageMetas) {
     const torrent = torrentByHash.get(meta.hash);
     if (!torrent) continue;
 
