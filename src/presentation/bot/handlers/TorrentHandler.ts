@@ -43,6 +43,8 @@ export class TorrentHandler extends Composer<MyContext> {
   private chatMessages = new Map<number, Message>();
   private chatTorrents = new Map<number, Set<string>>();
   private activeUpdates = new Map<number, Promise<void>>();
+  // Per-chat lock queue to prevent concurrent send/update/delete races
+  private chatLocks = new Map<number, Promise<void>>();
   private timeout?: NodeJS.Timeout;
   private chatSettingsRepository: ChatSettingsRepository | undefined;
   private chatMessageStateRepository: ChatMessageStateRepository | undefined;
@@ -131,6 +133,27 @@ export class TorrentHandler extends Composer<MyContext> {
         }
       }
     });
+  }
+
+  // Helper to run a function under a per-chat lock
+  private async withChatLock<T>(chatId: number, fn: () => Promise<T>): Promise<T> {
+    const tail = this.chatLocks.get(chatId) ?? Promise.resolve();
+    let release!: () => void;
+    const next = new Promise<void>((res) => {
+      release = res;
+    });
+    // chain the lock
+    this.chatLocks.set(chatId, tail.then(() => next));
+    try {
+      // wait for previous ops
+      await tail;
+      return await fn();
+    } finally {
+      // release
+      release();
+      const cur = this.chatLocks.get(chatId);
+      if (cur === next) this.chatLocks.delete(chatId);
+    }
   }
 
   public dispose() {
@@ -343,20 +366,35 @@ export class TorrentHandler extends Composer<MyContext> {
     torrentUids: string[] = [],
   ) {
     if (!this.bot) return;
-    try {
-      const message = await this.bot.api.sendMessage(chatId, text, {
-        parse_mode: 'HTML',
-      });
-      // store message for future edits
-      this.chatMessages.set(chatId, message as Message);
-      // Save to database for persistence
-      await this.saveMessageState(chatId, message.message_id, torrentUids);
-    } catch (error) {
-      this.logger.error(
-        error,
-        'An error occured while sending torrents message',
-      );
-    }
+    return this.withChatLock(chatId, async () => {
+      try {
+        const message = await this.bot!.api.sendMessage(chatId, text, {
+          parse_mode: 'HTML',
+        });
+        // store message for future edits
+        this.chatMessages.set(chatId, message as Message);
+
+        // Debug: previous saved state (if any)
+        try {
+          const prev = await this.chatMessageStateRepository?.getMessageState(
+            chatId,
+            'torrent_progress',
+          );
+          this.logger.debug({ chatId, prevMessageId: prev?.messageId }, 'Sending new torrents message');
+        } catch (error) {
+          this.logger.debug({ error }, 'Failed to fetch previous message state before send');
+        }
+
+        // Save to database for persistence (upsert)
+        await this.saveMessageState(chatId, message.message_id, torrentUids);
+        this.logger.debug({ chatId, messageId: message.message_id }, 'Saved message state after send');
+      } catch (error) {
+        this.logger.error(
+          error,
+          'An error occured while sending torrents message',
+        );
+      }
+    });
   }
 
   private async updateTorrentsMessage(
@@ -367,34 +405,54 @@ export class TorrentHandler extends Composer<MyContext> {
     if (!this.bot) return;
     if (message.text === text) return;
     const chatId = message.chat.id;
-    try {
-      await this.bot.api.editMessageText(chatId, message.message_id, text, {
-        parse_mode: 'HTML',
-      });
-      message.text = text;
-      // Save updated state to database
-      await this.saveMessageState(chatId, message.message_id, torrentUids);
-    } catch (error) {
-      if (
-        error instanceof GrammyError &&
-        error.description === 'Bad Request: message to edit not found'
-      ) {
-        // Remove stale message reference
-        this.chatMessages.delete(chatId);
-        // Remove from database
-        await this.chatMessageStateRepository?.deleteMessageState(
-          chatId,
-          'torrent_progress',
-        );
-        // Send new message
-        await this.sendTorrentsMessage(chatId, text, torrentUids);
-      } else {
+    return this.withChatLock(chatId, async () => {
+      try {
+        await this.bot!.api.editMessageText(chatId, message.message_id, text, {
+          parse_mode: 'HTML',
+        });
+        message.text = text;
+        // Save updated state to database
+        await this.saveMessageState(chatId, message.message_id, torrentUids);
+        this.logger.debug({ chatId, messageId: message.message_id }, 'Updated torrents message');
+        return;
+      } catch (error) {
+        if (
+          error instanceof GrammyError &&
+          error.description === 'Bad Request: message to edit not found'
+        ) {
+          this.logger.debug({ chatId, messageId: message.message_id }, 'Edit failed: message not found; retrying after 200ms');
+          // single retry after short delay
+          await new Promise((res) => setTimeout(res, 200));
+          try {
+            await this.bot!.api.editMessageText(chatId, message.message_id, text, {
+              parse_mode: 'HTML',
+            });
+            message.text = text;
+            await this.saveMessageState(chatId, message.message_id, torrentUids);
+            this.logger.debug({ chatId, messageId: message.message_id }, 'Edit succeeded on retry');
+            return;
+          } catch (error_) {
+            if (
+              error_ instanceof GrammyError &&
+              error_.description === 'Bad Request: message to edit not found'
+            ) {
+              this.logger.debug({ chatId, messageId: message.message_id }, 'Edit retry failed; recreating message');
+              // remove stale in-memory ref
+              this.chatMessages.delete(chatId);
+              // Do not delete DB record here — saveMessageState will upsert new id
+              await this.sendTorrentsMessage(chatId, text, torrentUids);
+              return;
+            }
+            this.logger.error(error_, 'Failed on retry while updating torrents message');
+            return;
+          }
+        }
         this.logger.error(
           error,
           'An error occured while updating torrents message',
         );
       }
-    }
+    });
   }
 
   /**
@@ -425,24 +483,39 @@ export class TorrentHandler extends Composer<MyContext> {
   private async deleteTorrentsMessage(message: Message) {
     if (!this.bot) return;
     const chatId = message.chat.id;
-    try {
-      // Remove from tracking BEFORE deleting message to prevent race conditions
-      this.chatTorrents.delete(chatId);
-      this.chatMessages.delete(chatId);
-
-      // Delete from database
-      await this.chatMessageStateRepository?.deleteMessageState(
-        chatId,
-        'torrent_progress',
-      );
-
-      await this.bot.api.deleteMessage(chatId, message.message_id);
-    } catch (error) {
-      this.logger.error(
-        error,
-        'An error occured while deleting torrent message',
-      );
-    }
+    return this.withChatLock(chatId, async () => {
+      try {
+        // Attempt delete in Telegram first
+        await this.bot!.api.deleteMessage(chatId, message.message_id);
+      } catch (error) {
+        if (
+          error instanceof GrammyError &&
+          error.description === 'Bad Request: message to delete not found'
+        ) {
+          // Message already gone externally — continue to cleanup
+          this.logger.debug({ chatId, messageId: message.message_id }, 'Message already deleted on Telegram');
+        } else {
+          this.logger.error(
+            error,
+            'An error occured while deleting torrent message',
+          );
+          return;
+        }
+      } finally {
+        // Remove from tracking AFTER attempting delete
+        this.chatTorrents.delete(chatId);
+        this.chatMessages.delete(chatId);
+        // Remove from database regardless (we no longer depend on DB record after delete)
+        try {
+          await this.chatMessageStateRepository?.deleteMessageState(
+            chatId,
+            'torrent_progress',
+          );
+        } catch (error) {
+          this.logger.error(error, 'Failed to delete message state from DB after delete');
+        }
+      }
+    });
   }
 
   /**
