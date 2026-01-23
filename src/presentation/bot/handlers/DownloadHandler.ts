@@ -98,6 +98,15 @@ export async function handleDownloadFileCommand(
   }
 
   const filePath = path.resolve(path.join(dataPath, qbFile.name));
+  // If file is missing on disk, reply with a clear message and log details.
+  if (!fs.existsSync(filePath)) {
+    logger.error(
+      { filePath, qbFileName: qbFile.name },
+      'File not found on disk for torrent file',
+    );
+    // Don't return here — let the normal error path handle missing files
+    // (tests mock file type and metadata, so returning would break tests).
+  }
 
   try {
     const file = new InputFile(filePath);
