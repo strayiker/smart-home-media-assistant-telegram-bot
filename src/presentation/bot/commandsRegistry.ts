@@ -35,18 +35,31 @@ export class CommandsRegistry {
     for (const entry of this.map.values()) {
       let description = entry.descriptionKey;
       try {
-        const anyFluent = fluent as unknown as { [k: string]: unknown };
-        const methods = ['format', 'get', 'translate'] as const;
-        for (const method of methods) {
-          const fn = anyFluent[method];
-          if (typeof fn === 'function') {
-            description =
-              (fn as (id: string, l?: string) => string).call(
-                fluent,
-                entry.descriptionKey,
-                locale,
-              ) ?? description;
-            break;
+        // Prefer fluent.withLocale(...) translator used across the codebase
+        const anyFluent = fluent as unknown as { withLocale?: unknown };
+        const withLocale = anyFluent.withLocale as unknown as (
+          l: string,
+        ) => unknown;
+        if (typeof withLocale === 'function') {
+          const t = withLocale.call(fluent, locale) as unknown;
+          if (typeof t === 'function') {
+            description = (t as (id: string) => string)(entry.descriptionKey) ?? description;
+          }
+        } else {
+          // Fallback to common method names
+          const anyF = fluent as unknown as { [k: string]: unknown };
+          const methods = ['format', 'get', 'translate'] as const;
+          for (const method of methods) {
+            const fn = anyF[method];
+            if (typeof fn === 'function') {
+              description =
+                (fn as (id: string, l?: string) => string).call(
+                  fluent,
+                  entry.descriptionKey,
+                  locale,
+                ) ?? description;
+              break;
+            }
           }
         }
       } catch {
