@@ -33,7 +33,7 @@ export class CommandsRegistry {
       scope?: unknown;
     }> = [];
     for (const entry of this.map.values()) {
-      let description = entry.descriptionKey;
+      let localizedDescription = entry.descriptionKey;
       try {
         // Prefer fluent.withLocale(...) translator used across the codebase
         const anyFluent = fluent as unknown as { withLocale?: unknown };
@@ -43,9 +43,9 @@ export class CommandsRegistry {
         if (typeof withLocale === 'function') {
           const t = withLocale.call(fluent, locale) as unknown;
           if (typeof t === 'function') {
-            description =
+            localizedDescription =
               (t as (id: string) => string)(entry.descriptionKey) ??
-              description;
+              localizedDescription;
           }
         } else {
           // Fallback to common method names
@@ -54,12 +54,12 @@ export class CommandsRegistry {
           for (const method of methods) {
             const fn = anyF[method];
             if (typeof fn === 'function') {
-              description =
+              localizedDescription =
                 (fn as (id: string, l?: string) => string).call(
                   fluent,
                   entry.descriptionKey,
                   locale,
-                ) ?? description;
+                ) ?? localizedDescription;
               break;
             }
           }
@@ -69,10 +69,14 @@ export class CommandsRegistry {
       }
 
       // Telegram limits description to 256 chars
-      if (description.length > 256)
-        description = description.slice(0, 253) + '...';
+      if (localizedDescription.length > 256)
+        localizedDescription = localizedDescription.slice(0, 253) + '...';
 
-      out.push({ command: entry.command, description, scope: entry.scope });
+      out.push({
+        command: entry.command,
+        description: localizedDescription,
+        scope: entry.scope,
+      });
     }
     return out;
   }

@@ -74,7 +74,7 @@ torrents-removed-success = ✅ Torrent removed
 torrents-removed-error = ❌ Failed to remove torrent
 
 commands.search = Search media by title or query
-commands.torrents = Manage your torrents (list / remove)
+commands.torrents = List and manage torrents
 commands.download = Start a download (use detailed command with id)
 commands.files = List files for a torrent (use detailed command with uid)
 commands.preview = Generate media preview (use detailed command with params)
