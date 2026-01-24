@@ -240,15 +240,39 @@ export class TorrentHandler extends Composer<MyContext> {
       return;
     }
 
-    // If torrent already existed, return existing meta information to user
+    // If torrent already existed, show the same torrent card/list as on first add
     if (!addResult.value.added) {
+      const chatId = ctx.chatId as number;
       const hash = addResult.value.hash;
-      const existingUid = addResult.value.existingMeta?.uid ?? '';
-      const filesCmd = existingUid ? `/ls_${existingUid}` : '';
       try {
-        await ctx.reply(
-          ctx.t('torrent-already-exists', { hash, files: filesCmd }),
-        );
+        if (chatId === undefined) return;
+
+        // Try to fetch torrent status from QBittorrent
+        let torrents: QBittorrentTorrent[] = [];
+        try {
+          torrents = (await this.torrentService.getTorrentsByHash([hash])) as QBittorrentTorrent[];
+        } catch {
+          // ignore — proceed to recreate progress card as a fallback
+        }
+
+        const torrent = torrents?.[0];
+
+        if (torrent && torrent.progress >= 1) {
+          // Torrent already completed — show list/card like /torrents
+          try {
+            const result = await buildTorrentsList(ctx, this.torrentService, 1);
+            await ctx.reply(result.text, {
+              parse_mode: 'HTML',
+              reply_markup: result.keyboard,
+            });
+          } catch {
+            // fallback to recreate progress message
+            await this.createOrUpdateTorrentsMessage(chatId, true);
+          }
+        } else {
+          // Torrent is pending or unknown — recreate progress card
+          await this.createOrUpdateTorrentsMessage(chatId, true);
+        }
       } catch (error) {
         this.logger.debug(
           { err: error },

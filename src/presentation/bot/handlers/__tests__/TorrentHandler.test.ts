@@ -130,7 +130,7 @@ describe('TorrentHandler unit tests', () => {
       expect(ctx.reply).toHaveBeenCalledWith('torrent-download-error');
     });
 
-    it('replies with existing torrent info when add returns added=false', async () => {
+    it('shows torrent card when existing torrent is completed', async () => {
       (ctx.message as any).text = '/dl_engine_id_123';
       mockTorrentService.downloadTorrentFile.mockResolvedValue({
         ok: true,
@@ -145,11 +145,71 @@ describe('TorrentHandler unit tests', () => {
         },
       });
 
+      // Simulate that QBittorrent reports completed torrent
+      (mockTorrentService as any).getTorrentsByHash = vi.fn().mockResolvedValue([
+        {
+          hash: 'abc123',
+          progress: 1,
+          dlspeed: 0,
+          eta: 0,
+          name: 'done',
+          num_seeds: 0,
+          num_complete: 0,
+          num_leechs: 0,
+          size: 100,
+        },
+      ]);
+
+      // Ensure buildTorrentsList will include the meta — provide metas
+      mockTorrentService.getTorrentMetasByChatId = vi.fn().mockResolvedValue([
+        { hash: 'abc123', uid: 'engine_id_123' },
+      ] as any);
+
       await (handler as any).handleDownloadCommand(ctx);
 
       expect(mockTorrentService.downloadTorrentFile).toHaveBeenCalled();
       expect(mockTorrentService.addTorrent).toHaveBeenCalled();
-      expect(ctx.reply).toHaveBeenCalledWith('torrent-already-exists');
+      expect(ctx.reply).toHaveBeenCalled();
+    });
+
+    it('recreates download card when existing torrent is pending', async () => {
+      (ctx.message as any).text = '/dl_engine_id_123';
+      mockTorrentService.downloadTorrentFile.mockResolvedValue({
+        ok: true,
+        value: 'torrentdata',
+      });
+      mockTorrentService.addTorrent.mockResolvedValue({
+        ok: true,
+        value: {
+          hash: 'abc123',
+          added: false,
+          existingMeta: { uid: 'engine_id_123' },
+        },
+      });
+
+      // Simulate that QBittorrent reports pending torrent
+      (mockTorrentService as any).getTorrentsByHash = vi.fn().mockResolvedValue([
+        {
+          hash: 'abc123',
+          progress: 0.5,
+          dlspeed: 100,
+          eta: 123,
+          name: 'downloading',
+          num_seeds: 1,
+          num_complete: 2,
+          num_leechs: 3,
+          size: 1000,
+        },
+      ]);
+
+      const spy = vi.spyOn(handler as any, 'createOrUpdateTorrentsMessage');
+
+      await (handler as any).handleDownloadCommand(ctx);
+
+      expect(mockTorrentService.downloadTorrentFile).toHaveBeenCalled();
+      expect(mockTorrentService.addTorrent).toHaveBeenCalled();
+      expect(spy).toHaveBeenCalledWith(chatId, true);
+      spy.mockRestore();
     });
 
     it('adds chat to tracking and triggers progress update on success', async () => {
