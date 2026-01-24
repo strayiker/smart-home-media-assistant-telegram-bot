@@ -130,6 +130,24 @@ describe('TorrentHandler unit tests', () => {
       expect(ctx.reply).toHaveBeenCalledWith('torrent-download-error');
     });
 
+    it('replies with existing torrent info when add returns added=false', async () => {
+      (ctx.message as any).text = '/dl_engine_id_123';
+      mockTorrentService.downloadTorrentFile.mockResolvedValue({
+        ok: true,
+        value: 'torrentdata',
+      });
+      mockTorrentService.addTorrent.mockResolvedValue({
+        ok: true,
+        value: { hash: 'abc123', added: false, existingMeta: { uid: 'engine_id_123' } },
+      });
+
+      await (handler as any).handleDownloadCommand(ctx);
+
+      expect(mockTorrentService.downloadTorrentFile).toHaveBeenCalled();
+      expect(mockTorrentService.addTorrent).toHaveBeenCalled();
+      expect(ctx.reply).toHaveBeenCalledWith('torrent-already-exists');
+    });
+
     it('adds chat to tracking and triggers progress update on success', async () => {
       (ctx.message as any).text = '/dl_engine_id_123';
       mockTorrentService.downloadTorrentFile.mockResolvedValue({

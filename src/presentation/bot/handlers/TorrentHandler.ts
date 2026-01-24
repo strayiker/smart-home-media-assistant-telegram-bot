@@ -240,6 +240,19 @@ export class TorrentHandler extends Composer<MyContext> {
       return;
     }
 
+    // If torrent already existed, return existing meta information to user
+    if (!addResult.value.added) {
+      const hash = addResult.value.hash;
+      const existingUid = addResult.value.existingMeta?.uid ?? '';
+      const filesCmd = existingUid ? `/ls_${existingUid}` : '';
+      try {
+        await ctx.reply(ctx.t('torrent-already-exists', { hash, files: filesCmd }));
+      } catch (error) {
+        this.logger.debug({ err: error }, 'Failed to notify user about existing torrent');
+      }
+      return;
+    }
+
     const chatId = ctx.chatId as number;
     // Trigger immediate update to show progress message (force refresh)
     await this.createOrUpdateTorrentsMessage(chatId, true);

@@ -28,6 +28,7 @@ torrent-message-completed =
     Удалить: {$remove}</blockquote>
 torrent-unsupported-tracker-error = Трекер не поддерживается
 torrent-download-error = Произошла ошибка при добавлении торрента
+torrent-already-exists = Торрент уже добавлен — { $hash } { $files }
 torrent-download-success = ✅ Торрент добавлен
     ---
     Файлы: /ls_{$uid}
