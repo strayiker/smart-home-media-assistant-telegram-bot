@@ -246,9 +246,14 @@ export class TorrentHandler extends Composer<MyContext> {
       const existingUid = addResult.value.existingMeta?.uid ?? '';
       const filesCmd = existingUid ? `/ls_${existingUid}` : '';
       try {
-        await ctx.reply(ctx.t('torrent-already-exists', { hash, files: filesCmd }));
+        await ctx.reply(
+          ctx.t('torrent-already-exists', { hash, files: filesCmd }),
+        );
       } catch (error) {
-        this.logger.debug({ err: error }, 'Failed to notify user about existing torrent');
+        this.logger.debug(
+          { err: error },
+          'Failed to notify user about existing torrent',
+        );
       }
       return;
     }

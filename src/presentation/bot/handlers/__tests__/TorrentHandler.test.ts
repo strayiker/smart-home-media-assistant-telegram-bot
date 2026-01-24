@@ -138,7 +138,11 @@ describe('TorrentHandler unit tests', () => {
       });
       mockTorrentService.addTorrent.mockResolvedValue({
         ok: true,
-        value: { hash: 'abc123', added: false, existingMeta: { uid: 'engine_id_123' } },
+        value: {
+          hash: 'abc123',
+          added: false,
+          existingMeta: { uid: 'engine_id_123' },
+        },
       });
 
       await (handler as any).handleDownloadCommand(ctx);

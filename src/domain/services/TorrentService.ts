@@ -30,7 +30,12 @@ export class TorrentService {
 
   async addTorrent(
     options: AddTorrentOptions,
-  ): Promise<ResultT<{ hash: string; added: boolean; existingMeta?: Partial<TorrentMeta> }, Error>> {
+  ): Promise<
+    ResultT<
+      { hash: string; added: boolean; existingMeta?: Partial<TorrentMeta> },
+      Error
+    >
+  > {
     const { torrent, uid, chatId, searchEngine, trackerId } = options;
     // If metadata with same uid already exists, do not add torrent again.
     try {
@@ -40,7 +45,11 @@ export class TorrentService {
           'Torrent meta already exists for uid, returning existing hash: %s',
           existing.hash,
         );
-        return ok({ hash: existing.hash, added: false, existingMeta: existing });
+        return ok({
+          hash: existing.hash,
+          added: false,
+          existingMeta: existing,
+        });
       }
     } catch (error) {
       this.logger.error(
@@ -112,7 +121,11 @@ export class TorrentService {
                 'Torrent meta already exists for uid, returning existing hash: %s',
                 existing.hash,
               );
-              return ok({ hash: existing.hash, added: false, existingMeta: existing });
+              return ok({
+                hash: existing.hash,
+                added: false,
+                existingMeta: existing,
+              });
             }
             // If for some reason record not found, fall through to return error below
           } catch (lookupError) {
