@@ -669,21 +669,8 @@ export class TorrentHandler extends Composer<MyContext> {
           remove: `/rm_${uid}`,
         });
 
-        const keyboard = new InlineKeyboard();
-        if (meta.uid) {
-          keyboard.text(
-            t('torrents-btn-files'),
-            `torrents:files:${meta.uid}:1`,
-          );
-          keyboard.text(
-            t('torrents-btn-remove'),
-            `torrents:remove:${meta.uid}:1`,
-          );
-        }
-
         await this.bot.api.sendMessage(chatId, text, {
           parse_mode: 'HTML',
-          reply_markup: keyboard,
         });
         return;
       }
@@ -698,18 +685,8 @@ export class TorrentHandler extends Composer<MyContext> {
         remove: uid ? `/rm_${uid}` : '',
       });
 
-      const keyboard = new InlineKeyboard();
-      if (meta.uid) {
-        keyboard.text(t('torrents-btn-files'), `torrents:files:${meta.uid}:1`);
-        keyboard.text(
-          t('torrents-btn-remove'),
-          `torrents:remove:${meta.uid}:1`,
-        );
-      }
-
       await this.bot.api.sendMessage(chatId, text, {
         parse_mode: 'HTML',
-        reply_markup: keyboard,
       });
       return;
     } catch (error) {
