@@ -265,10 +265,22 @@ export class TorrentHandler extends Composer<MyContext> {
           try {
             const metas =
               await this.torrentService.getTorrentMetasByChatId(chatId);
-            const meta =
+            // Start with existingMeta returned by service (may be partial), then try to enrich it from DB
+            let meta =
               (addResult.value.existingMeta as
                 | Partial<TorrentMeta>
                 | undefined) ?? metas.find((m: TorrentMeta) => m.hash === hash);
+            if (meta && !meta.hash) {
+              // try to find full meta by uid
+              const foundByUid = meta.uid
+                ? metas.find((m: TorrentMeta) => m.uid === meta!.uid)
+                : undefined;
+              if (foundByUid) meta = foundByUid;
+            }
+            if (!meta) {
+              // as a last resort try to find by hash
+              meta = metas.find((m: TorrentMeta) => m.hash === hash);
+            }
             if (meta) {
               await this.sendSingleTorrentCard(
                 chatId,
@@ -608,8 +620,12 @@ export class TorrentHandler extends Composer<MyContext> {
 
   private async sendSingleTorrentCard(
     chatId: number,
-    meta: { hash: string; uid?: string },
+    meta: Partial<TorrentMeta>,
   ) {
+    if (!meta || !meta.hash) {
+      await this.createOrUpdateTorrentsMessage(chatId, true);
+      return;
+    }
     try {
       const chatLocale =
         (await this.chatSettingsRepository.getLocale(chatId)) ?? 'en';
