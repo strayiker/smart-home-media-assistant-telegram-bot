@@ -87,7 +87,8 @@ describe('TorrentService', () => {
 
       expect(result.ok).toBe(true);
       if (result.ok) {
-        expect(result.value).toBe(hash);
+        expect(result.value.hash).toBe(hash);
+        expect(result.value.added).toBe(true);
       }
 
       expect(mockQBittorrentClient.addTorrents).toHaveBeenCalledWith({

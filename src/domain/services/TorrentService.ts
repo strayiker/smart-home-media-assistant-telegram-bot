@@ -11,6 +11,7 @@ import type {
 import type { MyContext } from '../../shared/context.js';
 import type { Logger } from '../../shared/utils/logger.js';
 import { err, ok, type ResultT } from '../../shared/utils/result.js';
+import type { TorrentMeta } from '../entities/TorrentMeta.js';
 
 export interface AddTorrentOptions {
   torrent: string;
@@ -29,7 +30,7 @@ export class TorrentService {
 
   async addTorrent(
     options: AddTorrentOptions,
-  ): Promise<ResultT<string, Error>> {
+  ): Promise<ResultT<{ hash: string; added: boolean; existingMeta?: Partial<TorrentMeta> }, Error>> {
     const { torrent, uid, chatId, searchEngine, trackerId } = options;
     // If metadata with same uid already exists, do not add torrent again.
     try {
@@ -39,7 +40,7 @@ export class TorrentService {
           'Torrent meta already exists for uid, returning existing hash: %s',
           existing.hash,
         );
-        return ok(existing.hash);
+        return ok({ hash: existing.hash, added: false, existingMeta: existing });
       }
     } catch (error) {
       this.logger.error(
@@ -111,7 +112,7 @@ export class TorrentService {
                 'Torrent meta already exists for uid, returning existing hash: %s',
                 existing.hash,
               );
-              return ok(existing.hash);
+              return ok({ hash: existing.hash, added: false, existingMeta: existing });
             }
             // If for some reason record not found, fall through to return error below
           } catch (lookupError) {
@@ -137,7 +138,7 @@ export class TorrentService {
       }
 
       this.logger.debug('A new torrent was successfully added: %s', hash);
-      return ok(hash);
+      return ok({ hash, added: true });
     } catch (error) {
       this.logger.error(error, 'An error occurred while adding new torrent');
       return err(
