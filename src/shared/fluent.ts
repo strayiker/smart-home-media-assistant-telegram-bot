@@ -6,9 +6,11 @@ const fluent = new Fluent();
 const localeFiles = await fs.readdir('locales');
 
 for (const localeFile of localeFiles) {
+  const filePath = `locales/${localeFile}`;
+  const content = await fs.readFile(filePath, 'utf8');
   await fluent.addTranslation({
     locales: localeFile.split('.')[0],
-    filePath: `locales/${localeFile}`,
+    source: content,
   });
 }
 
