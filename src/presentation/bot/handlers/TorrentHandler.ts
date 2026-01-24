@@ -1,6 +1,7 @@
 import { type Bot, Composer, GrammyError, InlineKeyboard } from 'grammy';
 import type { Message } from 'grammy/types';
 
+import type { TorrentMeta } from '../../../domain/entities/TorrentMeta.js';
 import type { TorrentService } from '../../../domain/services/TorrentService.js';
 import type { ChatMessageStateRepository } from '../../../infrastructure/persistence/repositories/ChatMessageStateRepository.js';
 import type { ChatSettingsRepository } from '../../../infrastructure/persistence/repositories/ChatSettingsRepository.js';
@@ -250,7 +251,9 @@ export class TorrentHandler extends Composer<MyContext> {
         // Try to fetch torrent status from QBittorrent
         let torrents: QBittorrentTorrent[] = [];
         try {
-          torrents = (await this.torrentService.getTorrentsByHash([hash])) as QBittorrentTorrent[];
+          torrents = (await this.torrentService.getTorrentsByHash([
+            hash,
+          ])) as QBittorrentTorrent[];
         } catch {
           // ignore — proceed to recreate progress card as a fallback
         }
@@ -258,13 +261,31 @@ export class TorrentHandler extends Composer<MyContext> {
         const torrent = torrents?.[0];
 
         if (torrent && torrent.progress >= 1) {
-          // Torrent already completed — show list/card like /torrents
+          // Torrent already completed — show single torrent card
           try {
-            const result = await buildTorrentsList(ctx, this.torrentService, 1);
-            await ctx.reply(result.text, {
-              parse_mode: 'HTML',
-              reply_markup: result.keyboard,
-            });
+            const metas =
+              await this.torrentService.getTorrentMetasByChatId(chatId);
+            const meta =
+              (addResult.value.existingMeta as
+                | Partial<TorrentMeta>
+                | undefined) ?? metas.find((m: TorrentMeta) => m.hash === hash);
+            if (meta) {
+              await this.sendSingleTorrentCard(
+                chatId,
+                meta as Partial<TorrentMeta>,
+              );
+            } else {
+              // fallback to list if meta missing
+              const result = await buildTorrentsList(
+                ctx,
+                this.torrentService,
+                1,
+              );
+              await ctx.reply(result.text, {
+                parse_mode: 'HTML',
+                reply_markup: result.keyboard,
+              });
+            }
           } catch {
             // fallback to recreate progress message
             await this.createOrUpdateTorrentsMessage(chatId, true);
@@ -583,6 +604,102 @@ export class TorrentHandler extends Composer<MyContext> {
         }
       }
     });
+  }
+
+  private async sendSingleTorrentCard(
+    chatId: number,
+    meta: { hash: string; uid?: string },
+  ) {
+    try {
+      const chatLocale =
+        (await this.chatSettingsRepository.getLocale(chatId)) ?? 'en';
+      const t = fluent.withLocale(chatLocale);
+
+      let torrents: QBittorrentTorrent[] = [];
+      try {
+        torrents = (await this.torrentService.getTorrentsByHash([
+          meta.hash,
+        ])) as QBittorrentTorrent[];
+      } catch {
+        // ignore
+      }
+
+      const torrent = torrents?.[0];
+      if (!torrent) {
+        // nothing known — recreate progress card as fallback
+        await this.createOrUpdateTorrentsMessage(chatId, true);
+        return;
+      }
+
+      if (torrent.progress < 1) {
+        const uid = meta.uid ?? '';
+        const dlspeed = torrent.dlspeed ?? 0;
+        const speed = `${this.torrentService.formatBytes(dlspeed)}/s`;
+        const etaStr = (() => {
+          if (torrent.eta === undefined) return '∞';
+          if (torrent.eta >= 8_640_000) return '∞';
+          return this.torrentService.formatDuration(torrent.eta);
+        })();
+        const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
+        const text = t('torrent-message-in-progress', {
+          title: torrent.name ?? '',
+          seeds: torrent.num_seeds ?? 0,
+          maxSeeds: torrent.num_complete ?? 0,
+          peers: torrent.num_leechs ?? 0,
+          maxPeers: torrent.num_incomplete ?? 0,
+          speed,
+          eta: etaStr,
+          progress,
+          remove: `/rm_${uid}`,
+        });
+
+        const keyboard = new InlineKeyboard();
+        if (meta.uid) {
+          keyboard.text(
+            t('torrents-btn-files'),
+            `torrents:files:${meta.uid}:1`,
+          );
+          keyboard.text(
+            t('torrents-btn-remove'),
+            `torrents:remove:${meta.uid}:1`,
+          );
+        }
+
+        await this.bot.api.sendMessage(chatId, text, {
+          parse_mode: 'HTML',
+          reply_markup: keyboard,
+        });
+        return;
+      }
+
+      // completed
+      const uid = meta.uid ?? '';
+      const progress = `${Math.round(torrent.progress * 100 * 100) / 100}%`;
+      const text = t('torrent-message-completed', {
+        title: torrent.name ?? '',
+        progress,
+        files: uid ? `/ls_${uid}` : '',
+        remove: uid ? `/rm_${uid}` : '',
+      });
+
+      const keyboard = new InlineKeyboard();
+      if (meta.uid) {
+        keyboard.text(t('torrents-btn-files'), `torrents:files:${meta.uid}:1`);
+        keyboard.text(
+          t('torrents-btn-remove'),
+          `torrents:remove:${meta.uid}:1`,
+        );
+      }
+
+      await this.bot.api.sendMessage(chatId, text, {
+        parse_mode: 'HTML',
+        reply_markup: keyboard,
+      });
+      return;
+    } catch (error) {
+      this.logger.debug({ err: error }, 'Failed to send single torrent card');
+      await this.createOrUpdateTorrentsMessage(chatId, true);
+    }
   }
 
   /**

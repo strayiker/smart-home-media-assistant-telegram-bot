@@ -44,7 +44,13 @@ describe('TorrentHandler unit tests', () => {
       cleanupExpiredMessages: vi.fn().mockResolvedValue(0),
     };
 
-    mockBot = {} as Bot<MyContext> | undefined;
+    mockBot = {
+      api: {
+        sendMessage: vi.fn(),
+        editMessageText: vi.fn(),
+        deleteMessage: vi.fn(),
+      },
+    } as unknown as Bot<MyContext> | undefined;
 
     mockMessage = {
       chat: { id: chatId },
@@ -63,7 +69,7 @@ describe('TorrentHandler unit tests', () => {
       torrentService: mockTorrentService as TorrentService,
       logger: mockLogger as Logger,
       searchEngines: [],
-      bot: mockBot,
+      bot: mockBot as unknown as Bot<MyContext>,
       chatSettingsRepository: mockChatSettings,
       chatMessageStateRepository: mockChatMessageState,
     });
@@ -146,30 +152,32 @@ describe('TorrentHandler unit tests', () => {
       });
 
       // Simulate that QBittorrent reports completed torrent
-      (mockTorrentService as any).getTorrentsByHash = vi.fn().mockResolvedValue([
-        {
-          hash: 'abc123',
-          progress: 1,
-          dlspeed: 0,
-          eta: 0,
-          name: 'done',
-          num_seeds: 0,
-          num_complete: 0,
-          num_leechs: 0,
-          size: 100,
-        },
-      ]);
+      (mockTorrentService as any).getTorrentsByHash = vi
+        .fn()
+        .mockResolvedValue([
+          {
+            hash: 'abc123',
+            progress: 1,
+            dlspeed: 0,
+            eta: 0,
+            name: 'done',
+            num_seeds: 0,
+            num_complete: 0,
+            num_leechs: 0,
+            size: 100,
+          },
+        ]);
 
       // Ensure buildTorrentsList will include the meta — provide metas
-      mockTorrentService.getTorrentMetasByChatId = vi.fn().mockResolvedValue([
-        { hash: 'abc123', uid: 'engine_id_123' },
-      ] as any);
+      mockTorrentService.getTorrentMetasByChatId = vi
+        .fn()
+        .mockResolvedValue([{ hash: 'abc123', uid: 'engine_id_123' }] as any);
 
       await (handler as any).handleDownloadCommand(ctx);
 
       expect(mockTorrentService.downloadTorrentFile).toHaveBeenCalled();
       expect(mockTorrentService.addTorrent).toHaveBeenCalled();
-      expect(ctx.reply).toHaveBeenCalled();
+      expect((mockBot as any).api.sendMessage).toHaveBeenCalled();
     });
 
     it('recreates download card when existing torrent is pending', async () => {
@@ -188,19 +196,21 @@ describe('TorrentHandler unit tests', () => {
       });
 
       // Simulate that QBittorrent reports pending torrent
-      (mockTorrentService as any).getTorrentsByHash = vi.fn().mockResolvedValue([
-        {
-          hash: 'abc123',
-          progress: 0.5,
-          dlspeed: 100,
-          eta: 123,
-          name: 'downloading',
-          num_seeds: 1,
-          num_complete: 2,
-          num_leechs: 3,
-          size: 1000,
-        },
-      ]);
+      (mockTorrentService as any).getTorrentsByHash = vi
+        .fn()
+        .mockResolvedValue([
+          {
+            hash: 'abc123',
+            progress: 0.5,
+            dlspeed: 100,
+            eta: 123,
+            name: 'downloading',
+            num_seeds: 1,
+            num_complete: 2,
+            num_leechs: 3,
+            size: 1000,
+          },
+        ]);
 
       const spy = vi.spyOn(handler as any, 'createOrUpdateTorrentsMessage');
 
