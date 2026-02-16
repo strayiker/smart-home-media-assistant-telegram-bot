@@ -798,16 +798,39 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mikro-orm/migrations@npm:6.4.16":
-  version: 6.4.16
-  resolution: "@mikro-orm/migrations@npm:6.4.16"
+"@mikro-orm/knex@npm:6.6.7":
+  version: 6.6.7
+  resolution: "@mikro-orm/knex@npm:6.6.7"
   dependencies:
-    "@mikro-orm/knex": "npm:6.4.16"
-    fs-extra: "npm:11.3.0"
+    fs-extra: "npm:11.3.3"
+    knex: "npm:3.1.0"
+    sqlstring: "npm:2.3.3"
+  peerDependencies:
+    "@mikro-orm/core": ^6.0.0
+    better-sqlite3: "*"
+    libsql: "*"
+    mariadb: "*"
+  peerDependenciesMeta:
+    better-sqlite3:
+      optional: true
+    libsql:
+      optional: true
+    mariadb:
+      optional: true
+  checksum: 10c0/fe0b93b1ff652e949c69d19c2ee77e27eaa68e131dd921688838f9c356270e571abbe6cf6a96ced517ca809075aae1faa71f1fa7c2ad22dae35770dbdca6713f
+  languageName: node
+  linkType: hard
+
+"@mikro-orm/migrations@npm:6.6.7":
+  version: 6.6.7
+  resolution: "@mikro-orm/migrations@npm:6.6.7"
+  dependencies:
+    "@mikro-orm/knex": "npm:6.6.7"
+    fs-extra: "npm:11.3.3"
     umzug: "npm:3.8.2"
   peerDependencies:
     "@mikro-orm/core": ^6.0.0
-  checksum: 10c0/1d5beb2423c20879cffc9c51f035b2f24b963997bea4d69445f1686616686a3bd8d7b34c2081fcb421df24c0f14ee2c51b4ed01299b5c9dbf2af4fc4cbc22de5
+  checksum: 10c0/9531f8165c9fde891277641396e9b7762512cc3dccf2a1e125895862a3c71e5dddfab44f7ccbafb7f0c646ddaf3ff725fd69efa850ed4b3d0c92292736ab3a54
   languageName: node
   linkType: hard
 
@@ -4162,7 +4185,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:^11.0.0, fs-extra@npm:~11.3.0":
+"fs-extra@npm:11.3.3, fs-extra@npm:^11.0.0, fs-extra@npm:~11.3.0":
   version: 11.3.3
   resolution: "fs-extra@npm:11.3.3"
   dependencies:
@@ -7862,7 +7885,7 @@ __metadata:
     "@mikro-orm/better-sqlite": "npm:6.4.16"
     "@mikro-orm/cli": "npm:6.4.16"
     "@mikro-orm/core": "npm:6.4.16"
-    "@mikro-orm/migrations": "npm:6.4.16"
+    "@mikro-orm/migrations": "npm:6.6.7"
     "@mikro-orm/reflection": "npm:6.4.16"
     "@moebius/fluent": "npm:^1.1.0"
     "@semantic-release/git": "npm:^10.0.1"
