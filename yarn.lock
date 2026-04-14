@@ -804,6 +804,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mikro-orm/core@npm:6.6.10":
+  version: 6.6.10
+  resolution: "@mikro-orm/core@npm:6.6.10"
+  dependencies:
+    dataloader: "npm:2.2.3"
+    dotenv: "npm:17.3.1"
+    esprima: "npm:4.0.1"
+    fs-extra: "npm:11.3.3"
+    globby: "npm:11.1.0"
+    mikro-orm: "npm:6.6.10"
+    reflect-metadata: "npm:0.2.2"
+  checksum: 10c0/13fc37fa35d96f00ca7f3dc58545befb70ceffa5370cb4eff73e561cbd61c13c3c0e9aa3855e61a92334241a9fe0c8f279ce86969e109b51bd694bf8c1b77bbc
+  languageName: node
+  linkType: hard
+
 "@mikro-orm/knex@npm:6.4.16":
   version: 6.4.16
   resolution: "@mikro-orm/knex@npm:6.4.16"
@@ -3357,6 +3372,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dotenv@npm:17.3.1":
+  version: 17.3.1
+  resolution: "dotenv@npm:17.3.1"
+  checksum: 10c0/c78e0c2d5a549c751e544cc60e2b95e7cb67e0c551f42e094d161c6b297aa44b630a3c2dcacf5569e529a6c2a6b84e2ab9be8d37b299d425df5a18b81ce4a35f
+  languageName: node
+  linkType: hard
+
 "dotenv@npm:^16.5.0":
   version: 16.6.1
   resolution: "dotenv@npm:16.6.1"
@@ -5735,6 +5757,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mikro-orm@npm:6.6.10":
+  version: 6.6.10
+  resolution: "mikro-orm@npm:6.6.10"
+  checksum: 10c0/9358f44ec20ec6e1dcb8189475e7c1f5ea4c059349a0069118f2a1578392e930bab751977d179198d08c9d83b2e6f14e0626818f6be2b24e135932296ec94f34
+  languageName: node
+  linkType: hard
+
 "mime@npm:^4.0.0":
   version: 4.1.0
   resolution: "mime@npm:4.1.0"
@@ -7718,7 +7747,7 @@ __metadata:
     "@grammyjs/fluent": "npm:^1.0.3"
     "@mikro-orm/better-sqlite": "npm:6.4.16"
     "@mikro-orm/cli": "npm:6.4.16"
-    "@mikro-orm/core": "npm:6.4.16"
+    "@mikro-orm/core": "npm:6.6.10"
     "@mikro-orm/migrations": "npm:6.6.7"
     "@mikro-orm/reflection": "npm:6.4.16"
     "@moebius/fluent": "npm:^1.1.0"
