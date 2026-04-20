@@ -804,6 +804,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mikro-orm/core@npm:7.0.11":
+  version: 7.0.11
+  resolution: "@mikro-orm/core@npm:7.0.11"
+  peerDependencies:
+    dataloader: 2.2.3
+  peerDependenciesMeta:
+    dataloader:
+      optional: true
+  checksum: 10c0/d19a252a8e19590e46aab4552cd4e61e1b35292a9c38ab25f9e4b9d341bc7827503c83f0ce0a0ea7f1c8a73db4d80da7e2c6a7b3ae9fd5f4b578c500b0b516df
+  languageName: node
+  linkType: hard
+
 "@mikro-orm/knex@npm:6.4.16":
   version: 6.4.16
   resolution: "@mikro-orm/knex@npm:6.4.16"
@@ -7718,7 +7730,7 @@ __metadata:
     "@grammyjs/fluent": "npm:^1.0.3"
     "@mikro-orm/better-sqlite": "npm:6.4.16"
     "@mikro-orm/cli": "npm:6.4.16"
-    "@mikro-orm/core": "npm:6.4.16"
+    "@mikro-orm/core": "npm:7.0.11"
     "@mikro-orm/migrations": "npm:6.6.7"
     "@mikro-orm/reflection": "npm:6.4.16"
     "@moebius/fluent": "npm:^1.1.0"
