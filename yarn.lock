@@ -858,15 +858,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mikro-orm/reflection@npm:6.4.16":
-  version: 6.4.16
-  resolution: "@mikro-orm/reflection@npm:6.4.16"
+"@mikro-orm/reflection@npm:7.0.11":
+  version: 7.0.11
+  resolution: "@mikro-orm/reflection@npm:7.0.11"
   dependencies:
-    globby: "npm:11.1.0"
-    ts-morph: "npm:26.0.0"
+    ts-morph: "npm:28.0.0"
   peerDependencies:
-    "@mikro-orm/core": ^6.0.0
-  checksum: 10c0/b6716916e92fbcc06e172bd5fa03485a77b01740a992e4cf47b4f9396614ed5c64c12e9cd8c199cae0f443cbdc8c3ef734fe089c3271e530132a49ce620de060
+    "@mikro-orm/core": 7.0.11
+  checksum: 10c0/6116736bed96f90f978b12c55e1ad45ff13c6a3bc03250f7e44827ae1bcf0d0e16d3938ef519157ba2e8766c964932d6dc7d706e73a8d2c62e1f7289fb147761
   languageName: node
   linkType: hard
 
@@ -1724,14 +1723,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ts-morph/common@npm:~0.27.0":
-  version: 0.27.0
-  resolution: "@ts-morph/common@npm:0.27.0"
+"@ts-morph/common@npm:~0.29.0":
+  version: 0.29.0
+  resolution: "@ts-morph/common@npm:0.29.0"
   dependencies:
-    fast-glob: "npm:^3.3.3"
     minimatch: "npm:^10.0.1"
     path-browserify: "npm:^1.0.1"
-  checksum: 10c0/3daa267bd78114ff504eb064c5215da6e46589e775b781ec0da4998d999b0d7130eff287e70d6e13e0a0a897ea16e9387f4cd885b4b9d6d628f318cecb81d473
+    tinyglobby: "npm:^0.2.14"
+  checksum: 10c0/97ab8ca66558b817e5475a8893ee1476ab760a3ac71fa9868413d95ddbaaf909eda81716e3a8d14291cbf449e624af66de81bcddd3ec2e36525728b4edf5e8ee
   languageName: node
   linkType: hard
 
@@ -3943,7 +3942,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.2, fast-glob@npm:^3.3.3":
+"fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.2":
   version: 3.3.3
   resolution: "fast-glob@npm:3.3.3"
   dependencies:
@@ -7738,7 +7737,7 @@ __metadata:
     "@mikro-orm/cli": "npm:6.4.16"
     "@mikro-orm/core": "npm:7.0.11"
     "@mikro-orm/migrations": "npm:6.6.7"
-    "@mikro-orm/reflection": "npm:6.4.16"
+    "@mikro-orm/reflection": "npm:7.0.11"
     "@moebius/fluent": "npm:^1.1.0"
     "@semantic-release/git": "npm:^10.0.1"
     "@types/fluent-ffmpeg": "npm:^2.1.27"
@@ -8452,13 +8451,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-morph@npm:26.0.0":
-  version: 26.0.0
-  resolution: "ts-morph@npm:26.0.0"
+"ts-morph@npm:28.0.0":
+  version: 28.0.0
+  resolution: "ts-morph@npm:28.0.0"
   dependencies:
-    "@ts-morph/common": "npm:~0.27.0"
+    "@ts-morph/common": "npm:~0.29.0"
     code-block-writer: "npm:^13.0.3"
-  checksum: 10c0/c6880d90a1eefe0ce6555bf8c11cc104b1f36f84bd36a37a82b9ae0b974f51fe6b1bc91bb0ec42550158dc1c812329d6433e1237cba64f1ef515c129b321dd5d
+  checksum: 10c0/969570a5e983b4193735fff43878ce7b78787b4860bf3d23f330c86d7de707286969e5a82d486dce333eea27bf9d373a46f9de58a80c0bf86d2a462620563a55
   languageName: node
   linkType: hard
 
