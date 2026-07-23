@@ -10,7 +10,7 @@ jobs:
     steps:
       # checkout
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # to fetch all history for all branches and tags
       # setup node.js
@@ -53,7 +53,7 @@ jobs:
     steps:
       # checkout
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       # download build artifacts
       - name: Download Artifacts
         uses: actions/download-artifact@v8
@@ -88,7 +88,7 @@ jobs:
     steps:
       # checkout
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # to fetch all history for all branches and tags
       # setup node.js
