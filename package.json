@@ -41,7 +41,7 @@
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
     "reflect-metadata": "^0.1.13",
-    "tmp": "^0.2.3",
+    "tmp": "^0.2.7",
     "tough-cookie": "^5.1.2",
     "uuid": "^11.1.0",
     "zod": "^3.22.0"
