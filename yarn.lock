@@ -7764,7 +7764,7 @@ __metadata:
     prettier: "npm:^3.5.3"
     reflect-metadata: "npm:^0.1.13"
     semantic-release: "npm:^25.0.3"
-    tmp: "npm:^0.2.3"
+    tmp: "npm:^0.2.7"
     tough-cookie: "npm:^5.1.2"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.8.3"
@@ -8385,10 +8385,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tmp@npm:^0.2.3":
-  version: 0.2.5
-  resolution: "tmp@npm:0.2.5"
-  checksum: 10c0/cee5bb7d674bb4ba3ab3f3841c2ca7e46daeb2109eec395c1ec7329a91d52fcb21032b79ac25161a37b2565c4858fefab927af9735926a113ef7bac9091a6e0e
+"tmp@npm:^0.2.7":
+  version: 0.2.7
+  resolution: "tmp@npm:0.2.7"
+  checksum: 10c0/59eb55584f2f07210d3231b6a1f6b5c2b9794d8a7b509c8ee867ed2acad6d2245ee2448b7937b676ffbff3155a70077edde8a69f9d7cf0f90c86a62e8910c357
   languageName: node
   linkType: hard
 
